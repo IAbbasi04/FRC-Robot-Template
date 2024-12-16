@@ -256,8 +256,18 @@ public class PIDGainsProfile implements Sendable {
         this.gainsLogger.log("kD", kD);
     }
 
-    public void logAsProfiledPIDController() {
-
+    public PIDGainsProfile logAsProfiledPIDController() {
+        this.setP(gainsLogger.getEntry("kP").getDouble(kP));
+        this.setI(gainsLogger.getEntry("kI").getDouble(kI));
+        this.setD(gainsLogger.getEntry("kD").getDouble(kD));
+        this.setG(gainsLogger.getEntry("kG").getDouble(kG));
+        this.setA(gainsLogger.getEntry("kA").getDouble(kA));
+        this.setS(gainsLogger.getEntry("kS").getDouble(kS));
+        this.setV(gainsLogger.getEntry("kV").getDouble(kV));
+        this.setFF(gainsLogger.getEntry("kFF").getDouble(kFF));
+        this.setMaxVelocity(gainsLogger.getEntry("MaxVelocity").getDouble(maxVelocity));
+        this.setMaxAcceleration(gainsLogger.getEntry("MaxAccel").getDouble(maxAcceleration));
+        return this;
     }
 
     public PIDGainsProfile fromLoggedPIDController() {

@@ -297,6 +297,9 @@ public class SwerveSubsystem extends NewtonSubsystem {
      */
     public void setRobotRelative(boolean robotRelative){
         this.robotRelative = robotRelative;
+
+        // If we are setting robot relative externally override the consumer
+        logger.overrideReceiver("Is Robot Relative", robotRelative);
     }
 
     /**
@@ -464,11 +467,11 @@ public class SwerveSubsystem extends NewtonSubsystem {
                 newRobotPose = newRobotPose.transformBy(
                     new Transform2d(
                         new Translation2d(
-                            Constants.SIMULATION.SWERVE_TRANSLATE_DELTA * desiredSpeeds.vxMetersPerSecond,
-                            Constants.SIMULATION.SWERVE_TRANSLATE_DELTA * desiredSpeeds.vyMetersPerSecond
+                            Robot.CLOCK.dt() * desiredSpeeds.vxMetersPerSecond,
+                            Robot.CLOCK.dt() * desiredSpeeds.vyMetersPerSecond
                         ), 
                         Rotation2d.fromRadians(
-                            Constants.SIMULATION.SWERVE_ROTATE_DELTA * desiredSpeeds.omegaRadiansPerSecond   
+                            Robot.CLOCK.dt() * desiredSpeeds.omegaRadiansPerSecond   
                         )
                     )
                 );
@@ -477,11 +480,11 @@ public class SwerveSubsystem extends NewtonSubsystem {
                 newRobotPose = newRobotPose.transformBy(
                     new Transform2d(
                         new Translation2d(
-                            Constants.SIMULATION.SWERVE_TRANSLATE_DELTA * desiredSpeeds.vxMetersPerSecond,
-                            Constants.SIMULATION.SWERVE_TRANSLATE_DELTA * desiredSpeeds.vyMetersPerSecond
+                            Robot.CLOCK.dt() * desiredSpeeds.vxMetersPerSecond,
+                            Robot.CLOCK.dt() * desiredSpeeds.vyMetersPerSecond
                         ), 
                         Rotation2d.fromRadians(
-                            Constants.SIMULATION.SWERVE_ROTATE_DELTA* desiredSpeeds.omegaRadiansPerSecond   
+                            Robot.CLOCK.dt() * desiredSpeeds.omegaRadiansPerSecond   
                         )
                     )
                 );
@@ -499,8 +502,12 @@ public class SwerveSubsystem extends NewtonSubsystem {
         this.logger.log("Current Robot Pose", this.getCurrentPosition());
         this.logger.log("Reset Pose", this.resetPose);
         this.logger.log("Desired Chassis Speeds", this.desiredSpeeds);
-        this.logger.log("Is Robot Relative", this.robotRelative);
         this.logger.log("Current Drive Mode", driveMode);
+        this.logger.logReceiver(
+            "Is Robot Relative",
+            this.robotRelative, 
+            (relative) -> robotRelative = relative
+        );
     }
 
     /**
