@@ -2,6 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.apriltag.*;
 import edu.wpi.first.math.geometry.*;
+import lib.team8592.PIDGainsProfile;
 
 public final class Constants {
     public final class SHARED {
@@ -165,6 +166,12 @@ public final class Constants {
         public static final double MAX_VELOCITY_METERS_PER_SECOND = 4.5;
 
         public static final double DRIVE_TRAIN_RADIUS = 0.6;
+
+        public static final PIDGainsProfile SNAP_TO_GAINS = new PIDGainsProfile()
+        .setP(SWERVE.SNAP_TO_kP)
+        .setI(SWERVE.SNAP_TO_kI)
+        .setD(SWERVE.SNAP_TO_kD)
+        ;
     }
 
     public final class VISION {

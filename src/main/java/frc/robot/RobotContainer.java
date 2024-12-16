@@ -40,6 +40,8 @@ public class RobotContainer {
         this.configureBindings(ControlSets.DUAL_DRIVER);
         this.configureDefaults();
         this.registerNamedCommands();
+
+        this.activeSubsystemsManager.onRobotInit();
     }
 
     /**

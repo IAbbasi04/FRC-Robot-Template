@@ -18,19 +18,13 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.ReplanningConfig;
 
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.*;
-import lib.team8592.MatchMode;
-import lib.team8592.SmoothingFilter;
-import lib.team8592.Utils;
+import lib.team8592.*;
 import lib.team8592.hardware.swerve.CTRESwerve;
 import lib.team8592.hardware.swerve.CTRESwerve.SpeedConstants;
 import frc.robot.Constants.*;
@@ -49,8 +43,6 @@ public class SwerveSubsystem extends NewtonSubsystem {
         FIELD_RELATIVE
     }
 
-    private PIDController snapToController;
-
     private boolean isSlowMode;
     private boolean robotRelative;
 
@@ -64,6 +56,7 @@ public class SwerveSubsystem extends NewtonSubsystem {
 
     private DriveModes driveMode = DriveModes.AUTOMATIC;
 
+
     protected SwerveSubsystem(boolean logToShuffleboard) {
         super(logToShuffleboard);
 
@@ -72,8 +65,6 @@ public class SwerveSubsystem extends NewtonSubsystem {
             SWERVE.TRANSLATION_SMOOTHING_AMOUNT,
             SWERVE.ROTATION_SMOOTHING_AMOUNT
         );
-
-        snapToController = new PIDController(SWERVE.SNAP_TO_kP, SWERVE.SNAP_TO_kI, SWERVE.SNAP_TO_kD);
 
         // PID constants for the swerve's drive and steer controllers
         Slot0Configs driveGains = (
@@ -381,8 +372,7 @@ public class SwerveSubsystem extends NewtonSubsystem {
             errorAngle += 2*Math.PI;
         }
 
-        double out = snapToController.calculate(0, errorAngle);
-
+        double out = SWERVE.SNAP_TO_GAINS.toPIDController().calculate(0, errorAngle);
         return out;
     }
 
@@ -435,6 +425,12 @@ public class SwerveSubsystem extends NewtonSubsystem {
         }
 
         return currentSpeeds;
+    }
+
+    @Override
+    public void onRobotInit() {
+        // this.resetPose(Utils.mirrorPose(resetPose, Suppliers.robotRunningOnRed.getAsBoolean()));
+        // this.
     }
 
     @Override
@@ -508,6 +504,17 @@ public class SwerveSubsystem extends NewtonSubsystem {
             this.robotRelative, 
             (relative) -> robotRelative = relative
         );
+    }
+
+    @Override
+    public void periodicOutputs() {
+        if (Robot.MODE.is(MatchMode.DISABLED)) {
+            Pose2d newPose = new Pose2d(
+                getCurrentPosition().getTranslation(),
+                Suppliers.currentGyroscopeRotationOffset.get()
+            );
+            this.resetPose(newPose);
+        }
     }
 
     /**

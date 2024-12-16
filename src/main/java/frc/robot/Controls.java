@@ -58,8 +58,8 @@ public final class Controls {
 
         snapForward = driverController.pov(0);
         snapBack = driverController.pov(180);
-        snapLeft = driverController.pov(90);
-        snapRight = driverController.pov(270);
+        snapLeft = driverController.pov(270);
+        snapRight = driverController.pov(90);
     }
 
     /**

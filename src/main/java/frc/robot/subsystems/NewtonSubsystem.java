@@ -62,6 +62,8 @@ public abstract class NewtonSubsystem extends SubsystemBase {
     
     public void periodicOutputs() {}
 
+    public void onRobotInit() {}
+
     public abstract void onInit(MatchMode mode);
 
     public abstract void periodicLogs();

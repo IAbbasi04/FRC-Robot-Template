@@ -45,6 +45,15 @@ public class SubsystemManager extends SubsystemBase {
         activeSubystems.forEach(s -> s.onInit(mode));
     }
 
+    public void onRobotInit() {
+        NewtonSubsystem[] subs = new NewtonSubsystem[activeSubystems.size()];
+        for (int i = 0; i < activeSubystems.size(); i++) {
+            subs[i] = activeSubystems.get(i);
+        }
+
+        activeSubystems.forEach(s -> s.onRobotInit());
+    }
+
     @Override
     public void periodic() {
         this.activeSubystems.forEach(s -> {

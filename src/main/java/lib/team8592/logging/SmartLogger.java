@@ -119,28 +119,6 @@ public class SmartLogger {
         }
     }
 
-    // public void log(String key, ChassisSpeeds value) {
-    //     Logger.recordOutput(tableName + "/" + key, value); // Record to AdvantageKit logs
-    //     if (!this.logToShuffleboard) return; // Do not proceed if we do not want to log to shuffleboard
-    //     if (!initialized()) initialize(); // Initialize the shuffleboard tab if not already initialized
-    //     if (!dictionary.contains(key)) { // Card doesn't exist yet
-    //         dictionary.addEntry(key, new LoggerEntry(key, shuffleboardTab.add(key, value.toString()).getEntry()));
-    //     } else { // Card already exists
-    //         dictionary.getGenericEntry(key).setString(value.toString());
-    //     }
-    // }
-
-    // public void log(String key, Pose2d value) {
-    //     Logger.recordOutput(tableName + "/" + key, value); // Record to AdvantageKit logs
-    //     if (!this.logToShuffleboard) return; // Do not proceed if we do not want to log to shuffleboard
-    //     if (!initialized()) initialize(); // Initialize the shuffleboard tab if not already initialized
-    //     if (!dictionary.contains(key)) { // Card doesn't exist yet
-    //         dictionary.addEntry(key, new LoggerEntry(key, shuffleboardTab.add(key, value.toString()).getEntry()));
-    //     } else { // Card already exists
-    //         dictionary.getGenericEntry(key).setString(value.toString());
-    //     }
-    // }
-
     public void log(String key, StructSerializable value) {
         Logger.recordOutput(tableName + "/" + key, value); // Record to AdvantageKit logs
         if (!this.logToShuffleboard) return; // Do not proceed if we do not want to log to shuffleboard
@@ -153,7 +131,6 @@ public class SmartLogger {
     }
 
     public void logReceiver(String key, boolean defaultValue, Consumer<Boolean> consumer) {
-        key = key.concat("_(RECEIVER)"); // Indicate that this field is a receiver field
         if (!dictionary.contains(key)) { // Do not log if already logged
             this.log(key, defaultValue);
         }
@@ -164,7 +141,6 @@ public class SmartLogger {
     }
 
     public void overrideReceiver(String key, boolean override) {
-        key = key.concat("_(RECEIVER)"); // Indicate that this field is a receiver field
         if (dictionary.contains(key)) {
             dictionary.getLoggerEntry(key).override(override);
         }

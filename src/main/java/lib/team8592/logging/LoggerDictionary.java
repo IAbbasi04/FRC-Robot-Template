@@ -10,7 +10,7 @@ public class LoggerDictionary {
     protected LoggerDictionary() {}
 
     public boolean contains(String key) {
-        return Collections.list(cards.keys()).contains(key.concat("_(RECEIVER)"));
+        return Collections.list(cards.keys()).contains(key);
     }
 
     public void addEntry(String key, LoggerEntry entry) {

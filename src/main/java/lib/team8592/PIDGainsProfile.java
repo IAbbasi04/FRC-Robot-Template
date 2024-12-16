@@ -249,6 +249,8 @@ public class PIDGainsProfile implements Sendable {
     }
 
     public void logAsPIDController(String name) {
+        if (this.gainsLogger != null) return;
+
         this.gainsLogger = new SmartLogger(name).initialize();
 
         this.gainsLogger.log("kP", kP);
@@ -256,7 +258,22 @@ public class PIDGainsProfile implements Sendable {
         this.gainsLogger.log("kD", kD);
     }
 
-    public PIDGainsProfile logAsProfiledPIDController() {
+    public void logAsProfiledPIDController(String name) {
+        this.gainsLogger = new SmartLogger(name).initialize();
+
+        this.gainsLogger.log("kP", kP);
+        this.gainsLogger.log("kI", kI);
+        this.gainsLogger.log("kD", kD);
+        this.gainsLogger.log("kFF", kFF);
+        this.gainsLogger.log("kA", kA);
+        this.gainsLogger.log("kV", kV);
+        this.gainsLogger.log("kS", kS);
+        this.gainsLogger.log("kG", kG);
+        this.gainsLogger.log("MaxVelocity", maxVelocity);
+        this.gainsLogger.log("MaxAcceleration", maxAcceleration);
+    }
+
+    public PIDGainsProfile fromLoggedProfiledPIDController() {
         this.setP(gainsLogger.getEntry("kP").getDouble(kP));
         this.setI(gainsLogger.getEntry("kI").getDouble(kI));
         this.setD(gainsLogger.getEntry("kD").getDouble(kD));
@@ -266,7 +283,7 @@ public class PIDGainsProfile implements Sendable {
         this.setV(gainsLogger.getEntry("kV").getDouble(kV));
         this.setFF(gainsLogger.getEntry("kFF").getDouble(kFF));
         this.setMaxVelocity(gainsLogger.getEntry("MaxVelocity").getDouble(maxVelocity));
-        this.setMaxAcceleration(gainsLogger.getEntry("MaxAccel").getDouble(maxAcceleration));
+        this.setMaxAcceleration(gainsLogger.getEntry("MaxAcceleration").getDouble(maxAcceleration));
         return this;
     }
 
