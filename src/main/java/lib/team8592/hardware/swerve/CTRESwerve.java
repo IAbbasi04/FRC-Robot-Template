@@ -18,10 +18,9 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
-import frc.robot.Robot;
 
 public class CTRESwerve extends SwerveDrivetrain{
-    public final class SpeedConstants {
+    public static final class SpeedConstants {
         public final double MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND;
         public final double MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND;
 
@@ -63,10 +62,6 @@ public class CTRESwerve extends SwerveDrivetrain{
             .withRotationalDeadband(speedConstants.MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND * 0.001)
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
         );
-
-        if (!Robot.isReal()) {
-            startSimThread();
-        }
     }
 
     /**
@@ -152,7 +147,8 @@ public class CTRESwerve extends SwerveDrivetrain{
         this.seedFieldRelative(pose);
     }
 
-    private void startSimThread() {
+    public void startSimThread(boolean isSimulation) {
+        if (!isSimulation) return; // Do not run on real robot
         m_lastSimTime = Utils.getCurrentTimeSeconds();
 
         /* Run simulation at a faster rate so PID gains behave more reasonably */

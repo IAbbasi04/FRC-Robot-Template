@@ -5,70 +5,139 @@
 package frc.robot;
 
 import org.littletonrobotics.junction.LoggedRobot;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.*;
+import lib.team8592.MatchMode;
+import lib.team8592.RobotClock;
+import lib.team8592.field.FieldLayout;
+import lib.team8592.logging.LogUtils;
+import lib.team8592.logging.LogUtils.LogConstants;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-
+/**
+ * The VM is configured to automatically run this class, and to call the
+ * functions corresponding to
+ * each mode, as described in the TimedRobot documentation. If you change the
+ * name of this class or
+ * the package after creating this project, you must also update the
+ * build.gradle file in the
+ * project.
+ */
 public class Robot extends LoggedRobot {
-  private Command m_autonomousCommand;
+    private Command autonomousCommand;
+    private RobotContainer robotContainer;
 
-  private RobotContainer m_robotContainer;
+    public static MatchMode MODE = MatchMode.DISABLED;
+    public static RobotClock CLOCK = new RobotClock();
+    public static FieldLayout FIELD = FieldLayout.none();
 
-  @Override
-  public void robotInit() {
-    m_robotContainer = new RobotContainer();
-  }
+    /**
+     * This function is run when the robot is first started up and should be used
+     * for any
+     * initialization code.
+     */
+    @Override
+    public void robotInit() {
+        LogUtils.initialize(new LogConstants(
+            Constants.LOGGER.GAME, 
+            Constants.LOGGER.YEAR, 
+            Constants.LOGGER.ROBOT, 
+            Constants.LOGGER.TEAM
+        ), isSimulation());
 
-  @Override
-  public void robotPeriodic() {
-    CommandScheduler.getInstance().run();
-  }
-
-  @Override
-  public void disabledInit() {}
-
-  @Override
-  public void disabledPeriodic() {}
-
-  @Override
-  public void disabledExit() {}
-
-  @Override
-  public void autonomousInit() {
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.schedule();
+        this.robotContainer = new RobotContainer(!DriverStation.isFMSAttached());
+        
+        FIELD.logToShuffleboard(robotContainer.logToShuffleboard());
     }
-  }
 
-  @Override
-  public void autonomousPeriodic() {}
-
-  @Override
-  public void autonomousExit() {}
-
-  @Override
-  public void teleopInit() {
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
+    /**
+     * This function is called every 20 ms, no matter the mode. Use this for items
+     * like diagnostics
+     * that you want ran during disabled, autonomous, teleoperated and test.
+     *
+     * <p>
+     * This runs after the mode specific periodic functions, but before LiveWindow
+     * and
+     * SmartDashboard integrated updating.
+     */
+    @Override
+    public void robotPeriodic() {
+        // Runs the Scheduler. This is responsible for polling buttons, adding
+        // newly-scheduled
+        // commands, running already-scheduled commands, removing finished or
+        // interrupted commands,
+        // and running subsystem periodic() methods. This must be called from the
+        // robot's periodic
+        // block in order for anything in the Command-based framework to work.
+        CommandScheduler.getInstance().run();
+        Controls.logControlsToShuffleboard();
+        CLOCK.update();
+        LogUtils.logToSmartDashboard("Clock dt", CLOCK.dt());
     }
-  }
 
-  @Override
-  public void teleopPeriodic() {}
+    /** This function is called once each time the robot enters Disabled mode. */
+    @Override
+    public void disabledInit() {
+        MODE = MatchMode.DISABLED;
+        this.robotContainer.runSubsystemsInit(MODE);
+    }
 
-  @Override
-  public void teleopExit() {}
+    @Override
+    public void disabledPeriodic() {}
 
-  @Override
-  public void testInit() {
-    CommandScheduler.getInstance().cancelAll();
-  }
+    /**
+     * This autonomous runs the autonomous command selected by your
+     * {@link RobotContainer} class.
+     */
+    @Override
+    public void autonomousInit() {
+        autonomousCommand = robotContainer.getAutonomousCommand();
 
-  @Override
-  public void testPeriodic() {}
+        if (autonomousCommand != null) {
+            autonomousCommand.schedule();
+        }
 
-  @Override
-  public void testExit() {}
+        MODE = MatchMode.AUTONOMOUS;
+    }
+
+    /** This function is called periodically during autonomous. */
+    @Override
+    public void autonomousPeriodic() {}
+
+    @Override
+    public void teleopInit() {
+        // This makes sure that the autonomous stops running when
+        // teleop starts running. If you want the autonomous to
+        // continue until interrupted by another command, remove
+        // this line or comment it out.
+        if (autonomousCommand != null) {
+            autonomousCommand.cancel();
+        }
+
+        MODE = MatchMode.TELEOP;
+        this.robotContainer.runSubsystemsInit(MODE);
+    }
+
+    /** This function is called periodically during operator control. */
+    @Override
+    public void teleopPeriodic() {}
+
+    @Override
+    public void testInit() {
+        // Cancels all running commands at the start of test mode.
+        CommandScheduler.getInstance().cancelAll();
+        MODE = MatchMode.TEST;
+        this.robotContainer.runSubsystemsInit(MODE);
+    }
+
+    /** This function is called periodically during test mode. */
+    @Override
+    public void testPeriodic() {}
+
+    /** This function is called once when the robot is first started up. */
+    @Override
+    public void simulationInit() {}
+
+    /** This function is called periodically whilst in simulation. */
+    @Override
+    public void simulationPeriodic() {}
 }
