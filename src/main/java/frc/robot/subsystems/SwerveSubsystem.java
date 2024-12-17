@@ -56,7 +56,6 @@ public class SwerveSubsystem extends NewtonSubsystem {
 
     private DriveModes driveMode = DriveModes.AUTOMATIC;
 
-
     protected SwerveSubsystem(boolean logToShuffleboard) {
         super(logToShuffleboard);
 
@@ -262,6 +261,7 @@ public class SwerveSubsystem extends NewtonSubsystem {
             case AUTOMATIC:
                 this.desiredSpeeds = robotRelative ? 
                     speeds : ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getYaw());
+                
                 isFieldRelative = !robotRelative;
                 break;
         }
@@ -347,11 +347,10 @@ public class SwerveSubsystem extends NewtonSubsystem {
                 ),
                 pose.getRotation()
             );
-            // swerve.setKnownOdometryPose(flipped);
+            
             this.resetPose(flipped);
             return;
         }
-        // swerve.setKnownOdometryPose(pose);
         this.resetPose(pose);
     }
 
@@ -389,16 +388,23 @@ public class SwerveSubsystem extends NewtonSubsystem {
      * @return a ChassisSpeeds ready to be sent to the swerve.
      */
     public ChassisSpeeds processJoystickInputs(double rawX, double rawY, double rawRot){
+        double allianceBasedX = rawX; 
+        double allianceBasedY = rawY;
+        if (Suppliers.robotRunningOnRed.getAsBoolean()) {
+            allianceBasedX *= -1;
+            allianceBasedY *= -1;
+        }
+
         double driveTranslateY = (
-            rawY >= 0
-            ? (Math.pow(rawY, SWERVE.JOYSTICK_EXPONENT))
-            : -(Math.pow(rawY, SWERVE.JOYSTICK_EXPONENT))
+            allianceBasedY >= 0
+            ? (Math.pow(allianceBasedY, SWERVE.JOYSTICK_EXPONENT))
+            : -(Math.pow(allianceBasedY, SWERVE.JOYSTICK_EXPONENT))
         );
 
         double driveTranslateX = (
-            rawX >= 0
-            ? (Math.pow(rawX, SWERVE.JOYSTICK_EXPONENT))
-            : -(Math.pow(rawX, SWERVE.JOYSTICK_EXPONENT))
+            allianceBasedX >= 0
+            ? (Math.pow(allianceBasedX, SWERVE.JOYSTICK_EXPONENT))
+            : -(Math.pow(allianceBasedX, SWERVE.JOYSTICK_EXPONENT))
         );
 
         double driveRotate = (
@@ -428,10 +434,7 @@ public class SwerveSubsystem extends NewtonSubsystem {
     }
 
     @Override
-    public void onRobotInit() {
-        // this.resetPose(Utils.mirrorPose(resetPose, Suppliers.robotRunningOnRed.getAsBoolean()));
-        // this.
-    }
+    public void onRobotInit() {}
 
     @Override
     public void onInit(MatchMode mode) {

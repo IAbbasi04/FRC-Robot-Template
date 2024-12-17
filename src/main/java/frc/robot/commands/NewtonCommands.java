@@ -42,4 +42,20 @@ public final class NewtonCommands {
             manager.getSwerve().drive(processed, DriveModes.AUTOMATIC);
         });
     }
+
+    /**
+     * Command to drive the swerve with translation processed for human input and
+     * rotation controlled by the snap-to PID controller (snapping to the passed-in)
+     * angle
+     *
+     * @param angle the angle to snap to
+     * @param driveX a lambda returning the driver's X input
+     * @param driveY a lambda returning the driver's Y input
+     *
+     * @return the command
+     */
+    public static Command swerveSnapToCommand(Rotation2d angle, DoubleSupplier driveX, DoubleSupplier driveY, boolean isRunningOnRed){
+        Rotation2d allianceAngle = Suppliers.currentGyroscopeRotationOffset.get().plus(angle);
+        return swerveSnapToCommand(allianceAngle, driveX, driveY);
+    }
 }
