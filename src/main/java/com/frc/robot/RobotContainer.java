@@ -9,13 +9,16 @@ import com.frc.robot.commands.*;
 import com.frc.robot.commands.proxies.NewtonWrapperCommand;
 import com.frc.robot.subsystems.*;
 import com.frc.robot.subsystems.SwerveSubsystem.DriveModes;
+import com.frc.robot.unittest.UnitTestScheduler;
 import com.lib.team8592.MatchMode;
+import com.lib.team8592.logging.LogUtils;
 import com.frc.robot.Controls.ControlSets;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.*;
 
 public class RobotContainer {
+    private UnitTestScheduler testScheduler;
     private SubsystemManager activeSubsystemsManager;
     private SwerveSubsystem swerve;
 
@@ -27,6 +30,8 @@ public class RobotContainer {
      */
     public RobotContainer(boolean logToShuffleboard) {
         this.activeSubsystemsManager = new SubsystemManager(logToShuffleboard);
+        this.testScheduler = new UnitTestScheduler(activeSubsystemsManager);
+
         this.logToShuffleboard = logToShuffleboard;
         
         NewtonCommands.initialize(activeSubsystemsManager);
@@ -43,6 +48,7 @@ public class RobotContainer {
         this.registerNamedCommands();
 
         this.activeSubsystemsManager.onRobotInit();
+        LogUtils.addSendable(activeSubsystemsManager);
     }
 
     /**
@@ -147,5 +153,9 @@ public class RobotContainer {
      */
     public void runSubsystemsInit(MatchMode mode) {
         activeSubsystemsManager.onInit(mode);
+    }
+
+    public Command getUnitTestAsCommand() {
+        return this.testScheduler.getSelectedTest();
     }
 }

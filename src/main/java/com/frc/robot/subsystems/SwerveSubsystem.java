@@ -240,6 +240,8 @@ public class SwerveSubsystem extends NewtonSubsystem {
      * @param speeds the speeds to run the drivetrain at
      */
     public void drive(ChassisSpeeds speeds){
+        // If this subsystem is not in the active subsystems list do nothing
+        if (!isEnabled()) return;
         this.desiredSpeeds = speeds;
         swerve.drive(speeds, false);
     }
@@ -250,6 +252,9 @@ public class SwerveSubsystem extends NewtonSubsystem {
      * @param speeds the speeds to run the drivetrain at
      */
     public void drive(ChassisSpeeds speeds, DriveModes mode){
+        // If this subsystem is not in the active subsystems list do nothing
+        if (!isEnabled()) return;
+
         this.driveMode = mode;
         boolean isFieldRelative;
         switch(mode){
@@ -270,9 +275,7 @@ public class SwerveSubsystem extends NewtonSubsystem {
                 break;
         }
 
-        if (isEnabled()) { // If this subsystem is in the active subsystems list apply speeds
-            swerve.drive(speeds, isFieldRelative);
-        }
+        swerve.drive(speeds, isFieldRelative);
     }
 
     /**
@@ -466,6 +469,8 @@ public class SwerveSubsystem extends NewtonSubsystem {
     public void simulationPeriodic() {
         Pose2d newRobotPose = getCurrentPosition();
         switch (Robot.MODE) {
+            case TEST:
+            // Logic for driving in test mode works the same as teleop
             case TELEOP:
                 newRobotPose = newRobotPose.transformBy(
                     new Transform2d(
@@ -506,22 +511,12 @@ public class SwerveSubsystem extends NewtonSubsystem {
         this.logger.log("Reset Pose", this.resetPose);
         this.logger.log("Desired Chassis Speeds", this.desiredSpeeds);
         this.logger.log("Current Drive Mode", driveMode);
+        this.logger.log("Is Enabled", this.isEnabled());
         this.logger.logReceiver(
             "Is Robot Relative",
             this.robotRelative, 
             (relative) -> robotRelative = relative
         );
-    }
-
-    @Override
-    public void periodicOutputs() {
-        if (Robot.MODE.is(MatchMode.DISABLED)) {
-            Pose2d newPose = new Pose2d(
-                getCurrentPosition().getTranslation(),
-                Suppliers.currentGyroscopeRotationOffset.get()
-            );
-            this.resetPose(newPose);
-        }
     }
 
     /**

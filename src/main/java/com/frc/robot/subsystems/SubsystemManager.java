@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.lib.team8592.MatchMode;
 
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.*;
 
 public class SubsystemManager extends SubsystemBase {
@@ -67,7 +68,32 @@ public class SubsystemManager extends SubsystemBase {
     // Add all getSubsystem() methods below \\
     // ==================================== \\
 
+    public List<NewtonSubsystem> getAllSubsystemsAsList() {
+        return activeSubystems;
+    }
+
+    public NewtonSubsystem[] getAllSubsystemsAsArray() {
+        NewtonSubsystem[] subsystems = new NewtonSubsystem[activeSubystems.size()];
+        for (int i = 0; i < activeSubystems.size(); i++) {
+            subsystems[i] = activeSubystems.get(i);
+        }
+        return subsystems;
+    }
+
     public SwerveSubsystem getSwerve() {
         return this.swerveSubsystem;
+    }
+
+    @Override
+    public void initSendable(SendableBuilder builder) {
+        builder.setSmartDashboardType("SubsystemManager");
+        activeSubystems.forEach(sub -> {
+            builder.addBooleanProperty(sub.getName() + " Enabled", 
+                sub::isEnabled, 
+                (enable) -> {
+                    sub.enableSubsystem(enable);
+                }
+            );
+        });
     }
 }

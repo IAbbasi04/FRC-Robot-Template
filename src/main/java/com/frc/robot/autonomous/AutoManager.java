@@ -33,7 +33,7 @@ public final class AutoManager {
      */
     public static void prepare(SubsystemManager manager){
         AutoManager.manager = manager;
-        autoChooser = LogUtils.createSendableChooserWithDefault(
+        AutoManager.autoChooser = LogUtils.createSendableChooserWithDefault(
             AutoCommand.getDefaultAuto(), 
             List.of(
                 // Add all autos here

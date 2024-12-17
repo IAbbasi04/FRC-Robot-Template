@@ -72,7 +72,7 @@ public class LogUtils {
         SmartDashboard.putBoolean(key, value);
     }
 
-    public static void logSendable(Sendable sendable) {
+    public static void addSendable(Sendable sendable) {
         SmartDashboard.putData(sendable);
     }
 
