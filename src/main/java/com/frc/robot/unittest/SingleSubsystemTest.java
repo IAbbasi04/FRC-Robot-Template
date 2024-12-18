@@ -26,7 +26,7 @@ public abstract class SingleSubsystemTest<S extends NewtonSubsystem> extends Uni
     }
 
     @Override
-    public void update() {
+    public void run() {
         this.timer.start();
         this.subsystem.periodicLogs();
         this.updateTest();

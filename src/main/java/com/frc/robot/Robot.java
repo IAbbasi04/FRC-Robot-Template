@@ -4,6 +4,7 @@
 
 package com.frc.robot;
 
+
 import org.littletonrobotics.junction.LoggedRobot;
 
 import com.lib.team8592.MatchMode;
@@ -129,9 +130,7 @@ public class Robot extends LoggedRobot {
         CommandScheduler.getInstance().cancelAll();
         MODE = MatchMode.TEST;
         this.robotContainer.runSubsystemsInit(MODE);
-        CommandScheduler.getInstance().schedule(
-            robotContainer.getUnitTestAsCommand()
-        );
+        this.robotContainer.scheduleUnitTests();
     }
 
     /** This function is called periodically during test mode. */

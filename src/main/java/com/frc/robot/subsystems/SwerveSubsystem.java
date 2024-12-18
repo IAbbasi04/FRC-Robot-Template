@@ -234,6 +234,10 @@ public class SwerveSubsystem extends NewtonSubsystem {
         return this;
     }
 
+    public ChassisSpeeds getDesiredSpeeds() {
+        return this.desiredSpeeds;
+    }
+
     /**
      * Send a {@code ChassisSpeeds} to the drivetrain, robot-relative
      *

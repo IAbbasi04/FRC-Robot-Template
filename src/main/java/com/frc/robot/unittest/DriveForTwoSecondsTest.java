@@ -11,11 +11,6 @@ public class DriveForTwoSecondsTest extends SingleSubsystemTest<SwerveSubsystem>
     }
 
     @Override
-    public boolean isFinished() {
-        return timer.get() >= 2d;
-    }
-
-    @Override
     public void initTest() {}
 
     @Override
@@ -24,7 +19,24 @@ public class DriveForTwoSecondsTest extends SingleSubsystemTest<SwerveSubsystem>
     }
 
     @Override
-    public String getTestName() {
-        return "Drive for Two Seconds Test";
+    public String toString() {
+        return "Drive Forward for Two Seconds";
+    }
+
+    @Override
+    public boolean hasFailed() {
+        return timer.get() >= 1d && 
+            manager.getSwerve().getDesiredSpeeds().equals(new ChassisSpeeds());
+    }
+
+    @Override
+    public boolean hasSucceeded() {
+        return timer.get() >= 2d && 
+            manager.getSwerve().getDesiredSpeeds().equals(new ChassisSpeeds(2, 0, 0));
+    }
+
+    @Override
+    public boolean hasGivenUp() {
+        return timer.get() >= 3d;
     }
 }
