@@ -3,6 +3,7 @@ package com.frc.robot.subsystems;
 import com.lib.team8592.MatchMode;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.lib.team8592.logging.SmartLogger;
@@ -60,6 +61,16 @@ public abstract class NewtonSubsystem extends SubsystemBase {
         super.setDefaultCommand(command.withInterruptBehavior(InterruptionBehavior.kCancelSelf));
     }
 
+    public void removeDefaultCommand() {
+        super.removeDefaultCommand();
+    }
+
+    public Command getCurrentCommand() {
+        if (super.getCurrentCommand() == null) {// No command currently running
+            return Commands.none();
+        }
+        return super.getCurrentCommand();
+    }
     
     public void periodicOutputs() {}
 

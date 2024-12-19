@@ -30,6 +30,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+
 import com.lib.team8592.hardware.swerve.CTRESwerve;
 import com.lib.team8592.hardware.swerve.CTRESwerve.SpeedConstants;
 
@@ -211,6 +212,8 @@ public class SwerveSubsystem extends NewtonSubsystem {
             // Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackRight/SteerTargetAngle", modules[3].getTargetState().angle);
             // Logger.recordOutput(SWERVE.LOG_PATH+"Modules/BackRight/SteerReadVelocityRPM", modules[3].getSteerMotor().getVelocity().getValueAsDouble());
         });
+
+        swerve.startSimThread(Suppliers.robotIsReal.getAsBoolean());
     }
 
     public SwerveSubsystem initializeAutoBuilder() {
@@ -236,6 +239,10 @@ public class SwerveSubsystem extends NewtonSubsystem {
 
     public ChassisSpeeds getDesiredSpeeds() {
         return this.desiredSpeeds;
+    }
+
+    public ChassisSpeeds getCurrentSpeeds() {
+        return this.swerve.getCurrentSpeeds();
     }
 
     /**
@@ -474,7 +481,7 @@ public class SwerveSubsystem extends NewtonSubsystem {
         Pose2d newRobotPose = getCurrentPosition();
         switch (Robot.MODE) {
             case TEST:
-            // Logic for driving in test mode works the same as teleop
+                // Logic for driving in test mode works the same as teleop
             case TELEOP:
                 newRobotPose = newRobotPose.transformBy(
                     new Transform2d(
@@ -516,6 +523,9 @@ public class SwerveSubsystem extends NewtonSubsystem {
         this.logger.log("Desired Chassis Speeds", this.desiredSpeeds);
         this.logger.log("Current Drive Mode", driveMode);
         this.logger.log("Is Enabled", this.isEnabled());
+
+        this.logger.log("Current Command", getCurrentCommand().getName());
+
         this.logger.logReceiver(
             "Is Robot Relative",
             this.robotRelative, 

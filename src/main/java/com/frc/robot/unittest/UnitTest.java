@@ -1,6 +1,14 @@
 package com.frc.robot.unittest;
 
-public abstract class UnitTest {
+import com.frc.robot.subsystems.NewtonSubsystem;
+
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+
+public abstract class UnitTest extends Command {
+    protected Timer timer = new Timer();
+    
     public enum StatusType {
         kRunning("IS STILL RUNNING"),
         kSucceeded("PASSED"),
@@ -16,15 +24,11 @@ public abstract class UnitTest {
     }
 
     protected StatusType status = StatusType.kRunning;
+    
     /**
      * Sets up everything needed to begin the testing sequence
      */
-    public abstract void initialize();
-
-    /**
-     * Runs the testing sequence
-     */
-    public abstract void run();
+    public abstract Command initTest();
 
     /**
      * Did not achieve desired end result
@@ -49,12 +53,13 @@ public abstract class UnitTest {
     /**
      * Code ran once after the completion of the unit test
      */
-    public abstract void shutdown();
+    public abstract Command onFinish();
 
     /**
      * Current test is considered finished if it has passed or failed the requirements
      */
-    public boolean hasFinished() {
+    @Override
+    public boolean isFinished() {
         return hasFailed() || hasSucceeded() || hasGivenUp();
     }
 
@@ -68,19 +73,29 @@ public abstract class UnitTest {
     /**
      * Updates the status based on what the unit test end conditions return
      */
-    public void updateStatus() {
-        if (hasFinished()) {
-            if (hasFailed()) {
-                this.status = StatusType.kFailed;
-            } else if (hasSucceeded()) {
-                this.status = StatusType.kSucceeded;
-            } else if (hasGivenUp()) {
-                this.status = StatusType.kGivenUp;
+    public Command updateStatus() {
+        return Commands.run(() -> {
+            if (isFinished()) {
+                if (hasFailed()) {
+                    this.status = StatusType.kFailed;
+                } else if (hasSucceeded()) {
+                    this.status = StatusType.kSucceeded;
+                } else if (hasGivenUp()) {
+                    this.status = StatusType.kGivenUp;
+                } else {
+                    this.status = StatusType.kError;
+                }
             } else {
-                this.status = StatusType.kError;
+                this.status = StatusType.kRunning;
             }
-        } else {
-            this.status = StatusType.kRunning;
-        }
+        }, new NewtonSubsystem[0]);
     }
+
+    public Command updateTimer() {
+        return Commands.run(() -> {
+            timer.start();
+        }, new NewtonSubsystem[0]);
+    }
+
+    public abstract Command createTest();
 }

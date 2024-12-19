@@ -3,25 +3,16 @@ package com.frc.robot.unittest;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-
-import com.frc.robot.unittest.UnitTest.StatusType;
-
-import com.frc.robot.Suppliers;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 
 public class UnitTestSequence extends Command {
-    private Timer sequenceTimer = new Timer();
-    private UnitTest currentTest;
-    
-    private List<StatusType> testResults = new ArrayList<>(); // Whether each test passed or failed
-    private List<UnitTest> ranTests = new ArrayList<>(); // Tests that have already finished
-
-    private int currentIndex = 0;
+    private Command testCommand = null;
 
     /**
-     * Pass all tests you want to run in Robot.testPeriodic().
+     * Pass all tests you want to run in into the UnitTestScheduler.
      * 
      * Treated like a queue of sorts since the tests run in order and not
      * simultaneously.
@@ -33,59 +24,49 @@ public class UnitTestSequence extends Command {
      */
     public UnitTestSequence(List<UnitTest> tests) {
         this.testsToRun = tests;
+
+        Command[] commandArray = new Command[tests.size()];
+        for (int i = 0; i < tests.size(); i++) {
+            UnitTest currentTest = tests.get(i);
+            commandArray[i] = currentTest.initTest().andThen(
+                tests.get(i).createTest().deadlineWith(
+                    tests.get(i).updateStatus(),
+                    tests.get(i).updateTimer()
+                ).until(() -> currentTest.isFinished())
+            ).andThen(tests.get(i).onFinish())
+            .andThen(new WaitCommand(1.0));
+        }
+
+        this.testCommand = new SequentialCommandGroup(commandArray)
+            .until(() -> tests.get(tests.size()-1).isFinished());
     }
 
     @Override
     public void initialize() {
-        sequenceTimer.reset();
-        sequenceTimer.start();
-        currentTest = testsToRun.get(0);
-        currentTest.initialize();
+        testCommand.initialize();
     }
 
     @Override
     public void execute() {
-        if (!currentTest.equals(null)) { // If there are tests to run
-            currentTest.run(); // Runs through the current test plan
-            currentTest.updateStatus(); // Updates the ending status of the current unit test
-            if (currentTest.hasFinished()) { // Test has completed
-                currentTest.shutdown(); // Run the shutdown() of the currently running command
-                testResults.add(currentTest.getStatus()); // Records the ending status of the current test
-                ranTests.add(currentTest);
-                currentIndex++;
-
-                if (currentIndex == testsToRun.size()) { // No more tests left
-                    currentTest = null;
-                } else { // Move on to the next test
-                    currentTest = testsToRun.get(currentIndex);
-                    currentTest.initialize();
-                }
-            }
-        }
+        testCommand.execute();
     }
 
     @Override
     public boolean isFinished() {
-        return currentTest == null;
+        return testCommand.isFinished();
     }
 
     @Override
     public void end(boolean interrupted) {
+        testCommand.end(interrupted);
         if (interrupted) return; // Do nothing if test plan was interrupted
 
-        if (ranTests.size() != testResults.size()) {
+        for (UnitTest test : testsToRun) {
             System.out.println("\n\n===========================================================");
-            System.out.println("\u001B[31mError: Number of Ran Tests Does Not Match Number of Results\u001B[0m");
-            System.out.println("===========================================================\n\n");
-            return;
-        }
-
-        for (int i = 0; i < ranTests.size(); i++) {
-            System.out.println("\n\n===========================================================");
-            String displayedResult = ranTests.get(i).toString();
-            String displayedStatus = ranTests.get(i).getStatus().displayResult;
+            String displayedResult = test.toString();
+            String displayedStatus = test.getStatus().displayResult;
             String displayColor = "";
-            switch (ranTests.get(i).getStatus()) {
+            switch (test.getStatus()) {
                 case kFailed:
                     displayColor = "\u001B[31m"; // Red
                     break;
@@ -100,9 +81,7 @@ public class UnitTestSequence extends Command {
                     break;
             }
 
-            if (Suppliers.robotRunningOnRed.getAsBoolean()) {
-                SmartDashboard.putString("Unit Tests/" + displayedResult, displayedStatus);
-            }
+            SmartDashboard.putString("Unit Tests/" + displayedResult, displayedStatus);
             
             displayedResult += "... " + displayColor + displayedStatus + "\u001B[0m";
             System.out.println(displayedResult);

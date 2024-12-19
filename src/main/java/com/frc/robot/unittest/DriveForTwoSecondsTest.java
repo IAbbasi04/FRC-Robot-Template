@@ -1,21 +1,24 @@
 package com.frc.robot.unittest;
 
-import com.frc.robot.subsystems.SubsystemManager;
-import com.frc.robot.subsystems.SwerveSubsystem;
+import com.frc.robot.subsystems.*;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 
 public class DriveForTwoSecondsTest extends SingleSubsystemTest<SwerveSubsystem> {
+    private ChassisSpeeds appliedSpeeds = new ChassisSpeeds();
+
     protected DriveForTwoSecondsTest(SubsystemManager manager) {
         super(manager, manager.getSwerve());
     }
 
     @Override
-    public void initTest() {}
-
-    @Override
-    public void updateTest() {
-        manager.getSwerve().drive(new ChassisSpeeds(2, 0, 0));
+    public Command createTest() {
+        appliedSpeeds = new ChassisSpeeds(2d, 0d, 0d);
+        return manager.getSwerve().run(() -> {
+            manager.getSwerve().drive(appliedSpeeds);
+        });
     }
 
     @Override
@@ -25,14 +28,15 @@ public class DriveForTwoSecondsTest extends SingleSubsystemTest<SwerveSubsystem>
 
     @Override
     public boolean hasFailed() {
-        return timer.get() >= 1d && 
-            manager.getSwerve().getDesiredSpeeds().equals(new ChassisSpeeds());
+        return timer.get() >= 1d && manager.getSwerve().getCurrentSpeeds().equals(new ChassisSpeeds());
     }
 
     @Override
     public boolean hasSucceeded() {
-        return timer.get() >= 2d && 
-            manager.getSwerve().getDesiredSpeeds().equals(new ChassisSpeeds(2, 0, 0));
+        SmartDashboard.putString("AAA MMM", appliedSpeeds.toString());
+        SmartDashboard.putString("BBB MMM", manager.getSwerve().getCurrentSpeeds().toString());
+
+        return timer.get() >= 2d && manager.getSwerve().getCurrentSpeeds().equals(appliedSpeeds);
     }
 
     @Override

@@ -40,6 +40,10 @@ public class CTRESwerve extends SwerveDrivetrain{
 
     private Supplier<Rotation2d> currentGyroOffset = () -> new Rotation2d();
 
+    private ChassisSpeeds appliedSpeeds = new ChassisSpeeds();
+
+    private Supplier<Boolean> robotIsSimulation = () -> true;
+
     /**
      * Creates a new CTRESwerve (a class dedicated to tucking away the complexity of Phoenix 6)
      * @param driveTrainConstants the constants for the drivetrain as a whole
@@ -73,6 +77,8 @@ public class CTRESwerve extends SwerveDrivetrain{
      * is {@code false}, the drivetrain will run robot-relative instead
      */
     public void drive(ChassisSpeeds speeds, boolean isFieldRelative) {
+        this.appliedSpeeds = speeds;
+
         this.setControl(
             isFieldRelative ? getRequest(speeds, fieldRelativeDrive) : getRequest(speeds, robotRelativeDrive)
         );
@@ -101,6 +107,9 @@ public class CTRESwerve extends SwerveDrivetrain{
      * from the motors, then using kinematics to calculate what they mean)
      */
     public ChassisSpeeds getCurrentSpeeds(){
+        if (robotIsSimulation.get()) {
+            return appliedSpeeds;
+        }
         return m_cachedState.speeds;
     }
 
@@ -149,6 +158,8 @@ public class CTRESwerve extends SwerveDrivetrain{
 
     public void startSimThread(boolean isSimulation) {
         if (!isSimulation) return; // Do not run on real robot
+        this.robotIsSimulation = () -> isSimulation;
+
         m_lastSimTime = Utils.getCurrentTimeSeconds();
 
         /* Run simulation at a faster rate so PID gains behave more reasonably */

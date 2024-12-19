@@ -63,7 +63,7 @@ public class RobotContainer {
     /**
      * Configure default commands for the subsystems
      */
-    private void configureDefaults(){
+    public void configureDefaults(){
         // Set the swerve's default command to drive with joysticks
         swerve.setDefaultCommand(swerve.run(() -> {
             swerve.drive(swerve.processJoystickInputs(
@@ -72,6 +72,10 @@ public class RobotContainer {
                 Controls.driveRotate.getAsDouble()
             ), DriveModes.AUTOMATIC);
         }));
+    }
+
+    public void removeDefaults() {
+        swerve.removeDefaultCommand();
     }
 
     /**
@@ -158,6 +162,7 @@ public class RobotContainer {
     }
 
     public void scheduleUnitTests() {
+        testScheduler.getUnitTestCommand();
         CommandScheduler.getInstance().schedule(
             testScheduler.getUnitTestCommand()
         );

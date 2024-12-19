@@ -1,13 +1,12 @@
 package com.frc.robot.unittest;
 
-import com.frc.robot.subsystems.NewtonSubsystem;
-import com.frc.robot.subsystems.SubsystemManager;
+import com.frc.robot.subsystems.*;
 import com.lib.team8592.MatchMode;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
 
 public abstract class SingleSubsystemTest<S extends NewtonSubsystem> extends UnitTest {
-    protected Timer timer = new Timer();
     private S subsystem;
     protected SubsystemManager manager;
 
@@ -15,29 +14,20 @@ public abstract class SingleSubsystemTest<S extends NewtonSubsystem> extends Uni
         this.manager = manager;
         this.subsystem = subsystem;
 
-        timer.stop();
+        timer = new Timer();
         timer.reset();
     }
 
     @Override
-    public void initialize() {
-        this.subsystem.onInit(MatchMode.TEST);
-        this.initTest();
+    public Command initTest() {
+        return this.subsystem.runOnce(() -> {
+            this.subsystem.onInit(MatchMode.TEST);
+            this.timer.start();
+        });
     }
 
     @Override
-    public void run() {
-        this.timer.start();
-        this.subsystem.periodicLogs();
-        this.updateTest();
+    public Command onFinish() {
+        return this.subsystem.getStopCommand();
     }
-
-    @Override
-    public void shutdown() {
-        this.subsystem.stop();
-    }
-
-    public abstract void initTest();
-
-    public abstract void updateTest();
 }
