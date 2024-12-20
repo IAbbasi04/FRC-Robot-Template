@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.function.DoubleSupplier;
 
 import com.frc.robot.Constants.CONTROLLERS;
+import com.frc.robot.subsystems.NewtonSubsystem;
 
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -86,6 +87,11 @@ public final class Controls {
                 break;
         }
         
+    }
+
+    // TODO - Move this into a wrapper class for Trigger to make this easier
+    public static void onHold(Trigger trigger, Runnable action, NewtonSubsystem subsystem) {
+        trigger.whileTrue(subsystem.run(action)).onFalse(subsystem.getStopCommand());
     }
 
     public static void initializeShuffleboardLogs(boolean logToShuffleboard) {

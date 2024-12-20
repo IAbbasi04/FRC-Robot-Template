@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.*;
 public class RobotContainer {
     private SubsystemManager activeSubsystemsManager;
     private SwerveSubsystem swerve;
+    private PivotSubsystem pivot;
 
     private UnitTestScheduler testScheduler;
 
@@ -43,7 +44,8 @@ public class RobotContainer {
         Controls.initializeShuffleboardLogs(logToShuffleboard);
 
         // Add subsystems here
-        swerve = activeSubsystemsManager.getSwerve();
+        this.swerve = activeSubsystemsManager.getSwerve();
+        this.pivot = activeSubsystemsManager.getPivot();
 
         this.configureBindings(ControlSets.DUAL_DRIVER);
         this.configureDefaults();
@@ -136,6 +138,18 @@ public class RobotContainer {
                 Controls.driveTranslateY
             )
         );
+
+        Controls.getDriver().b().whileTrue(pivot.run(() -> {
+            pivot.reachSetpoint(0);
+        })).onFalse(pivot.getStopCommand());
+
+        Controls.getDriver().y().whileTrue(pivot.run(() -> {
+            pivot.reachSetpoint(90);
+        })).onFalse(pivot.getStopCommand());
+
+        Controls.getDriver().x().whileTrue(pivot.run(() -> {
+            pivot.reachSetpoint(-45);
+        })).onFalse(pivot.getStopCommand());
     }
 
     /**

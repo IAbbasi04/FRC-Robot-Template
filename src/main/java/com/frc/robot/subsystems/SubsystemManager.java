@@ -3,6 +3,7 @@ package com.frc.robot.subsystems;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.frc.robot.Suppliers;
 import com.lib.team8592.MatchMode;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -10,15 +11,18 @@ import edu.wpi.first.wpilibj2.command.*;
 
 public class SubsystemManager extends SubsystemBase {
     private SwerveSubsystem swerveSubsystem;
+    private PivotSubsystem pivotSubsystem;
 
     private List<NewtonSubsystem> activeSubystems = new ArrayList<>();
 
     public SubsystemManager(boolean logToShuffleboard) {
         this.swerveSubsystem = new SwerveSubsystem(logToShuffleboard);
+        this.pivotSubsystem = new PivotSubsystem(logToShuffleboard);
 
         this.activeSubystems = List.of(
             // Add all active subsystems here
-            swerveSubsystem
+            swerveSubsystem,
+            pivotSubsystem
         );
 
         this.activeSubystems.forEach(s -> {
@@ -61,6 +65,9 @@ public class SubsystemManager extends SubsystemBase {
         this.activeSubystems.forEach(s -> {
             s.periodicLogs();
             s.periodicOutputs();
+            if (Suppliers.robotIsReal.getAsBoolean()) {
+                s.simulationPeriodic();
+            }
         });
     }
 
@@ -95,5 +102,9 @@ public class SubsystemManager extends SubsystemBase {
 
     public SwerveSubsystem getSwerve() {
         return this.swerveSubsystem;
+    }
+
+    public PivotSubsystem getPivot() {
+        return this.pivotSubsystem;
     }
 }
