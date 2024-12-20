@@ -61,9 +61,10 @@ public class UnitTestSequence extends Command {
         testCommand.end(interrupted);
         if (interrupted) return; // Do nothing if test plan was interrupted
 
+        int index = 1;
         for (UnitTest test : testsToRun) {
             System.out.println("\n\n===========================================================");
-            String displayedResult = test.toString();
+            String displayedResult = String.format("Test [%s]: ", index) + test.toString();
             String displayedStatus = test.getStatus().displayResult;
             String displayColor = "";
             switch (test.getStatus()) {
@@ -86,6 +87,8 @@ public class UnitTestSequence extends Command {
             displayedResult += "... " + displayColor + displayedStatus + "\u001B[0m";
             System.out.println(displayedResult);
             System.out.println("===========================================================\n\n");
+
+            index++;
         }
     }
 }
