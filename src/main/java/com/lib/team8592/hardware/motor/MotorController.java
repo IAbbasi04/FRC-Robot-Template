@@ -3,17 +3,19 @@ package com.lib.team8592.hardware.motor;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.lib.team8592.PIDGainsProfile;
+import com.lib.team8592.PIDProfile;
 
 public abstract class MotorController {
-    protected List<PIDGainsProfile> motorPIDGains = new ArrayList<>();
+    protected List<PIDProfile> motorPIDGains = new ArrayList<>();
 
     public enum IdleMode {
         kBrake,
         kCoast
     }
 
-    public abstract void withGains(PIDGainsProfile gains);
+    public abstract void setInverted(boolean inverted);
+
+    public abstract void withGains(PIDProfile gains);
     
     public abstract void setPercentOutput(double percent);
 

@@ -1,7 +1,7 @@
 package com.lib.team8592.hardware.motor;
 
 import com.revrobotics.CANSparkBase.ControlType;
-import com.lib.team8592.PIDGainsProfile;
+import com.lib.team8592.PIDProfile;
 import com.lib.team8592.Utils;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -27,7 +27,12 @@ public class SparkMaxMotorController extends MotorController {
     }
 
     @Override
-    public void withGains(PIDGainsProfile gains) {
+    public void setInverted(boolean inverted) {
+        this.motor.setInverted(inverted);
+    }
+
+    @Override
+    public void withGains(PIDProfile gains) {
         super.motorPIDGains.add(gains.getSlot(), gains);
         
         this.motorCtrl.setP(gains.kP);

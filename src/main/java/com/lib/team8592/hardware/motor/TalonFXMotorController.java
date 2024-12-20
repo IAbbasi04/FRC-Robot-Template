@@ -5,7 +5,7 @@ import com.ctre.phoenix6.controls.*;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.lib.team8592.PIDGainsProfile;
+import com.lib.team8592.PIDProfile;
 import com.lib.team8592.Utils;
 
 public class TalonFXMotorController extends MotorController {
@@ -36,7 +36,12 @@ public class TalonFXMotorController extends MotorController {
     }
 
     @Override
-    public void withGains(PIDGainsProfile gains) {
+    public void setInverted(boolean inverted) {
+        this.motor.setInverted(inverted);
+    }
+
+    @Override
+    public void withGains(PIDProfile gains) {
         super.motorPIDGains.add(gains.getSlot(), gains);
         
         switch (gains.pidSlot) {

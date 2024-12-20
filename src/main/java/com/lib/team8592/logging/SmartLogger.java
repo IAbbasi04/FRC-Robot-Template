@@ -5,10 +5,13 @@ import java.util.function.Consumer;
 
 import org.littletonrobotics.junction.Logger;
 
+import com.lib.team8592.logging.LogUtils.WidgetProfile;
+
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.struct.StructSerializable;
 import edu.wpi.first.wpilibj.shuffleboard.*;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 public class SmartLogger {
     private String tableName = "";
@@ -144,6 +147,19 @@ public class SmartLogger {
         if (dictionary.contains(key)) {
             dictionary.getLoggerEntry(key).override(override);
         }
+    }
+
+    public <T> SendableChooser<T> createSendableChooserWithDefault(T defaultChoice, List<T> choices) {
+        SendableChooser<T> chooser = new SendableChooser<>();
+        chooser.setDefaultOption(defaultChoice.toString(), defaultChoice);
+        for (T choice : choices) {
+            chooser.addOption(choice.toString(), choice);
+        }
+        return chooser;
+    }
+
+    public void addSendable(Sendable sendable, WidgetProfile constants) {
+        this.shuffleboardTab.add(sendable).withPosition(constants.column, constants.row);
     }
 
     // TODO - Try to fix this sometime

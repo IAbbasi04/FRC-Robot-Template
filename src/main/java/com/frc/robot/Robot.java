@@ -4,6 +4,7 @@
 
 package com.frc.robot;
 
+
 import org.littletonrobotics.junction.LoggedRobot;
 
 import com.lib.team8592.MatchMode;
@@ -116,6 +117,7 @@ public class Robot extends LoggedRobot {
         }
 
         MODE = MatchMode.TELEOP;
+        this.robotContainer.configureDefaults();
         this.robotContainer.runSubsystemsInit(MODE);
     }
 
@@ -128,7 +130,9 @@ public class Robot extends LoggedRobot {
         // Cancels all running commands at the start of test mode.
         CommandScheduler.getInstance().cancelAll();
         MODE = MatchMode.TEST;
+        this.robotContainer.removeDefaults();
         this.robotContainer.runSubsystemsInit(MODE);
+        this.robotContainer.scheduleUnitTests();
     }
 
     /** This function is called periodically during test mode. */

@@ -5,7 +5,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.util.sendable.*;
 import com.lib.team8592.logging.SmartLogger;
 
-public class PIDGainsProfile implements Sendable {
+public class PIDProfile implements Sendable {
     private SmartLogger gainsLogger;
 
     public int pidSlot = 0;
@@ -38,11 +38,11 @@ public class PIDGainsProfile implements Sendable {
 
     public boolean useSmartMotion = false;
 
-    public PIDGainsProfile() {
+    public PIDProfile() {
         SendableRegistry.add(this, "PIDGainsProfile", 1);
     }
 
-    public PIDGainsProfile setP(double gain) {
+    public PIDProfile setP(double gain) {
         kP = gain;
         return this;
     }
@@ -51,7 +51,7 @@ public class PIDGainsProfile implements Sendable {
         return kP;
     }
 
-    public PIDGainsProfile setI(double gain) {
+    public PIDProfile setI(double gain) {
         kI = gain;
         return this;
     }
@@ -60,7 +60,7 @@ public class PIDGainsProfile implements Sendable {
         return kI;
     }
 
-    public PIDGainsProfile setD(double gain) {
+    public PIDProfile setD(double gain) {
         kD = gain;
         return this;
     }
@@ -69,7 +69,7 @@ public class PIDGainsProfile implements Sendable {
         return kD;
     }
 
-    public PIDGainsProfile setFF(double gain) {
+    public PIDProfile setFF(double gain) {
         kFF = gain;
         return this;
     }
@@ -78,7 +78,7 @@ public class PIDGainsProfile implements Sendable {
         return kFF;
     }
 
-    public PIDGainsProfile setV(double gain) {
+    public PIDProfile setV(double gain) {
         this.kV = gain;
         return this;
     }
@@ -87,7 +87,7 @@ public class PIDGainsProfile implements Sendable {
         return kV;
     }
 
-    public PIDGainsProfile setA(double gain) {
+    public PIDProfile setA(double gain) {
         this.kA = gain;
         return this;
     }
@@ -96,7 +96,7 @@ public class PIDGainsProfile implements Sendable {
         return kA;
     }
 
-    public PIDGainsProfile setS(double gain) {
+    public PIDProfile setS(double gain) {
         this.kS = gain;
         return this;
     }
@@ -105,7 +105,7 @@ public class PIDGainsProfile implements Sendable {
         return kS;
     }
 
-    public PIDGainsProfile setG(double gain) {
+    public PIDProfile setG(double gain) {
         this.kG = gain;
         return this;
     }
@@ -114,7 +114,7 @@ public class PIDGainsProfile implements Sendable {
         return kG;
     }
 
-    public PIDGainsProfile setMaxAcceleration(double gain) {
+    public PIDProfile setMaxAcceleration(double gain) {
         maxAcceleration = gain;
         useSmartMotion = true;
         return this;
@@ -124,7 +124,7 @@ public class PIDGainsProfile implements Sendable {
         return maxAcceleration;
     }
 
-    public PIDGainsProfile setMaxVelocity(double gain) {
+    public PIDProfile setMaxVelocity(double gain) {
         maxVelocity = gain;
         useSmartMotion = true;
         return this;
@@ -134,7 +134,7 @@ public class PIDGainsProfile implements Sendable {
         return maxVelocity;
     }
 
-    public PIDGainsProfile setSlot(int slot) {
+    public PIDProfile setSlot(int slot) {
         pidSlot = slot;
         return this;
     }
@@ -143,7 +143,7 @@ public class PIDGainsProfile implements Sendable {
         return pidSlot;
     }
 
-    public PIDGainsProfile setTolerance(double tolerance) {
+    public PIDProfile setTolerance(double tolerance) {
         this.tolerance = tolerance;
         return this;
     }
@@ -155,7 +155,7 @@ public class PIDGainsProfile implements Sendable {
     /**
      * Useful for continually rotating mechanisms
      */
-    public PIDGainsProfile setContinuousInput(double min, double max) {
+    public PIDProfile setContinuousInput(double min, double max) {
         this.continuousMin = min;
         this.continuousMax = max;
         this.continuousInput = true;
@@ -169,7 +169,7 @@ public class PIDGainsProfile implements Sendable {
     /**
      * Currently only works for neo motors
      */
-    public PIDGainsProfile setSoftLimits(double min, double max) {
+    public PIDProfile setSoftLimits(double min, double max) {
         this.softLimitMin = min;
         this.softLimitMax = max;
         this.softLimit = true;
@@ -190,7 +190,7 @@ public class PIDGainsProfile implements Sendable {
     /**
      * Sets a scaling factor for the output
      */
-    public PIDGainsProfile setScalingFactor(double scale) {
+    public PIDProfile setScalingFactor(double scale) {
         this.scale = scale;
         return this;
     }
@@ -205,7 +205,7 @@ public class PIDGainsProfile implements Sendable {
     /**
      * Sets a maximum current limit
      */
-    public PIDGainsProfile setCurrentLimit(int limit) {
+    public PIDProfile setCurrentLimit(int limit) {
         this.currentLimit = limit;
         return this;
     }
@@ -273,7 +273,7 @@ public class PIDGainsProfile implements Sendable {
         this.gainsLogger.log("MaxAcceleration", maxAcceleration);
     }
 
-    public PIDGainsProfile fromLoggedProfiledPIDController() {
+    public PIDProfile fromLoggedProfiledPIDController() {
         this.setP(gainsLogger.getEntry("kP").getDouble(kP));
         this.setI(gainsLogger.getEntry("kI").getDouble(kI));
         this.setD(gainsLogger.getEntry("kD").getDouble(kD));
@@ -287,7 +287,7 @@ public class PIDGainsProfile implements Sendable {
         return this;
     }
 
-    public PIDGainsProfile fromLoggedPIDController() {
+    public PIDProfile fromLoggedPIDController() {
         this.setP(gainsLogger.getEntry("kP").getDouble(kP));
         this.setI(gainsLogger.getEntry("kI").getDouble(kI));
         this.setD(gainsLogger.getEntry("kD").getDouble(kD));
