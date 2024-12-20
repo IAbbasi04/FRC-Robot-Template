@@ -64,6 +64,19 @@ public class SubsystemManager extends SubsystemBase {
         });
     }
 
+    @Override
+    public void initSendable(SendableBuilder builder) {
+        builder.setSmartDashboardType("SubsystemManager");
+        activeSubystems.forEach(sub -> {
+            builder.addBooleanProperty(sub.getName() + " Enabled", 
+                sub::isEnabled, 
+                (enable) -> {
+                    sub.enableSubsystem(enable);
+                }
+            );
+        });
+    }
+
     // ==================================== \\
     // Add all getSubsystem() methods below \\
     // ==================================== \\
@@ -82,18 +95,5 @@ public class SubsystemManager extends SubsystemBase {
 
     public SwerveSubsystem getSwerve() {
         return this.swerveSubsystem;
-    }
-
-    @Override
-    public void initSendable(SendableBuilder builder) {
-        builder.setSmartDashboardType("SubsystemManager");
-        activeSubystems.forEach(sub -> {
-            builder.addBooleanProperty(sub.getName() + " Enabled", 
-                sub::isEnabled, 
-                (enable) -> {
-                    sub.enableSubsystem(enable);
-                }
-            );
-        });
     }
 }

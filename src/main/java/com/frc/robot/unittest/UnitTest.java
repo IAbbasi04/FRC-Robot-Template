@@ -30,6 +30,8 @@ public abstract class UnitTest extends Command {
      */
     public abstract Command initTest();
 
+    public abstract Command createTest();
+
     /**
      * Did not achieve desired end result
      */
@@ -96,6 +98,4 @@ public abstract class UnitTest extends Command {
             timer.start();
         }, new NewtonSubsystem[0]);
     }
-
-    public abstract Command createTest();
 }

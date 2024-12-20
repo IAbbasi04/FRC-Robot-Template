@@ -13,8 +13,6 @@ public class UnitTestScheduler {
     public UnitTestScheduler(SubsystemManager manager) {
         UnitTestSequence testSequence = new UnitTestSequence(List.of(
             // Add all unit tests you want to run in sequence below
-            new DriveForTwoSecondsTest(manager),
-            new DriveForTwoSecondsTest(manager)
         ));
 
         this.unitTestCommand = testSequence.withInterruptBehavior(InterruptionBehavior.kCancelIncoming);

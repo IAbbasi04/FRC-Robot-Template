@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public abstract class SingleSubsystemTest<S extends NewtonSubsystem> extends UnitTest {
-    private S subsystem;
+    protected S subsystem;
     protected SubsystemManager manager;
 
     protected SingleSubsystemTest(SubsystemManager manager, S subsystem) {

@@ -1,6 +1,6 @@
 package com.lib.team8592.hardware.motor;
 
-import com.lib.team8592.PIDGainsProfile;
+import com.lib.team8592.PIDProfile;
 import com.lib.team8592.Utils;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.RelativeEncoder;
@@ -33,7 +33,7 @@ public class SparkFlexMotorController extends MotorController {
     }
 
     @Override
-    public void withGains(PIDGainsProfile gains) {
+    public void withGains(PIDProfile gains) {
         super.motorPIDGains.add(gains.getSlot(), gains);
 
         this.motorCtrl.setP(gains.kP);

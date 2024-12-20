@@ -1,6 +1,6 @@
 package com.frc.robot;
 
-import com.lib.team8592.PIDGainsProfile;
+import com.lib.team8592.PIDProfile;
 
 import edu.wpi.first.apriltag.*;
 import edu.wpi.first.math.geometry.*;
@@ -168,7 +168,7 @@ public final class Constants {
 
         public static final double DRIVE_TRAIN_RADIUS = 0.6;
 
-        public static final PIDGainsProfile SNAP_TO_GAINS = new PIDGainsProfile()
+        public static final PIDProfile SNAP_TO_GAINS = new PIDProfile()
         .setP(SWERVE.SNAP_TO_kP)
         .setI(SWERVE.SNAP_TO_kI)
         .setD(SWERVE.SNAP_TO_kD)

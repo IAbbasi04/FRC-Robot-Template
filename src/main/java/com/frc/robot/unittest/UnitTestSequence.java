@@ -63,7 +63,7 @@ public class UnitTestSequence extends Command {
 
         int index = 1;
         for (UnitTest test : testsToRun) {
-            System.out.println("\n\n===========================================================");
+            System.out.println("\n\n=================================================================================");
             String displayedResult = String.format("Test [%s]: ", index) + test.toString();
             String displayedStatus = test.getStatus().displayResult;
             String displayColor = "";
@@ -86,7 +86,7 @@ public class UnitTestSequence extends Command {
             
             displayedResult += "... " + displayColor + displayedStatus + "\u001B[0m";
             System.out.println(displayedResult);
-            System.out.println("===========================================================\n\n");
+            System.out.println("=================================================================================\n\n");
 
             index++;
         }
