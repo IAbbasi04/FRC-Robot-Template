@@ -13,6 +13,8 @@ public abstract class MotorController {
         kCoast
     }
 
+    public abstract void setInverted(boolean inverted);
+
     public abstract void withGains(PIDGainsProfile gains);
     
     public abstract void setPercentOutput(double percent);

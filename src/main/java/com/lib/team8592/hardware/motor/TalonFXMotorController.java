@@ -36,6 +36,11 @@ public class TalonFXMotorController extends MotorController {
     }
 
     @Override
+    public void setInverted(boolean inverted) {
+        this.motor.setInverted(inverted);
+    }
+
+    @Override
     public void withGains(PIDGainsProfile gains) {
         super.motorPIDGains.add(gains.getSlot(), gains);
         
