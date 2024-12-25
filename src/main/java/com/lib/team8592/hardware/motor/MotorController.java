@@ -7,9 +7,9 @@ import com.lib.team8592.PIDProfile;
 
 public abstract class MotorController {
     protected List<PIDProfile> motorPIDGains = new ArrayList<>();
+    protected List<NewtonFeedForward> feedForward = new ArrayList<>();
     protected int deviceID = 0;
     protected boolean reversed = false;
-    protected NewtonFeedForward feedForward = new NewtonFeedForward();
 
     protected MotorController(int id) {
         this(id, false);

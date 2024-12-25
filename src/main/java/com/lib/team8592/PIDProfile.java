@@ -14,10 +14,6 @@ public class PIDProfile implements Sendable {
     public double kI = 0;
     public double kD = 0;
     public double kFF = 0;
-    // public double kS = 0;
-    // public double kA = 0;
-    // public double kV = 0;
-    // public double kG = 0;
 
     public double maxAcceleration = Double.POSITIVE_INFINITY;
     public double maxVelocity = Double.POSITIVE_INFINITY;
@@ -41,7 +37,13 @@ public class PIDProfile implements Sendable {
     public NewtonFeedForward feedForward = new NewtonFeedForward();
 
     public PIDProfile() {
-        SendableRegistry.add(this, "PIDGainsProfile", 1);
+        SendableRegistry.add(this, this.class.getGenericName(), 1);
+    }
+
+    public PIDProfile setPID(double p, double i, double d) {
+        this.kP = p;
+        this.kI = i;
+        this.kD = d;
     }
 
     public PIDProfile setP(double gain) {
@@ -80,6 +82,15 @@ public class PIDProfile implements Sendable {
         return kFF;
     }
 
+    public PIDProfile setFeedForward(double kV, double kA, double kS) {
+        this.feedForward = new NewtonFeedForward(kV, kA, kS);
+        return this;
+    }
+
+    public PIDProfile setG(double kG, DoubleSupplier angle) {
+        this.feedForward.withKG(kG, angle);
+    }
+
     public PIDProfile setV(double gain) {
         this.kV = gain;
         this.feedForward.kV = gain;
@@ -92,6 +103,7 @@ public class PIDProfile implements Sendable {
 
     public PIDProfile setA(double gain) {
         this.kA = gain;
+        this.feedForward.kV = gain;
         return this;
     }
 
@@ -101,6 +113,7 @@ public class PIDProfile implements Sendable {
 
     public PIDProfile setS(double gain) {
         this.kS = gain;
+        this.feedForward.kV = gain;
         return this;
     }
 
