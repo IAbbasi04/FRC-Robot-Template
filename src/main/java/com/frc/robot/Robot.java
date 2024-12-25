@@ -32,6 +32,7 @@ public class Robot extends LoggedRobot {
     public static MatchMode MODE = MatchMode.DISABLED;
     public static RobotClock CLOCK = new RobotClock();
     public static FieldLayout FIELD = FieldLayout.none();
+    public static RobotProfile PROFILE = new RobotProfile(0d, 0d);
 
     /**
      * This function is run when the robot is first started up and should be used

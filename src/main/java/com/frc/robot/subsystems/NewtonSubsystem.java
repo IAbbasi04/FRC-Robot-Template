@@ -11,15 +11,12 @@ import com.lib.team8592.logging.SmartLogger;
 public abstract class NewtonSubsystem extends SubsystemBase {
     protected SmartLogger logger;
     protected boolean logToShuffleboard = false;
-    private boolean enabled = false;
+    protected boolean enabled = false;
+    protected boolean hasInit = false;
 
     protected NewtonSubsystem(boolean logToShuffleboard) {
         this.logToShuffleboard = logToShuffleboard;
         this.logger = new SmartLogger(getName(), logToShuffleboard);
-    }
-
-    public void initializeLogger() {
-        this.logger.initialize();
     }
 
     public boolean currentlyCommanded(){

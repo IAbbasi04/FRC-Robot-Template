@@ -42,6 +42,10 @@ public class PIDProfile implements Sendable {
         SendableRegistry.add(this, "PIDGainsProfile", 1);
     }
 
+    public PIDProfile setEstimatedP(double outputRange, double maxVelocity) {
+        return this.setP(120 * outputRange / Math.pow(maxVelocity, 2d));
+    }
+
     public PIDProfile setP(double gain) {
         kP = gain;
         return this;
@@ -250,8 +254,7 @@ public class PIDProfile implements Sendable {
 
     public void logAsPIDController(String name) {
         if (this.gainsLogger != null) return;
-
-        this.gainsLogger = new SmartLogger(name).initialize();
+        this.gainsLogger = new SmartLogger(name);
 
         this.gainsLogger.log("kP", kP);
         this.gainsLogger.log("kI", kI);
@@ -259,7 +262,8 @@ public class PIDProfile implements Sendable {
     }
 
     public void logAsProfiledPIDController(String name) {
-        this.gainsLogger = new SmartLogger(name).initialize();
+        if (this.gainsLogger != null) return;
+        this.gainsLogger = new SmartLogger(name);
 
         this.gainsLogger.log("kP", kP);
         this.gainsLogger.log("kI", kI);

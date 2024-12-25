@@ -12,9 +12,8 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.Trajectory.State;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.Timer;
-import com.frc.robot.subsystems.SwerveSubsystem;
+import com.frc.robot.subsystems.Swerve;
 import com.lib.team8592.logging.SmartLogger;
 
 public class FollowPathCommand extends LargeCommand {
@@ -41,14 +40,14 @@ public class FollowPathCommand extends LargeCommand {
     private SmartLogger logger;
 
     // Swerve
-    private SwerveSubsystem swerve;
+    private Swerve swerve;
 
     /**
      * Command to follow a trajectory assuming we always flip paths for red
      *
      * @param trajectory the trajectory to follow
      */
-    public FollowPathCommand(Trajectory trajectory, SwerveSubsystem swerve) {
+    public FollowPathCommand(Trajectory trajectory, Swerve swerve) {
         this(trajectory, () -> true, swerve);
     }
 
@@ -59,46 +58,29 @@ public class FollowPathCommand extends LargeCommand {
      * @param flip lambda that returns whether to mirror the path to the
      * red side of the field.
      */
-    public FollowPathCommand(Trajectory trajectory, BooleanSupplier flip, SwerveSubsystem swerve){
+    public FollowPathCommand(Trajectory trajectory, BooleanSupplier flip, Swerve swerve){
         super(swerve);
         this.swerve = swerve;
 
         this.trajectory = trajectory;
 
-        this.xController = new PIDController(
-            SWERVE.PATH_FOLLOW_TRANSLATE_kP,
-            SWERVE.PATH_FOLLOW_TRANSLATE_kI,
-            SWERVE.PATH_FOLLOW_TRANSLATE_kD
-        );
+        this.xController = SWERVE.PATH_FOLLOW_TRANSLATE_GAINS.toPIDController();
         this.xController.setTolerance(
             SWERVE.PATH_FOLLOW_POSITION_TOLERANCE,
             SWERVE.PATH_FOLLOW_VELOCITY_TOLERANCE
         );
 
-        this.yController = new PIDController(
-            SWERVE.PATH_FOLLOW_TRANSLATE_kP,
-            SWERVE.PATH_FOLLOW_TRANSLATE_kI,
-            SWERVE.PATH_FOLLOW_TRANSLATE_kD
-        );
+        this.yController = SWERVE.PATH_FOLLOW_TRANSLATE_GAINS.toPIDController();
         this.yController.setTolerance(
             SWERVE.PATH_FOLLOW_POSITION_TOLERANCE,
             SWERVE.PATH_FOLLOW_VELOCITY_TOLERANCE
         );
 
-        this.turnController = new ProfiledPIDController(
-            SWERVE.PATH_FOLLOW_ROTATE_kP,
-            SWERVE.PATH_FOLLOW_ROTATE_kI,
-            SWERVE.PATH_FOLLOW_ROTATE_kD,
-            new Constraints(
-                SWERVE.PATH_FOLLOW_ROTATE_MAX_VELOCITY,
-                SWERVE.PATH_FOLLOW_ROTATE_MAX_ACCELLERATION
-            )
-        );
+        this.turnController = SWERVE.PATH_FOLLOW_ROTATE_GAINS.toProfiledPIDController();
         this.turnController.setTolerance(
             SWERVE.PATH_FOLLOW_POSITION_TOLERANCE,
             SWERVE.PATH_FOLLOW_VELOCITY_TOLERANCE
         );
-        this.turnController.enableContinuousInput(-Math.PI, Math.PI);
 
         this.drivePID = new HolonomicDriveController(xController, yController, turnController);
         this.drivePID.setTolerance(
@@ -109,7 +91,6 @@ public class FollowPathCommand extends LargeCommand {
         );
 
         this.flip = flip;
-
         this.logger = new SmartLogger("PathFollower");
     }
 
@@ -140,7 +121,7 @@ public class FollowPathCommand extends LargeCommand {
         Trajectory trajectory, BooleanSupplier flip,
         BooleanSupplier useAlternateRotation, Supplier<Rotation2d> rotationSupplier,
         BooleanSupplier useAlternateTranslation, Supplier<ChassisSpeeds> translationSupplier,
-        SwerveSubsystem swerve
+        Swerve swerve
     ){
         this(trajectory, flip, swerve);
         this.useAlternateRotation = useAlternateRotation;
@@ -156,6 +137,7 @@ public class FollowPathCommand extends LargeCommand {
         // Stop the swerve
         swerve.drive(new ChassisSpeeds());
     }
+    
     public void execute(){
         // Instances of State contain information about pose, velocity, accelleration, curvature, etc.
         State desiredState = trajectory.sample(timer.get());
@@ -193,9 +175,11 @@ public class FollowPathCommand extends LargeCommand {
             swerve.resetPose(desiredState.poseMeters);
         }
     }
+
     public void end(boolean interrupted){
         swerve.drive(new ChassisSpeeds());
     }
+
     public boolean isFinished(){
         return ( // Only return true if enough time has elapsed, we're at the target location, and we're not using alternate movement.
             timer.hasElapsed(trajectory.getTotalTimeSeconds())

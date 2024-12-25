@@ -8,7 +8,7 @@ import com.frc.robot.autonomous.AutoManager;
 import com.frc.robot.commands.*;
 import com.frc.robot.commands.proxies.NewtonWrapperCommand;
 import com.frc.robot.subsystems.*;
-import com.frc.robot.subsystems.SwerveSubsystem.DriveModes;
+import com.frc.robot.subsystems.Swerve.DriveModes;
 import com.frc.robot.unittest.UnitTestScheduler;
 import com.lib.team8592.MatchMode;
 import com.lib.team8592.logging.LogUtils;
@@ -20,8 +20,8 @@ import edu.wpi.first.wpilibj2.command.*;
 
 public class RobotContainer {
     private SubsystemManager activeSubsystemsManager;
-    private SwerveSubsystem swerve;
-    private PivotSubsystem pivot;
+    private Swerve swerve;
+    // private Pivot pivot;
 
     private UnitTestScheduler testScheduler;
 
@@ -32,7 +32,7 @@ public class RobotContainer {
      * up button bindings, and prepares for autonomous.
      */
     public RobotContainer(boolean logToShuffleboard) {
-        this.activeSubsystemsManager = new SubsystemManager(logToShuffleboard);
+        this.activeSubsystemsManager = SubsystemManager.getInstance(logToShuffleboard);
         this.testScheduler = new UnitTestScheduler(activeSubsystemsManager);
 
         this.logToShuffleboard = logToShuffleboard;
@@ -45,7 +45,7 @@ public class RobotContainer {
 
         // Add subsystems here
         this.swerve = activeSubsystemsManager.getSwerve();
-        this.pivot = activeSubsystemsManager.getPivot();
+        // this.pivot = activeSubsystemsManager.getPivot();
 
         this.configureBindings(ControlSets.DUAL_DRIVER);
         this.configureDefaults();
@@ -139,17 +139,33 @@ public class RobotContainer {
             )
         );
 
-        Controls.getDriver().b().whileTrue(pivot.run(() -> {
-            pivot.reachSetpoint(0);
-        })).onFalse(pivot.getStopCommand());
+        Controls.getDriver().leftTrigger().whileTrue(activeSubsystemsManager.getSuperstructure().run(() -> {
+            activeSubsystemsManager.getSuperstructure().setPivotAngleRadians(0.2);
+        })).onFalse(activeSubsystemsManager.getSuperstructure().getStopCommand());
 
-        Controls.getDriver().y().whileTrue(pivot.run(() -> {
-            pivot.reachSetpoint(90);
-        })).onFalse(pivot.getStopCommand());
+        Controls.getDriver().rightTrigger().whileTrue(activeSubsystemsManager.getSuperstructure().run(() -> {
+            activeSubsystemsManager.getSuperstructure().setPivotAngleRadians(-0.2);
+        })).onFalse(activeSubsystemsManager.getSuperstructure().getStopCommand());
 
-        Controls.getDriver().x().whileTrue(pivot.run(() -> {
-            pivot.reachSetpoint(-45);
-        })).onFalse(pivot.getStopCommand());
+        Controls.getDriver().y().whileTrue(activeSubsystemsManager.getSuperstructure().run(() -> {
+            activeSubsystemsManager.getSuperstructure().setElevatorPositionMeters(0.2);
+        })).onFalse(activeSubsystemsManager.getSuperstructure().getStopCommand());
+
+        Controls.getDriver().a().whileTrue(activeSubsystemsManager.getSuperstructure().run(() -> {
+            activeSubsystemsManager.getSuperstructure().setElevatorPositionMeters(-0.2);
+        })).onFalse(activeSubsystemsManager.getSuperstructure().getStopCommand());
+
+        // Controls.getDriver().b().whileTrue(pivot.run(() -> {
+        //     pivot.reachSetpoint(0);
+        // })).onFalse(pivot.getStopCommand());
+
+        // Controls.getDriver().y().whileTrue(pivot.run(() -> {
+        //     pivot.reachSetpoint(90);
+        // })).onFalse(pivot.getStopCommand());
+
+        // Controls.getDriver().x().whileTrue(pivot.run(() -> {
+        //     pivot.reachSetpoint(-45);
+        // })).onFalse(pivot.getStopCommand());
     }
 
     /**

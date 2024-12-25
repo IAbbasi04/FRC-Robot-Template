@@ -10,7 +10,7 @@ import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkPIDController.AccelStrategy;
 
 public class SparkMaxMotorController extends MotorController {
-    public CANSparkMax motor; // Made public so it can be accessed as a follower
+    protected CANSparkMax motor; // Made protected so it can be accessed as a follower
     private SparkPIDController motorCtrl;
     private RelativeEncoder encoder;
 

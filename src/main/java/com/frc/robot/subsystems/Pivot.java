@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.simulation.*;
 import edu.wpi.first.wpilibj.smartdashboard.*;
 import edu.wpi.first.wpilibj.util.*;
 
-public class PivotSubsystem extends NewtonSubsystem {
+public class Pivot extends NewtonSubsystem {
     private DCMotor m_armGearbox = DCMotor.getNeoVortex(1);
 
     private final SingleJointedArmSim m_armSim = new SingleJointedArmSim(
@@ -29,17 +29,17 @@ public class PivotSubsystem extends NewtonSubsystem {
     private Encoder m_encoder = new Encoder(1, 2);
     private final EncoderSim m_encoderSim = new EncoderSim(m_encoder);
 
-    private final Mechanism2d m_mech2d = new Mechanism2d(60, 60);
-    private final MechanismRoot2d m_armPivot = m_mech2d.getRoot("ArmPivot", 30, 30);
+    private final Mechanism2d m_mech2d = new Mechanism2d(1, 1);
+    private final MechanismRoot2d m_armPivot = m_mech2d.getRoot("ArmPivot", 0.5, 0.5);
     
     private final MechanismLigament2d m_armTower =
-      m_armPivot.append(new MechanismLigament2d("ArmTower", 30, -90));
+      m_armPivot.append(new MechanismLigament2d("ArmTower", 0.5, -90));
     
     private final MechanismLigament2d m_arm =
       m_armPivot.append(
           new MechanismLigament2d(
               "Arm",
-              30,
+              0.5,
               Units.radiansToDegrees(m_armSim.getAngleRads()),
               6,
               new Color8Bit(Color.kYellow)));
@@ -49,7 +49,7 @@ public class PivotSubsystem extends NewtonSubsystem {
     private PIDProfile ARM_GAINS = new PIDProfile().setP(50d);
     private PIDController m_controller = ARM_GAINS.toPIDController();
 
-    protected PivotSubsystem(boolean logToShuffleboard) {
+    protected Pivot(boolean logToShuffleboard) {
         super(logToShuffleboard);
 
         this.m_encoder.setDistancePerPulse(2*Math.PI/4096);
@@ -78,7 +78,7 @@ public class PivotSubsystem extends NewtonSubsystem {
         m_arm.setAngle(Units.radiansToDegrees(m_armSim.getAngleRads()));
     }
 
-     /** Run the control loop to reach and maintain the setpoint from the preferences. */
+    /** Run the control loop to reach and maintain the setpoint from the preferences. */
     public void reachSetpoint(double armSetpointDegrees) {
         var pidOutput =
             m_controller.calculate(

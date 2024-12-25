@@ -19,6 +19,7 @@ import com.frc.robot.Robot;
 import com.frc.robot.Suppliers;
 import com.frc.robot.Constants.*;
 import com.lib.team8592.MatchMode;
+import com.lib.team8592.PIDProfile;
 import com.lib.team8592.SmoothingFilter;
 import com.lib.team8592.Utils;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -34,10 +35,10 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import com.lib.team8592.hardware.swerve.CTRESwerve;
 import com.lib.team8592.hardware.swerve.CTRESwerve.SpeedConstants;
 
-public class SwerveSubsystem extends NewtonSubsystem {
+public class Swerve extends NewtonSubsystem {
     /**
      * Small enum to control whether to drive robot- or field-
-     * relative for {@link SwerveSubsystem#drive(ChassisSpeeds, DriveModes)}
+     * relative for {@link Swerve#drive(ChassisSpeeds, DriveModes)}
      */
     public enum DriveModes{
         /** Drive robot-relative */
@@ -61,25 +62,36 @@ public class SwerveSubsystem extends NewtonSubsystem {
 
     private DriveModes driveMode = DriveModes.AUTOMATIC;
 
-    protected SwerveSubsystem(boolean logToShuffleboard) {
+    protected Swerve(boolean logToShuffleboard) {
         super(logToShuffleboard);
 
+        int translateSmoothing = SWERVE.TRANSLATION_SMOOTHING_AMOUNT;
+        int rotateSmoothing = SWERVE.ROTATION_SMOOTHING_AMOUNT;
+        if (!Suppliers.robotIsReal.getAsBoolean()) {
+            translateSmoothing = 10;
+            rotateSmoothing = 5;
+        }
+
         smoothingFilter = new SmoothingFilter(
-            SWERVE.TRANSLATION_SMOOTHING_AMOUNT,
-            SWERVE.TRANSLATION_SMOOTHING_AMOUNT,
-            SWERVE.ROTATION_SMOOTHING_AMOUNT
+            translateSmoothing,
+            translateSmoothing,
+            rotateSmoothing
         );
+
+        PIDProfile throttleGainsProfile = SWERVE.THROTTLE_MOTOR_GAINS;
+        PIDProfile steerGainsProfile = SWERVE.STEER_MOTOR_GAINS;
 
         // PID constants for the swerve's drive and steer controllers
         Slot0Configs driveGains = (
             new Slot0Configs()
-            .withKP(SWERVE.DRIVE_P).withKI(SWERVE.DRIVE_I).withKD(SWERVE.DRIVE_D)
-            .withKS(SWERVE.DRIVE_S).withKV(SWERVE.DRIVE_V).withKA(SWERVE.DRIVE_A)
+            .withKP(throttleGainsProfile.kP).withKI(throttleGainsProfile.kI).withKD(throttleGainsProfile.kD)
+            .withKS(throttleGainsProfile.kS).withKV(throttleGainsProfile.kV).withKA(throttleGainsProfile.kA)
         );
+
         Slot0Configs steerGains = (
             new Slot0Configs()
-            .withKP(SWERVE.STEER_P).withKI(SWERVE.STEER_I).withKD(SWERVE.STEER_D)
-            .withKS(SWERVE.STEER_S).withKV(SWERVE.STEER_V).withKA(SWERVE.STEER_A)
+            .withKP(steerGainsProfile.kP).withKI(steerGainsProfile.kI).withKD(steerGainsProfile.kD)
+            .withKS(steerGainsProfile.kS).withKV(steerGainsProfile.kV).withKA(steerGainsProfile.kA)
         );
 
         // Drivetrain configuration that doesn't involve the modules
@@ -216,7 +228,7 @@ public class SwerveSubsystem extends NewtonSubsystem {
         swerve.startSimThread(Suppliers.robotIsReal.getAsBoolean());
     }
 
-    public SwerveSubsystem initializeAutoBuilder() {
+    public Swerve initializeAutoBuilder() {
         AutoBuilder.configureHolonomic(
             swerve::getCurrentOdometryPosition, 
             this::resetPose,
@@ -400,7 +412,7 @@ public class SwerveSubsystem extends NewtonSubsystem {
      * @param rawY the raw Y input from a joystick. Should be -1 to 1
      * @param rawRot the raw rotation input from a joystick. Should be -1 to 1
      * @param fieldRelativeAllowed if this is true, switch between field- and
-     * robot-relative based on {@link SwerveSubsystem#robotRelative}. Otherwise, force
+     * robot-relative based on {@link Swerve#robotRelative}. Otherwise, force
      * robot-relative.
      *
      * @return a ChassisSpeeds ready to be sent to the swerve.

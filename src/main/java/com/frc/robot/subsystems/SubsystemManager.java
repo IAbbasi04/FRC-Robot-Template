@@ -10,24 +10,33 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.*;
 
 public class SubsystemManager extends SubsystemBase {
-    private SwerveSubsystem swerveSubsystem;
-    private PivotSubsystem pivotSubsystem;
+    private static SubsystemManager instance = null;
+    public static SubsystemManager getInstance(boolean logToShuffleboard) {
+        if (instance == null) instance = new SubsystemManager(logToShuffleboard);
+        return instance;
+    }
+
+    private Superstructure superstructure;
+
+    private Swerve swerve;
+    private Pivot pivot;
 
     private List<NewtonSubsystem> activeSubystems = new ArrayList<>();
 
-    public SubsystemManager(boolean logToShuffleboard) {
-        this.swerveSubsystem = new SwerveSubsystem(logToShuffleboard);
-        this.pivotSubsystem = new PivotSubsystem(logToShuffleboard);
+    private SubsystemManager(boolean logToShuffleboard) {
+        this.superstructure = new Superstructure(logToShuffleboard);
+        this.swerve = new Swerve(logToShuffleboard);
+        // this.pivotSubsystem = new PivotSubsystem(logToShuffleboard);
 
         this.activeSubystems = List.of(
             // Add all active subsystems here
-            swerveSubsystem,
-            pivotSubsystem
+            superstructure,
+            swerve
+            // pivotSubsystem
         );
 
         this.activeSubystems.forEach(s -> {
             s.enableSubsystem(true);
-            s.initializeLogger();
         });
     }
 
@@ -57,7 +66,10 @@ public class SubsystemManager extends SubsystemBase {
             subs[i] = activeSubystems.get(i);
         }
 
-        activeSubystems.forEach(s -> s.onRobotInit());
+        activeSubystems.forEach(s -> {
+            s.onRobotInit();
+            s.hasInit = true;
+        });
     }
 
     @Override
@@ -68,6 +80,8 @@ public class SubsystemManager extends SubsystemBase {
             if (Suppliers.robotIsReal.getAsBoolean()) {
                 s.simulationPeriodic();
             }
+
+            s.hasInit = true; // In case not already set
         });
     }
 
@@ -100,11 +114,15 @@ public class SubsystemManager extends SubsystemBase {
         return subsystems;
     }
 
-    public SwerveSubsystem getSwerve() {
-        return this.swerveSubsystem;
+    public Superstructure getSuperstructure() {
+        return this.superstructure;
     }
 
-    public PivotSubsystem getPivot() {
-        return this.pivotSubsystem;
+    public Swerve getSwerve() {
+        return this.swerve;
+    }
+
+    public Pivot getPivot() {
+        return this.pivot;
     }
 }

@@ -11,7 +11,7 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.SparkPIDController.AccelStrategy;
 
 public class SparkFlexMotorController extends MotorController {
-    public CANSparkFlex motor; // Made public so it can be accessed as a follower
+    protected CANSparkFlex motor; // Made protected so it can be accessed as a follower
     private SparkPIDController motorCtrl;
     private RelativeEncoder encoder;
 

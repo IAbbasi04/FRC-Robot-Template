@@ -62,27 +62,13 @@ public final class Constants {
         public static final int SWERVE_STEER_CURRENT_LIMIT = 40;
     }
 
+    public final class SUPERSTRUCTURE {
+        public static final double WIDTH_METERS = 1d;
+        public static final double HEIGHT_METERS = 1d;
+    }
+
     public final class SWERVE {
         public static final String LOG_PATH = SHARED.LOG_FOLDER+"/Swerve/";
-
-        public static final double STEER_P = 100;
-        public static final double STEER_I = 0;
-        public static final double STEER_D = 0.2;
-        public static final double STEER_S = 0;
-        public static final double STEER_V = 1.5;
-        public static final double STEER_A = 0;
-
-        public static final double DRIVE_P = 3;
-        public static final double DRIVE_I = 0;
-        public static final double DRIVE_D = 0;
-        public static final double DRIVE_S = 0;
-        public static final double DRIVE_V = 0;
-        public static final double DRIVE_A = 0;
-
-        //TODO: Double check that these PID constants still work
-        public static final double SNAP_TO_kP = 3.7;
-        public static final double SNAP_TO_kI = 0.0;
-        public static final double SNAP_TO_kD = 0.1;
 
         public static final int STEER_STATOR_CURRENT_LIMIT = 60;
 
@@ -115,11 +101,6 @@ public final class Constants {
         public static final Rotation2d BLUE_PERSPECTIVE_ROTATION = Rotation2d.fromDegrees(0);
         public static final Rotation2d RED_PERSPECTIVE_ROTATION = Rotation2d.fromDegrees(180);
 
-        // public static final double BLACK_FRONT_LEFT_STEER_OFFSET = -0.388427734375;
-        // public static final double ORANGE_FRONT_RIGHT_STEER_OFFSET = -0.462646484375;
-        // public static final double TEAL_BACK_LEFT_STEER_OFFSET = -0.18017578125;
-        // public static final double WHITE_BACK_RIGHT_STEER_OFFSET = -0.4853515625;
-
         //TODO: Set these
         public static final double BLACK_FRONT_LEFT_STEER_OFFSET = 0.062255859375;
         public static final double ORANGE_FRONT_RIGHT_STEER_OFFSET = -0.37890625;
@@ -132,34 +113,17 @@ public final class Constants {
         public static final boolean WHITE_BACK_RIGHT_STEER_INVERT = true;
 
 
-        //TODO: Set these
         public static final double BLACK_FRONT_LEFT_X_POSITION = 8.375;
         public static final double BLACK_FRONT_LEFT_Y_POSITION = 8.375;
 
-        //TODO: Set these
         public static final double ORANGE_FRONT_RIGHT_X_POSITION = 8.375;
         public static final double ORANGE_FRONT_RIGHT_Y_POSITION = -8.375;
 
-        //TODO: Set these
         public static final double TEAL_BACK_LEFT_X_POSITION = -8.375;
         public static final double TEAL_BACK_LEFT_Y_POSITION = 8.375;
 
-        //TODO: Set these
         public static final double WHITE_BACK_RIGHT_X_POSITION = -8.375;
         public static final double WHITE_BACK_RIGHT_Y_POSITION = -8.375;
-
-        //TODO: Double check that these still work
-        public static final double PATH_FOLLOW_TRANSLATE_kP = 6d;
-        public static final double PATH_FOLLOW_TRANSLATE_kI = 0d;
-        public static final double PATH_FOLLOW_TRANSLATE_kD = 0d;
-
-        //TODO: Double check that these still work
-        public static final double PATH_FOLLOW_ROTATE_kP = 3.7;
-        public static final double PATH_FOLLOW_ROTATE_kI = 0d;
-        public static final double PATH_FOLLOW_ROTATE_kD = 0.1;
-
-        public static final double PATH_FOLLOW_ROTATE_MAX_VELOCITY = 4 * Math.PI;
-        public static final double PATH_FOLLOW_ROTATE_MAX_ACCELLERATION = 2 * Math.PI;
 
         public static final double PATH_FOLLOW_POSITION_TOLERANCE = 0.1;
         public static final double PATH_FOLLOW_VELOCITY_TOLERANCE = 0.1;
@@ -168,10 +132,28 @@ public final class Constants {
 
         public static final double DRIVE_TRAIN_RADIUS = 0.6;
 
+        public static final PIDProfile THROTTLE_MOTOR_GAINS = new PIDProfile()
+            .setP(100d)
+            .setD(0.2)
+            .setV(1.5)
+            ;
+
+        public static final PIDProfile STEER_MOTOR_GAINS = new PIDProfile().setP(3d);
+
+        public static final PIDProfile PATH_FOLLOW_TRANSLATE_GAINS = new PIDProfile().setP(6d);
+
+        public static final PIDProfile PATH_FOLLOW_ROTATE_GAINS = new PIDProfile()
+            .setP(3.7)
+            .setD(0.1)
+            .setMaxVelocity(4 * Math.PI)
+            .setMaxAcceleration(2 * Math.PI)
+            .setContinuousInput(-Math.PI, Math.PI)
+            ;
+
         public static final PIDProfile SNAP_TO_GAINS = new PIDProfile()
-        .setP(SWERVE.SNAP_TO_kP)
-        .setI(SWERVE.SNAP_TO_kI)
-        .setD(SWERVE.SNAP_TO_kD)
+        .setP(3.7d)
+        .setI(0d)
+        .setD(0.1)
         ;
     }
 

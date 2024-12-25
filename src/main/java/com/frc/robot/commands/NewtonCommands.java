@@ -8,7 +8,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import com.frc.robot.subsystems.SubsystemManager;
-import com.frc.robot.subsystems.SwerveSubsystem.DriveModes;
+import com.frc.robot.subsystems.Swerve.DriveModes;
 
 public final class NewtonCommands {
     private static SubsystemManager manager;
