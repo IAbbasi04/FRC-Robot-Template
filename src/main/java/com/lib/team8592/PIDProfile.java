@@ -14,10 +14,10 @@ public class PIDProfile implements Sendable {
     public double kI = 0;
     public double kD = 0;
     public double kFF = 0;
-    public double kS = 0;
-    public double kA = 0;
-    public double kV = 0;
-    public double kG = 0;
+    // public double kS = 0;
+    // public double kA = 0;
+    // public double kV = 0;
+    // public double kG = 0;
 
     public double maxAcceleration = Double.POSITIVE_INFINITY;
     public double maxVelocity = Double.POSITIVE_INFINITY;
@@ -37,6 +37,8 @@ public class PIDProfile implements Sendable {
     public int currentLimit = -1;
 
     public boolean useSmartMotion = false;
+
+    public NewtonFeedForward feedForward = new NewtonFeedForward();
 
     public PIDProfile() {
         SendableRegistry.add(this, "PIDGainsProfile", 1);
@@ -80,6 +82,7 @@ public class PIDProfile implements Sendable {
 
     public PIDProfile setV(double gain) {
         this.kV = gain;
+        this.feedForward.kV = gain;
         return this;
     }
 

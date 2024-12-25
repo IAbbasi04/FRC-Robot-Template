@@ -21,6 +21,8 @@ public class TalonFXMotorController extends MotorController {
     }
 
     public TalonFXMotorController(int motorID, boolean reversed) {
+        super(motorID, reversed);
+        
         this.motor = new TalonFX(motorID);
         this.motor.setInverted(reversed);
 

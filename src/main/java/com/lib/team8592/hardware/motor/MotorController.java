@@ -7,6 +7,18 @@ import com.lib.team8592.PIDProfile;
 
 public abstract class MotorController {
     protected List<PIDProfile> motorPIDGains = new ArrayList<>();
+    protected int deviceID = 0;
+    protected boolean reversed = false;
+    protected NewtonFeedForward feedForward = new NewtonFeedForward();
+
+    protected MotorController(int id) {
+        this(id, false);
+    }
+
+    protected MotorController(int id, boolean reversed) {
+        this.deviceID = id;
+        this.reversed = reversed;
+    }
 
     public enum IdleMode {
         kBrake,
@@ -46,6 +58,14 @@ public abstract class MotorController {
     public abstract double getRotations();
 
     public abstract void resetEncoderPosition(double rotations);
+
+    public boolean isReversed() {
+        return this.reversed;
+    }
+
+    public int getDeviceID() {
+        return this.deviceID;
+    }
 
     public SparkFlexMotorController getAsSparkFlex() {
         return (SparkFlexMotorController)this;

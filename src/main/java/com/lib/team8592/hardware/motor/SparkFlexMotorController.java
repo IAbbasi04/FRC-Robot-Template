@@ -20,6 +20,7 @@ public class SparkFlexMotorController extends MotorController {
     }
 
     public SparkFlexMotorController(int motorID, boolean reversed) {
+        super(motorID, reversed);
         this.motor = new CANSparkFlex(motorID, MotorType.kBrushless);
         this.motorCtrl = motor.getPIDController();
         this.encoder = motor.getEncoder();
@@ -39,7 +40,9 @@ public class SparkFlexMotorController extends MotorController {
         this.motorCtrl.setP(gains.kP);
         this.motorCtrl.setI(gains.kI);
         this.motorCtrl.setD(gains.kD);
-        this.motorCtrl.setFF(gains.kFF);
+        // this.motorCtrl.setFF(gains.kFF);
+
+        this.feedForward = gains.feedForward;
 
         if (gains.softLimit) { // If soft limit values applied in the gains profile
             this.motor.enableSoftLimit(SoftLimitDirection.kForward, true);

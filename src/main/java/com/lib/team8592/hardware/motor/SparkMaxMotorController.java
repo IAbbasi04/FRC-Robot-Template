@@ -19,6 +19,7 @@ public class SparkMaxMotorController extends MotorController {
     }
 
     public SparkMaxMotorController(int motorID, boolean reversed) {
+        super(motorID, reversed);
         this.motor = new CANSparkMax(motorID, MotorType.kBrushless);
         this.motorCtrl = motor.getPIDController();
         this.encoder = motor.getEncoder();
@@ -38,9 +39,17 @@ public class SparkMaxMotorController extends MotorController {
         this.motorCtrl.setP(gains.kP);
         this.motorCtrl.setI(gains.kI);
         this.motorCtrl.setD(gains.kD);
-        this.motorCtrl.setFF(gains.kFF);
+        // this.motorCtrl.setFF(gains.kFF);
 
-        motorCtrl.setSmartMotionAllowedClosedLoopError(gains.getTolerance(), gains.getSlot());
+        if (gains.softLimit) { // If soft limit values applied in the gains profile
+            this.motor.enableSoftLimit(SoftLimitDirection.kForward, true);
+            this.motor.enableSoftLimit(SoftLimitDirection.kReverse, true);
+
+            this.motor.setSoftLimit(SoftLimitDirection.kForward, (float)gains.softLimitMax);
+            this.motor.setSoftLimit(SoftLimitDirection.kReverse, (float)gains.softLimitMin);
+        }
+
+        this.motorCtrl.setSmartMotionAllowedClosedLoopError(gains.getTolerance(), gains.getSlot());
         this.motorCtrl.setSmartMotionAccelStrategy(AccelStrategy.kTrapezoidal, gains.getSlot());
         this.motorCtrl.setSmartMotionMaxVelocity(gains.getMaxVelocity(), gains.getSlot());
         this.motorCtrl.setSmartMotionMaxAccel(gains.getMaxAcceleration(), gains.getSlot());
