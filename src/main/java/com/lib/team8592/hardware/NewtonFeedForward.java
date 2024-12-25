@@ -18,6 +18,18 @@ public class NewtonFeedForward {
         this.kS = kS;
     }
 
+    public NewtonFeedForward setV(double gain) {
+        this.kV = gain;
+    }
+
+    public NewtonFeedForward setA(double gain) {
+        this.kA = gain;
+    }
+
+    public NewtonFeedForward setS(double gain) {
+        this.kS = gain;
+    }
+
     public NewtonFeedForward withKG(double kG, DoubleSupplier angle) {
         this.angle = angle;
     }
