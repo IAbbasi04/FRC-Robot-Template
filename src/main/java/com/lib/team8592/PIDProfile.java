@@ -3,6 +3,10 @@ package com.lib.team8592;
 import edu.wpi.first.math.controller.*;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.util.sendable.*;
+
+import java.util.function.DoubleSupplier;
+
+import com.lib.team8592.hardware.NewtonFeedForward;
 import com.lib.team8592.logging.SmartLogger;
 
 public class PIDProfile implements Sendable {
@@ -36,14 +40,18 @@ public class PIDProfile implements Sendable {
 
     public NewtonFeedForward feedForward = new NewtonFeedForward();
 
+    private static int instances = 0;
+
     public PIDProfile() {
-        SendableRegistry.add(this, this.class.getGenericName(), 1);
+        SendableRegistry.add(this, this.getClass().getSimpleName(), instances);
+        instances++;
     }
 
     public PIDProfile setPID(double p, double i, double d) {
         this.kP = p;
         this.kI = i;
         this.kD = d;
+        return this;
     }
 
     public PIDProfile setP(double gain) {
@@ -87,47 +95,43 @@ public class PIDProfile implements Sendable {
         return this;
     }
 
-    public PIDProfile setG(double kG, DoubleSupplier angle) {
-        this.feedForward.withKG(kG, angle);
-    }
-
     public PIDProfile setV(double gain) {
-        this.kV = gain;
-        this.feedForward.kV = gain;
+        this.feedForward.setV(gain);
         return this;
     }
 
     public double getV() {
-        return kV;
+        return this.feedForward.kV;
     }
 
     public PIDProfile setA(double gain) {
-        this.kA = gain;
+        this.feedForward.setA(gain);
         this.feedForward.kV = gain;
         return this;
     }
 
     public double getA() {
-        return kA;
+        return this.feedForward.kA;
     }
 
     public PIDProfile setS(double gain) {
-        this.kS = gain;
-        this.feedForward.kV = gain;
+        this.feedForward.setS(gain);
+        this.feedForward.kS = gain;
         return this;
     }
 
     public double getS() {
-        return kS;
+        return this.feedForward.kS;
     }
 
-    public PIDProfile setG(double gain) {
-        this.kG = gain;
+    public PIDProfile setG(double gain, DoubleSupplier angle) {
+        this.feedForward.withKG(gain, angle);
+        this.feedForward.kG = gain;
         return this;
     }
 
     public double getG() {
-        return kG;
+        return this.feedForward.kG;
     }
 
     public PIDProfile setMaxAcceleration(double gain) {
@@ -277,26 +281,26 @@ public class PIDProfile implements Sendable {
     public void logAsProfiledPIDController(String name) {
         this.gainsLogger = new SmartLogger(name).initialize();
 
-        this.gainsLogger.log("kP", kP);
-        this.gainsLogger.log("kI", kI);
-        this.gainsLogger.log("kD", kD);
-        this.gainsLogger.log("kFF", kFF);
-        this.gainsLogger.log("kA", kA);
-        this.gainsLogger.log("kV", kV);
-        this.gainsLogger.log("kS", kS);
-        this.gainsLogger.log("kG", kG);
+        this.gainsLogger.log("kP", getP());
+        this.gainsLogger.log("kI", getI());
+        this.gainsLogger.log("kD", getD());
+        this.gainsLogger.log("kFF", getFF());
+        this.gainsLogger.log("kA", getA());
+        this.gainsLogger.log("kV", getV());
+        this.gainsLogger.log("kS", getS());
+        this.gainsLogger.log("kG", getG());
         this.gainsLogger.log("MaxVelocity", maxVelocity);
         this.gainsLogger.log("MaxAcceleration", maxAcceleration);
     }
 
     public PIDProfile fromLoggedProfiledPIDController() {
-        this.setP(gainsLogger.getEntry("kP").getDouble(kP));
-        this.setI(gainsLogger.getEntry("kI").getDouble(kI));
-        this.setD(gainsLogger.getEntry("kD").getDouble(kD));
-        this.setG(gainsLogger.getEntry("kG").getDouble(kG));
-        this.setA(gainsLogger.getEntry("kA").getDouble(kA));
-        this.setS(gainsLogger.getEntry("kS").getDouble(kS));
-        this.setV(gainsLogger.getEntry("kV").getDouble(kV));
+        this.setP(gainsLogger.getEntry("kP").getDouble(getP()));
+        this.setI(gainsLogger.getEntry("kI").getDouble(getI()));
+        this.setD(gainsLogger.getEntry("kD").getDouble(getD()));
+        this.setG(gainsLogger.getEntry("kG").getDouble(getG()), () -> 0.0);
+        this.setA(gainsLogger.getEntry("kA").getDouble(getA()));
+        this.setS(gainsLogger.getEntry("kS").getDouble(getS()));
+        this.setV(gainsLogger.getEntry("kV").getDouble(getV()));
         this.setFF(gainsLogger.getEntry("kFF").getDouble(kFF));
         this.setMaxVelocity(gainsLogger.getEntry("MaxVelocity").getDouble(maxVelocity));
         this.setMaxAcceleration(gainsLogger.getEntry("MaxAcceleration").getDouble(maxAcceleration));
@@ -320,7 +324,7 @@ public class PIDProfile implements Sendable {
         builder.addDoubleProperty("s", this::getS, this::setS);
         builder.addDoubleProperty("a", this::getA, this::setA);
         builder.addDoubleProperty("v", this::getV, this::setV);
-        builder.addDoubleProperty("g", this::getG, this::setG);
+        builder.addDoubleProperty("g", this::getG, (gain) -> {this.setG(gain, () -> 0d);});
         builder.addDoubleProperty("maxVelocity", this::getMaxVelocity, this::setMaxVelocity);
         builder.addDoubleProperty("maxAccel", this::getMaxAcceleration, this::setMaxAcceleration);
     }

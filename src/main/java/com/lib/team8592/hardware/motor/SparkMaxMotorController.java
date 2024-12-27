@@ -1,26 +1,14 @@
 package com.lib.team8592.hardware.motor;
 
-import com.lib.team8592.PIDProfile;
-import com.lib.team8592.Utils;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkPIDController;
-import com.revrobotics.CANSparkBase.ControlType;
-import com.revrobotics.CANSparkBase.SoftLimitDirection;
 import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.SparkPIDController.AccelStrategy;
 
-public class SparkFlexMotorController extends SparkBaseMotorController<CANSparkMax> {
-    public SparkFlexMotorController(int motorID) {
+public class SparkMaxMotorController extends SparkBaseMotorController<CANSparkMax> {
+    public SparkMaxMotorController(int motorID) {
         this(motorID, false);
     }
 
-    public SparkFlexMotorController(int motorID, boolean reversed) {
-        super(new CANSparkFlex(motorID), reversed);
-        this.motor = new CANSparkFlex(motorID, MotorType.kBrushless);
-        this.motorCtrl = motor.getPIDController();
-        this.encoder = motor.getEncoder();
-
-        this.motor.setInverted(reversed);
+    public SparkMaxMotorController(int motorID, boolean reversed) {
+        super(new CANSparkMax(motorID, MotorType.kBrushless), reversed);
     }
 }

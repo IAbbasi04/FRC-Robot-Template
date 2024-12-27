@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.lib.team8592.PIDProfile;
+import com.lib.team8592.hardware.NewtonFeedForward;
 
 public abstract class MotorController {
     protected List<PIDProfile> motorPIDGains = new ArrayList<>();

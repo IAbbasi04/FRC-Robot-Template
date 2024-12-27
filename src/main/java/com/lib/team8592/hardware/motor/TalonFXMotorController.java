@@ -52,10 +52,10 @@ public class TalonFXMotorController extends MotorController {
                     .withKP(gains.kP)
                     .withKI(gains.kI)
                     .withKD(gains.kD)
-                    .withKA(gains.kA)
-                    .withKV(gains.kV)
-                    .withKG(gains.kG)
-                    .withKS(gains.kS);
+                    .withKA(gains.feedForward.kA)
+                    .withKV(gains.feedForward.kV)
+                    .withKG(gains.feedForward.kG)
+                    .withKS(gains.feedForward.kS);
 
                 this.motor.getConfigurator().apply(slot0Config);
             case 1:
@@ -63,10 +63,10 @@ public class TalonFXMotorController extends MotorController {
                     .withKP(gains.kP)
                     .withKI(gains.kI)
                     .withKD(gains.kD)
-                    .withKA(gains.kA)
-                    .withKV(gains.kV)
-                    .withKG(gains.kG)
-                    .withKS(gains.kS);
+                    .withKA(gains.feedForward.kA)
+                    .withKV(gains.feedForward.kV)
+                    .withKG(gains.feedForward.kG)
+                    .withKS(gains.feedForward.kS);
 
                 this.motor.getConfigurator().apply(slot1Config);
                 break;
@@ -75,10 +75,10 @@ public class TalonFXMotorController extends MotorController {
                     .withKP(gains.kP)
                     .withKI(gains.kI)
                     .withKD(gains.kD)
-                    .withKA(gains.kA)
-                    .withKV(gains.kV)
-                    .withKG(gains.kG)
-                    .withKS(gains.kS);
+                    .withKA(gains.feedForward.kA)
+                    .withKV(gains.feedForward.kV)
+                    .withKG(gains.feedForward.kG)
+                    .withKS(gains.feedForward.kS);
 
                 this.motor.getConfigurator().apply(slot2Config);
                 break;
@@ -87,10 +87,10 @@ public class TalonFXMotorController extends MotorController {
                     .withKP(gains.kP)
                     .withKI(gains.kI)
                     .withKD(gains.kD)
-                    .withKA(gains.kA)
-                    .withKV(gains.kV)
-                    .withKG(gains.kG)
-                    .withKS(gains.kS);
+                    .withKA(gains.feedForward.kA)
+                    .withKV(gains.feedForward.kV)
+                    .withKG(gains.feedForward.kG)
+                    .withKS(gains.feedForward.kS);
 
                 this.motor.getConfigurator().apply(slotConfig);
                 break;

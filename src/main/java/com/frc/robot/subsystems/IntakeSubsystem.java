@@ -1,5 +1,10 @@
 package com.frc.robot.subsystems;
 
+import com.lib.team8592.MatchMode;
+import com.lib.team8592.PIDProfile;
+import com.lib.team8592.hardware.NewtonFeedForward;
+import com.lib.team8592.hardware.motor.SparkFlexMotorController;
+
 public class IntakeSubsystem extends NewtonSubsystem {
     private SparkFlexMotorController topRollerMotor, bottomRollerMotor;
     private double desiredTopRPM = 0d;
@@ -39,6 +44,6 @@ public class IntakeSubsystem extends NewtonSubsystem {
 
     @Override
     public void stop() {
-        this.setVelocity(0d, 0d);
+        this.setRollerVelocity(0d, 0d);
     }
 }

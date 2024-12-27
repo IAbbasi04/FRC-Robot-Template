@@ -1,5 +1,7 @@
 package com.lib.team8592.hardware;
 
+import java.util.function.DoubleSupplier;
+
 public class NewtonFeedForward {
     public double kV = 0d;
     public double kA = 0d;
@@ -7,8 +9,6 @@ public class NewtonFeedForward {
     public double kG = 0d;
 
     private DoubleSupplier angle = () -> 0d;
-
-    private double lastVelocity = 0d;
 
     public NewtonFeedForward() {}
 
@@ -20,32 +20,30 @@ public class NewtonFeedForward {
 
     public NewtonFeedForward setV(double gain) {
         this.kV = gain;
+        return this;
     }
 
     public NewtonFeedForward setA(double gain) {
         this.kA = gain;
+        return this;
     }
 
     public NewtonFeedForward setS(double gain) {
         this.kS = gain;
+        return this;
     }
 
     public NewtonFeedForward withKG(double kG, DoubleSupplier angle) {
+        this.kG = kG;
         this.angle = angle;
+        return this;
     }
 
     public double get(double velocity, double acceleration) {
-        this.lastVelocity = velocity;
-        return this.kG + this.kS + this.kV * velocity + this.kA * acceleration;
+        return this.kG * Math.cos(angle.getAsDouble()) + this.kS + this.kV * velocity + this.kA * acceleration;
     }
 
     public double get(double lastVelocity, double velocity, double dt) {
-        this.lastVelocity = lastVelocity;
-        return this.get(velocity, accel);
-    }
-
-    public double get(double velocity, double dt) {
-        double accel = (velocity - lastVelocity) / dt;
-        return this.get(velocity, accel);
+        return this.get(velocity, (velocity - lastVelocity) / dt);
     }
 }

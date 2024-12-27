@@ -1,10 +1,10 @@
 package com.lib.team8592.hardware.motor;
 
 import com.revrobotics.CANSparkBase.ControlType;
+import com.revrobotics.CANSparkBase.SoftLimitDirection;
 import com.lib.team8592.PIDProfile;
 import com.lib.team8592.Utils;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkBase;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkPIDController.AccelStrategy;
@@ -15,7 +15,7 @@ public class SparkBaseMotorController<M extends CANSparkBase> extends MotorContr
     protected RelativeEncoder encoder;
 
     protected SparkBaseMotorController(M motor, boolean reversed) {
-        super(motor.getID(), reversed);
+        super(motor.getDeviceId(), reversed);
         this.motor = motor;
         this.motorCtrl = motor.getPIDController();
         this.encoder = motor.getEncoder();
