@@ -140,32 +140,20 @@ public class RobotContainer {
         );
 
         Controls.getDriver().leftTrigger().whileTrue(activeSubsystemsManager.getSuperstructure().run(() -> {
-            activeSubsystemsManager.getSuperstructure().setPivotAngleRadians(0.2);
+            activeSubsystemsManager.getSuperstructure().setPivotAngleRadians(Math.PI/4d);
         })).onFalse(activeSubsystemsManager.getSuperstructure().getStopCommand());
 
         Controls.getDriver().rightTrigger().whileTrue(activeSubsystemsManager.getSuperstructure().run(() -> {
-            activeSubsystemsManager.getSuperstructure().setPivotAngleRadians(-0.2);
+            activeSubsystemsManager.getSuperstructure().setPivotAngleRadians(0d);
         })).onFalse(activeSubsystemsManager.getSuperstructure().getStopCommand());
 
         Controls.getDriver().y().whileTrue(activeSubsystemsManager.getSuperstructure().run(() -> {
-            activeSubsystemsManager.getSuperstructure().setElevatorPositionMeters(0.2);
-        })).onFalse(activeSubsystemsManager.getSuperstructure().getStopCommand());
+            activeSubsystemsManager.getSuperstructure().setElevatorPositionMeters(1.0);
+        }));
 
         Controls.getDriver().a().whileTrue(activeSubsystemsManager.getSuperstructure().run(() -> {
-            activeSubsystemsManager.getSuperstructure().setElevatorPositionMeters(-0.2);
-        })).onFalse(activeSubsystemsManager.getSuperstructure().getStopCommand());
-
-        // Controls.getDriver().b().whileTrue(pivot.run(() -> {
-        //     pivot.reachSetpoint(0);
-        // })).onFalse(pivot.getStopCommand());
-
-        // Controls.getDriver().y().whileTrue(pivot.run(() -> {
-        //     pivot.reachSetpoint(90);
-        // })).onFalse(pivot.getStopCommand());
-
-        // Controls.getDriver().x().whileTrue(pivot.run(() -> {
-        //     pivot.reachSetpoint(-45);
-        // })).onFalse(pivot.getStopCommand());
+            activeSubsystemsManager.getSuperstructure().setElevatorPositionMeters(0.7);
+        }));
     }
 
     /**
