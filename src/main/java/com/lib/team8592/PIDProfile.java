@@ -17,12 +17,11 @@ public class PIDProfile implements Sendable {
     public double kP = 0;
     public double kI = 0;
     public double kD = 0;
-    public double kFF = 0;
 
     public double maxAcceleration = Double.POSITIVE_INFINITY;
     public double maxVelocity = Double.POSITIVE_INFINITY;
 
-    public double tolerance = 0;
+    public double tolerance = 0.1; // Set to 0.1 units at default
 
     public boolean continuousInput = false;
     public double continuousMin = Double.NEGATIVE_INFINITY;
@@ -79,15 +78,6 @@ public class PIDProfile implements Sendable {
 
     public double getD() {
         return kD;
-    }
-
-    public PIDProfile setFF(double gain) {
-        kFF = gain;
-        return this;
-    }
-
-    public double getFF() {
-        return kFF;
     }
 
     public PIDProfile setFeedForward(double kV, double kA, double kS) {
@@ -284,7 +274,7 @@ public class PIDProfile implements Sendable {
         this.gainsLogger.log("kP", getP());
         this.gainsLogger.log("kI", getI());
         this.gainsLogger.log("kD", getD());
-        this.gainsLogger.log("kFF", getFF());
+        // this.gainsLogger.log("kFF", getFF());
         this.gainsLogger.log("kA", getA());
         this.gainsLogger.log("kV", getV());
         this.gainsLogger.log("kS", getS());
@@ -301,7 +291,7 @@ public class PIDProfile implements Sendable {
         this.setA(gainsLogger.getEntry("kA").getDouble(getA()));
         this.setS(gainsLogger.getEntry("kS").getDouble(getS()));
         this.setV(gainsLogger.getEntry("kV").getDouble(getV()));
-        this.setFF(gainsLogger.getEntry("kFF").getDouble(kFF));
+        // this.setFF(gainsLogger.getEntry("kFF").getDouble(kFF));
         this.setMaxVelocity(gainsLogger.getEntry("MaxVelocity").getDouble(maxVelocity));
         this.setMaxAcceleration(gainsLogger.getEntry("MaxAcceleration").getDouble(maxAcceleration));
         return this;
@@ -320,7 +310,7 @@ public class PIDProfile implements Sendable {
         builder.addDoubleProperty("p", this::getP, this::setP);
         builder.addDoubleProperty("i", this::getI, this::setI);
         builder.addDoubleProperty("d", this::getD, this::setD);
-        builder.addDoubleProperty("f", this::getFF, this::setFF);
+        // builder.addDoubleProperty("f", this::getFF, this::setFF);
         builder.addDoubleProperty("s", this::getS, this::setS);
         builder.addDoubleProperty("a", this::getA, this::setA);
         builder.addDoubleProperty("v", this::getV, this::setV);

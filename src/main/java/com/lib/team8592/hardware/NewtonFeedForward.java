@@ -10,6 +10,8 @@ public class NewtonFeedForward {
 
     private DoubleSupplier angle = () -> 0d;
 
+    private double lastVelocity = 0d;
+
     public NewtonFeedForward() {}
 
     public NewtonFeedForward(double kV, double kA, double kS) {
@@ -39,11 +41,13 @@ public class NewtonFeedForward {
         return this;
     }
 
-    public double get(double velocity, double acceleration) {
-        return this.kG * Math.cos(angle.getAsDouble()) + this.kS + this.kV * velocity + this.kA * acceleration;
+    private double get(double velocity, double acceleration) {
+        this.lastVelocity = velocity;
+
+        return this.kG * Math.cos(this.angle.getAsDouble()) + this.kS + this.kV * velocity + this.kA * acceleration;
     }
 
-    public double get(double lastVelocity, double velocity, double dt) {
+    public double calculate(double velocity, double dt) {
         return this.get(velocity, (velocity - lastVelocity) / dt);
     }
 }

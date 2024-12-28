@@ -1,4 +1,4 @@
-package com.lib.team8592.hardware.motor;
+package com.lib.team8592.hardware.motor.talonfx;
 
 import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.controls.*;
@@ -7,27 +7,29 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.lib.team8592.PIDProfile;
 import com.lib.team8592.Utils;
+import com.lib.team8592.hardware.motor.NewtonMotor;
+import com.lib.team8592.hardware.motor.MotorConstants;
 
-public class TalonFXMotorController extends MotorController {
-    public TalonFX motor; // Made public so it can be accessed as a follower
+public abstract class TalonFXMotor extends NewtonMotor {
+    protected TalonFX motor; // Made protected so it can be accessed as a follower
 
     private TalonFXConfiguration configuration;
 
     private PositionVoltage positionOutput;
     private VelocityVoltage velocityOutput;
 
-    public TalonFXMotorController(int motorID) {
-        this(motorID, false);
+    protected TalonFXMotor(int motorID, MotorConstants constants) {
+        this(motorID, false, constants);
     }
 
-    public TalonFXMotorController(int motorID, boolean reversed) {
-        super(motorID, reversed);
+    protected TalonFXMotor(int motorID, boolean inverted, MotorConstants constants) {
+        super(motorID, inverted, constants);
         
         this.motor = new TalonFX(motorID);
-        this.motor.setInverted(reversed);
+        this.motor.setInverted(inverted);
 
         this.configuration = new TalonFXConfiguration();
-        this.configuration.MotorOutput.Inverted = reversed ? 
+        this.configuration.MotorOutput.Inverted = inverted ? 
             InvertedValue.Clockwise_Positive :
             InvertedValue.CounterClockwise_Positive;
 
@@ -130,7 +132,7 @@ public class TalonFXMotorController extends MotorController {
     }
 
     @Override
-    public void setFollowerTo(MotorController master, boolean reversed) {
+    public void setFollowerTo(NewtonMotor master, boolean reversed) {
         this.motor.setControl(new Follower(master.getAsTalonFX().motor.getDeviceID(), reversed));
     }
 
@@ -165,6 +167,11 @@ public class TalonFXMotorController extends MotorController {
     @Override
     public double getRotations() {
         return this.motor.getPosition().getValueAsDouble();
+    }
+
+    @Override
+    public double getAppliedVoltage() {
+        return this.motor.getMotorVoltage().getValueAsDouble();
     }
 
     @Override

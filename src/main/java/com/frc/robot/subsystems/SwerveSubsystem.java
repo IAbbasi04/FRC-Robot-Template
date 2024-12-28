@@ -522,8 +522,6 @@ public class SwerveSubsystem extends NewtonSubsystem {
         this.logger.log("Reset Pose", this.resetPose);
         this.logger.log("Desired Chassis Speeds", this.desiredSpeeds);
         this.logger.log("Current Drive Mode", driveMode);
-        this.logger.log("Is Enabled", this.isEnabled());
-
         this.logger.log("Current Command", getCurrentCommand().getName());
 
         this.logger.logReceiver(

@@ -5,20 +5,22 @@ import java.util.List;
 
 import com.lib.team8592.PIDProfile;
 import com.lib.team8592.hardware.NewtonFeedForward;
+import com.lib.team8592.hardware.motor.spark.SparkFlexMotor;
+import com.lib.team8592.hardware.motor.spark.SparkMaxMotor;
+import com.lib.team8592.hardware.motor.talonfx.TalonFXMotor;
 
-public abstract class MotorController {
+public abstract class NewtonMotor {
     protected List<PIDProfile> motorPIDGains = new ArrayList<>();
     protected List<NewtonFeedForward> feedForward = new ArrayList<>();
     protected int deviceID = 0;
-    protected boolean reversed = false;
+    protected boolean inverted = false;
+    protected MotorConstants motorConstants = null;
+    protected double desiredVelocityRPM = 0d;
 
-    protected MotorController(int id) {
-        this(id, false);
-    }
-
-    protected MotorController(int id, boolean reversed) {
+    protected NewtonMotor(int id, boolean inverted, MotorConstants constants) {
         this.deviceID = id;
-        this.reversed = reversed;
+        this.inverted = inverted;
+        this.motorConstants = constants;
     }
 
     public enum IdleMode {
@@ -44,9 +46,9 @@ public abstract class MotorController {
         setPositionSmartMotion(desiredRotations, 0);
     }
     
-    public abstract void setFollowerTo(MotorController master, boolean reversed);
+    public abstract void setFollowerTo(NewtonMotor master, boolean reversed);
     
-    public void setFollowerTo(MotorController master) {
+    public void setFollowerTo(NewtonMotor master) {
         setFollowerTo(master, false);
     }
 
@@ -58,25 +60,43 @@ public abstract class MotorController {
 
     public abstract double getRotations();
 
+    public abstract double getAppliedVoltage();
+
     public abstract void resetEncoderPosition(double rotations);
 
-    public boolean isReversed() {
-        return this.reversed;
+    public boolean isInverted() {
+        return this.inverted;
     }
 
     public int getDeviceID() {
         return this.deviceID;
     }
 
-    public SparkFlexMotorController getAsSparkFlex() {
-        return (SparkFlexMotorController)this;
+    public double getMaxFreeVelocity() {
+        return this.motorConstants.MAX_VELOCITY_RPM;
     }
 
-    public SparkMaxMotorController getAsSparkMax() {
-        return (SparkMaxMotorController)this;
+    public MotorConstants getMotorConstants() {
+        return this.motorConstants;
     }
 
-    public TalonFXMotorController getAsTalonFX() {
-        return (TalonFXMotorController)this;
+    public double getVoltageToRPMRatio() {
+        return this.motorConstants.MOTOR_KV;
+    }
+
+    public double getDesiredVelocity() {
+        return this.desiredVelocityRPM;
+    }
+
+    public SparkFlexMotor getAsSparkFlex() {
+        return (SparkFlexMotor)this;
+    }
+
+    public SparkMaxMotor getAsSparkMax() {
+        return (SparkMaxMotor)this;
+    }
+
+    public TalonFXMotor getAsTalonFX() {
+        return (TalonFXMotor)this;
     }
 }

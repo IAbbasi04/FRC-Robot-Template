@@ -142,7 +142,7 @@ public class SmartLogger {
             consumer.accept(dictionary.getGenericEntry(key).getBoolean(defaultValue));
         }
     }
-
+    
     public void overrideReceiver(String key, boolean override) {
         if (dictionary.contains(key)) {
             dictionary.getLoggerEntry(key).override(override);

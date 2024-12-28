@@ -10,7 +10,7 @@ import com.lib.team8592.logging.SmartLogger;
 
 public abstract class NewtonSubsystem extends SubsystemBase {
     protected SmartLogger logger;
-    protected boolean logToShuffleboard = false;
+    private boolean logToShuffleboard = false;
     private boolean enabled = false;
 
     protected NewtonSubsystem(boolean logToShuffleboard) {
@@ -32,6 +32,10 @@ public abstract class NewtonSubsystem extends SubsystemBase {
 
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public boolean logToShuffleboard() {
+        return this.logToShuffleboard;
     }
 
     /**

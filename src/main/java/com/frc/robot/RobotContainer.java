@@ -136,6 +136,18 @@ public class RobotContainer {
                 Controls.driveTranslateY
             )
         );
+
+        // Controls.getDriver().leftTrigger().whileTrue(
+        //     activeSubsystemsManager.getIntake().run(() -> {
+        //         activeSubsystemsManager.getIntake().setRollerVelocity(2000);
+        //     })
+        // ).onFalse(activeSubsystemsManager.getIntake().getStopCommand());
+
+        // Controls.getDriver().rightTrigger().whileTrue(
+        //     activeSubsystemsManager.getIntake().run(() -> {
+        //         activeSubsystemsManager.getIntake().setRollerVelocity(-2000);
+        //     })
+        // ).onFalse(activeSubsystemsManager.getIntake().getStopCommand());
     }
 
     /**
