@@ -1,7 +1,9 @@
-package com.lib.team8592.hardware;
+package com.lib.team8592.hardware.motor;
 
+import com.frc.robot.Robot;
 import com.lib.team8592.PIDProfile;
-import com.lib.team8592.hardware.motor.NewtonMotor;
+import com.lib.team8592.hardware.NEW_NewtonPIDController;
+// import com.lib.team8592.hardware.NewtonPIDController;
 import com.lib.team8592.hardware.motor.spark.*;
 import com.lib.team8592.hardware.motor.talonfx.*;
 
@@ -12,6 +14,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class NewtonMotorIO<T extends NewtonMotor> {
     private ProfiledPIDController pidCtrl = null;
@@ -29,7 +32,11 @@ public class NewtonMotorIO<T extends NewtonMotor> {
     private State currentState = new State();
     private State desiredState = new State();
 
-    // private double profileOutput = 0d;
+    private double appliedVelocityRPM = 0d;
+
+    private double dt = 0d;
+
+    private NEW_NewtonPIDController newtonPID;
 
     @SuppressWarnings("unchecked")
     public NewtonMotorIO(PIDProfile pidGains, double gearRatio, double momentOfInertia, T ... motors) {
@@ -68,6 +75,8 @@ public class NewtonMotorIO<T extends NewtonMotor> {
             pidGains.maxVelocity, 
             pidGains.maxAcceleration
         ));
+
+        this.newtonPID = new NEW_NewtonPIDController(pidGains);
     }
 
     public double fromRPMToVolts(double rpm) {
@@ -79,30 +88,76 @@ public class NewtonMotorIO<T extends NewtonMotor> {
     }
 
     public void setVelocityRPM(double desiredRPM) {
+        double newtonVelocity = newtonPID.calculate(
+            this.getVelocityRPM(), 
+            desiredRPM
+        );
+            
+        this.desiredState = new State(0d, newtonVelocity);
+
+        this.appliedVelocityRPM = this.calculate(
+            new State(0d, motors[0].getVelocityRPM()), 
+            desiredState
+        );
+
+        SmartDashboard.putNumber("LMAO/DESIRED VELOCITY ___ A", desiredState.velocity);
+        SmartDashboard.putNumber("LMAO/APPLIED VELOCITY ___ A", appliedVelocityRPM);
+        SmartDashboard.putNumber("LMAO/NEWTON VELOCITY ___ A", newtonVelocity);
+
         for (T motor : motors) {
-            motor.setVelocity(desiredRPM);
+            motor.setVelocity(appliedVelocityRPM);
         }
 
         double appliedVoltage = fromRPMToVolts(desiredRPM);
         gearboxSim.setInput(appliedVoltage);
     }
 
-    public void updateSim(double dt) {
-        this.gearboxSim.update(dt);
+    public void update(double dt, boolean isSimulation) {
+        this.dt = dt;
+        if (isSimulation) {
+            this.gearboxSim.update(dt);
+            this.currentState = new State(
+                0d, 
+                gearboxSim.getAngularVelocityRPM()
+            );
+        } else {
+            this.currentState = new State(motors[0].getRotations(), motors[0].getVelocityRPM());
+        }
     }
 
-    // public void calculate(TrapezoidProfile.State current, TrapezoidProfile.State desired) {
-    //     if (!lastDesiredState.equals(desired)) { // Goal has changed
-    //         profileTimer.restart();
-    //     }
+    private double calculate(TrapezoidProfile.State current, TrapezoidProfile.State desired) {
+        if (!lastDesiredState.equals(desired)) { // Goal has changed
+            profileTimer.restart();
+        }
 
-    //     // this.profileOutput = trapezoidProfile.calculate(profileTimer.get(), current, desired).velocity;
-    //     this.lastDesiredState = desired;
+        this.appliedVelocityRPM = pidCtrl.calculate(
+            current.velocity, 
+            trapezoidProfile.calculate(
+                dt,
+                current, 
+                desired
+            ).velocity
+        );
 
-    //     // double applied = pidCtrl.calculate(current.velocity, profileOutput);
-    // }
+        this.lastDesiredState = desired;
+        return appliedVelocityRPM;
+    }
 
-    // public boolean atReference() {
-    //     return pidCtrl.atSetpoint();
-    // }
+    public double getRotations() {
+        if (Robot.isSimulation()) {
+            return this.gearboxSim.getAngularPositionRotations();
+        }
+        return this.motors[0].getRotations();
+    }
+
+    public double getVelocityRPM() {
+        if (Robot.isSimulation()) {
+            return this.gearboxSim.getAngularVelocityRPM();
+        }
+        return this.motors[0].getVelocityRPM();
+    }
+
+    public double getAppliedVelocityRPM() {
+        return this.appliedVelocityRPM;
+    }
 }
