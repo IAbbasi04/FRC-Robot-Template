@@ -154,7 +154,8 @@ public final class Constants {
         public static final double PATH_FOLLOW_TRANSLATE_kD = 0d;
 
         //TODO: Double check that these still work
-        public static final double PATH_FOLLOW_ROTATE_kP = 3.7;
+        // public static final double PATH_FOLLOW_ROTATE_kP = 3.7;
+        public static final double PATH_FOLLOW_ROTATE_kP = 10d;
         public static final double PATH_FOLLOW_ROTATE_kI = 0d;
         public static final double PATH_FOLLOW_ROTATE_kD = 0.1;
 

@@ -46,4 +46,8 @@ public class Utils {
 
         return newPose;
     }
+
+    public static Pose2d createPose(double x, double y, Rotation2d rot) {
+        return new Pose2d(new Translation2d(x, y), rot);
+    }
 }

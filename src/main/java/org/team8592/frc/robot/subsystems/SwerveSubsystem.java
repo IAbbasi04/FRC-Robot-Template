@@ -20,6 +20,8 @@ import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -237,12 +239,20 @@ public class SwerveSubsystem extends NewtonSubsystem {
         return this;
     }
 
+    public SwerveDriveKinematics getKinematics() {
+        return this.swerve.getKinematics();
+    }
+
     public ChassisSpeeds getDesiredSpeeds() {
         return this.desiredSpeeds;
     }
 
     public ChassisSpeeds getCurrentSpeeds() {
         return this.swerve.getCurrentSpeeds();
+    }
+
+    public void setModuleStates(SwerveModuleState[] states) {
+        this.drive(getKinematics().toChassisSpeeds(states));
     }
 
     /**
@@ -470,10 +480,12 @@ public class SwerveSubsystem extends NewtonSubsystem {
                 this.stop();
                 this.resetHeading();
                 break;
-            default: 
+            default:
                 // Typically do nothing on init
                 break;
         }
+
+        this.stop();
     }
 
     @Override

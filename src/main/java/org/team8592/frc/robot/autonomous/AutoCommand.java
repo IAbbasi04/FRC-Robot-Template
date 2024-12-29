@@ -60,7 +60,7 @@ public abstract class AutoCommand extends NewtonWrapperCommand {
      * {@link Commands#none()} as an {@link AutoCommand}
      */
     protected AutoCommand(){
-        super(Commands.none());
+        this(Commands.none());
     }
 
     /**

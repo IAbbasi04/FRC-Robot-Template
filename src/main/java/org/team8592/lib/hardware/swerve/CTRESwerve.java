@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 
-public class CTRESwerve extends SwerveDrivetrain{
+public class CTRESwerve extends SwerveDrivetrain {
     public static final class SpeedConstants {
         public final double MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND;
         public final double MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND;
@@ -236,5 +236,9 @@ public class CTRESwerve extends SwerveDrivetrain{
      */
     public void registerTelemetry(TriConsumer<SwerveDriveState, SwerveDriveKinematics, SwerveModule[]> telemetryFunction){
         registerTelemetry((swerveDriveState) -> telemetryFunction.accept(swerveDriveState, this.m_kinematics, this.Modules));
+    }
+
+    public SwerveDriveKinematics getKinematics() {
+        return this.m_kinematics;
     }
 }

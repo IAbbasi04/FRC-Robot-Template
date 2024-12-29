@@ -8,7 +8,9 @@ import org.team8592.frc.robot.subsystems.SwerveSubsystem.DriveModes;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 
 public final class NewtonCommands {
     private static SubsystemManager manager;
@@ -58,5 +60,9 @@ public final class NewtonCommands {
     public static Command swerveSnapToCommand(Rotation2d angle, DoubleSupplier driveX, DoubleSupplier driveY, boolean isRunningOnRed){
         Rotation2d allianceAngle = Suppliers.currentGyroscopeRotationOffset.get().plus(angle);
         return swerveSnapToCommand(allianceAngle, driveX, driveY);
+    }
+
+    public static Command newtonPathFollowCommand(Trajectory trajectory) {
+        return Commands.none();
     }
 }

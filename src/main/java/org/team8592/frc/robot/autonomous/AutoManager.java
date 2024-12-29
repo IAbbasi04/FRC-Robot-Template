@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.*;
 import org.team8592.lib.logging.LogUtils;
 import org.team8592.lib.logging.LogUtils.WidgetProfile;
 import org.team8592.frc.robot.Robot;
+import org.team8592.frc.robot.autonomous.autos.TestSimpleAuto;
 import org.team8592.frc.robot.commands.proxies.*;
 import org.team8592.frc.robot.subsystems.SubsystemManager;
 
@@ -37,6 +38,7 @@ public final class AutoManager {
             AutoCommand.getDefaultAuto(), 
             List.of(
                 // Add all autos here
+                new TestSimpleAuto()
             )
         );
 
