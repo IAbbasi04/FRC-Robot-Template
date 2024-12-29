@@ -3,20 +3,23 @@ package com.frc.robot.subsystems;
 import com.frc.robot.Robot;
 import com.lib.team8592.MatchMode;
 import com.lib.team8592.PIDProfile;
+import com.lib.team8592.Utils;
+import com.lib.team8592.hardware.SimIO;
 import com.lib.team8592.hardware.motor.NewtonMotorIO;
 import com.lib.team8592.hardware.motor.spark.SparkFlexMotor;
 
 public class TEST_TEST_Intake extends NewtonSubsystem {
     private SparkFlexMotor rollerMotor;
     private NewtonMotorIO<SparkFlexMotor> rollerIO;
+    private SimIO simIO;
 
     private double desiredRollerRPM = 0d;
 
     private PIDProfile rollerGains = new PIDProfile()
-        .setP(1E-4)
+        .setP(2000d)
         // .setD(1E-2)
-        .setA(0.01)
-        .setV(5E-4)
+        // .setA(0.01)
+        // .setV(5E-4)
         // .setS(0.1)
         .setMaxVelocity(5000d)
         .setMaxAcceleration(5000d);
@@ -25,7 +28,14 @@ public class TEST_TEST_Intake extends NewtonSubsystem {
         super(logToShuffleboard);
 
         this.rollerMotor = new SparkFlexMotor(29);
+        this.rollerMotor.withGains(rollerGains);
+
         this.rollerIO = new NewtonMotorIO<>(rollerGains, 1d, 1d, rollerMotor);
+        this.simIO = new SimIO(
+            0.5, 
+            Utils.getMOIForRoller(2d, 1d), 
+            rollerMotor
+        );
     }
 
     public void setRollerVelocity(double desiredRPM) {
@@ -33,13 +43,16 @@ public class TEST_TEST_Intake extends NewtonSubsystem {
 
         this.desiredRollerRPM = desiredRPM;
         this.rollerIO.setVelocityRPM(desiredRPM);
+        this.simIO.setVelocityRPM(desiredRPM);
     }
 
     @Override
     public void onInit(MatchMode mode) {}
 
     @Override
-    public void simulationPeriodic() {}
+    public void simulationPeriodic() {
+        this.simIO.update(Robot.CLOCK.dt());
+    }
 
     @Override
     public void periodicLogs() {

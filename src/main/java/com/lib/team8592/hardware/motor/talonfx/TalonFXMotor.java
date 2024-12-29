@@ -11,7 +11,7 @@ import com.lib.team8592.hardware.motor.NewtonMotor;
 import com.lib.team8592.hardware.motor.MotorConstants;
 
 public abstract class TalonFXMotor extends NewtonMotor {
-    protected TalonFX motor; // Made protected so it can be accessed as a follower
+    protected TalonFX motor;
 
     private TalonFXConfiguration configuration;
 
@@ -104,6 +104,11 @@ public abstract class TalonFXMotor extends NewtonMotor {
     @Override
     public void setPercentOutput(double percent) {
         this.motor.set(percent);
+    }
+
+    @Override
+    public void setVoltage(double voltage, int slot) {
+        this.motor.setVoltage(voltage);
     }
 
     @Override

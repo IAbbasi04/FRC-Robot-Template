@@ -42,8 +42,8 @@ public class NewtonPIDController implements Sendable {
         // return pidCtrls.get(slot).calculate(measurement, setpoint) + 
         //     pidGains.get(slot).feedForward.calculate((setpoint-measurement) / dt, slot);
 
-        double p = pidGains.get(slot).kP * (setpoint - measurement);
-        double i = pidGains.get(slot).kI * (setpoint - measurement);
+        // double p = pidGains.get(slot).kP * (setpoint - measurement);
+        // double i = pidGains.get(slot).kI * (setpoint - measurement);
         return 0d;
     }
 

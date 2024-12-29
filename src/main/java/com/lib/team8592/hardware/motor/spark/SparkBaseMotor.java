@@ -12,8 +12,11 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkPIDController.AccelStrategy;
 
+import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
+
 public abstract class SparkBaseMotor<M extends CANSparkBase> extends NewtonMotor {
-    protected M motor; // Made protected so it can be accessed as a follower
+    protected M motor;
     protected SparkPIDController motorCtrl;
     protected RelativeEncoder encoder;
 
@@ -23,6 +26,13 @@ public abstract class SparkBaseMotor<M extends CANSparkBase> extends NewtonMotor
         this.motorCtrl = motor.getPIDController();
         this.encoder = motor.getEncoder();
         this.motor.setInverted(inverted);
+
+        super.simEncoder = EncoderSim.createForIndex(deviceID);
+        super.simMotor = new DCMotorSim(
+            NewtonMotor.getDCMotor(this, 1),
+            deviceID, 
+            1d
+        );
     }
 
     @Override
@@ -55,6 +65,12 @@ public abstract class SparkBaseMotor<M extends CANSparkBase> extends NewtonMotor
     @Override
     public void setPercentOutput(double percent) {
         this.motor.set(percent);
+        this.simEncoder.setDistance(percent);
+    }
+
+    @Override
+    public void setVoltage(double voltage, int slot) {
+        this.motor.setVoltage(voltage);
     }
 
     @Override
