@@ -17,10 +17,6 @@ public class TEST_TEST_Intake extends NewtonSubsystem {
 
     private PIDProfile rollerGains = new PIDProfile()
         .setP(2000d)
-        // .setD(1E-2)
-        // .setA(0.01)
-        // .setV(5E-4)
-        // .setS(0.1)
         .setMaxVelocity(5000d)
         .setMaxAcceleration(5000d);
 

@@ -2,6 +2,7 @@ package com.lib.team8592.hardware;
 
 import com.lib.team8592.PIDProfile;
 import com.lib.team8592.hardware.motor.NewtonMotor;
+import com.lib.team8592.logging.SmartLogger;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -10,7 +11,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.*;
 import edu.wpi.first.util.sendable.*;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.*;
-import edu.wpi.first.wpilibj.smartdashboard.*;
 
 public class SimIO implements Sendable {
     private DCMotorSim simMotor;
@@ -21,11 +21,11 @@ public class SimIO implements Sendable {
     private NewtonMotor motor;
     
     private double lastDesiredOutput = 0d;
-    private double desiredOutput = 0d;
+    private double goalOutput = 0d;
     private double appliedVoltage = 0d;
 
     private State currentState = new State();
-    private State desiredState = new State();
+    private State goalState = new State();
 
     public enum ControlMode {
         kVelocity,
@@ -42,6 +42,10 @@ public class SimIO implements Sendable {
 
     private Timer motionTimer = new Timer();
 
+    private static int instances = 0;
+
+    private SmartLogger logger;
+
     public SimIO(double gearRatio, double momentOfInertia, NewtonMotor motor) {
         this.motor = motor;
         this.simMotor = new DCMotorSim(
@@ -55,7 +59,7 @@ public class SimIO implements Sendable {
 
         this.simEncoder = EncoderSim.createForIndex(motor.getDeviceID());
         this.simEncoder.setPeriod(0.02);
-        this.simEncoder.setDistancePerPulse(1d);
+        this.simEncoder.setDistancePerPulse(motor.getVoltageToRPMRatio());
 
         this.motionProfile = new TrapezoidProfile(
             new Constraints(
@@ -63,13 +67,17 @@ public class SimIO implements Sendable {
                 pidGains.maxAcceleration
             )
         );
+
+        instances++;
+
+        this.logger = new SmartLogger("SimIO[" + instances + "]");
     }
 
     public void setVelocityRPM(double desiredRPM) {
         this.controlMode = ControlMode.kVelocity;
-        this.desiredOutput = desiredRPM;
+        this.goalOutput = desiredRPM;
         
-        double desiredVoltage = this.desiredOutput / motor.getVoltageToRPMRatio();
+        double desiredVoltage = this.goalOutput / motor.getVoltageToRPMRatio();
 
         currentState = new State(
             0, 
@@ -77,42 +85,32 @@ public class SimIO implements Sendable {
             motor.getVoltageToRPMRatio()
         );
 
-        desiredState = new State(
+        goalState = new State(
             0,
             desiredVoltage
         );
 
-        // appliedVoltage = motionProfile.calculate(
-        //     motionTimer.get(), 
-        //     currentState, 
-        //     desiredState
-        // ).velocity;
+        double appliedVelocity = this.pidCtrl.calculate(currentState.velocity, goalState.velocity);
+        this.appliedVoltage = appliedVelocity / motor.getVoltageToRPMRatio();
 
-        this.pidCtrl.setGoal(desiredState.velocity);
-
-        SmartDashboard.putNumber("MMLLIIAASLDJKJDKLAS", this.pidCtrl.calculate(currentState.velocity));
-
-        this.appliedVoltage = this.pidCtrl.calculate(currentState.velocity);
-
-        this.motor.setVoltage(appliedVoltage);
-        this.simMotor.setInputVoltage(appliedVoltage);
+        this.simMotor.setInputVoltage(appliedVelocity);
     }
 
     public void setRotations(double desiredRotations) {
         this.controlMode = ControlMode.kPosition;
-        this.desiredOutput = desiredRotations;
+        this.goalOutput = desiredRotations;
 
         currentState = new State(
             simMotor.getAngularPositionRotations(), 
             simMotor.getAngularVelocityRPM()
         );
 
-        desiredState = new State(desiredOutput, 0d);
+        goalState = new State(goalOutput, 0d);
 
         appliedVoltage = motionProfile.calculate(
             motionTimer.get(), 
             currentState, 
-            desiredState
+            goalState
         ).velocity / motor.getVoltageToRPMRatio();
 
         this.motor.setVoltage(appliedVoltage);
@@ -121,9 +119,9 @@ public class SimIO implements Sendable {
 
     public void setVoltage(double desiredVolts) {
         this.controlMode = ControlMode.kVoltage;
-        this.desiredOutput = desiredVolts;
+        this.goalOutput = desiredVolts;
 
-        double desiredVoltage = this.desiredOutput / motor.getVoltageToRPMRatio();
+        double desiredVoltage = this.goalOutput / motor.getVoltageToRPMRatio();
 
         currentState = new State(
             0, 
@@ -131,7 +129,7 @@ public class SimIO implements Sendable {
             motor.getVoltageToRPMRatio()   
         );
 
-        desiredState = new State(
+        goalState = new State(
             0,
             desiredVoltage
         );
@@ -139,7 +137,7 @@ public class SimIO implements Sendable {
         appliedVoltage = motionProfile.calculate(
             motionTimer.get(), 
             currentState, 
-            desiredState
+            goalState
         ).velocity;
 
         this.motor.setVoltage(appliedVoltage);
@@ -148,9 +146,9 @@ public class SimIO implements Sendable {
 
     public void setDutyCycle(double desiredPercent) {
         this.controlMode = ControlMode.kDutyCycle;
-        this.desiredOutput = desiredPercent;
+        this.goalOutput = desiredPercent;
 
-        double desiredVoltage = this.desiredOutput / motor.getVoltageToRPMRatio();
+        double goalVoltage = this.goalOutput / motor.getVoltageToRPMRatio();
 
         currentState = new State(
             0, 
@@ -158,44 +156,36 @@ public class SimIO implements Sendable {
             motor.getVoltageToRPMRatio()   
         );
 
-        desiredState = new State(
+        goalState = new State(
             0,
-            desiredVoltage
+            goalVoltage
         );
-
-        appliedVoltage = motionProfile.calculate(
-            motionTimer.get(), 
-            currentState, 
-            desiredState
-        ).velocity;
+        
+        this.appliedVoltage = pidCtrl.calculate(currentState.velocity, goalState.velocity);
 
         this.motor.setVoltage(appliedVoltage);
         this.simMotor.setInputVoltage(appliedVoltage);
     }
 
-    public void updateTimer() {
-        if (lastDesiredOutput != desiredOutput ||
+    public void update(double dt) {
+        if (lastDesiredOutput != goalOutput ||
             !lastControlMode.equals(controlMode)) {
             motionTimer.restart();
         }
-    }
 
-    public void update(double dt) {
-        this.updateTimer();
-
-        SmartDashboard.putNumber("SIMIO/CURRENT VOLTAGE", currentState.velocity);
-        SmartDashboard.putNumber("SIMIO/DESIRED VOLTAGE", desiredState.velocity);
-        SmartDashboard.putNumber("SIMIO/APPLIED VOLTAGE", appliedVoltage);
-        SmartDashboard.putNumber("SIMIO/DESIRED OUTPUT", desiredOutput);
-        SmartDashboard.putString("SIMIO/CONTROL MODE", controlMode.name());
-        SmartDashboard.putNumber("SIMIO/Position", simMotor.getAngularPositionRotations());
-        SmartDashboard.putNumber("SIMIO/Velocity", simMotor.getAngularVelocityRPM());
-        SmartDashboard.putNumber("SIMIO/Encoder", simEncoder.getDistance());
+        this.logger.log("Current Voltage", this.currentState.velocity);
+        this.logger.log("Goal Voltage", this.goalState.velocity);
+        this.logger.log("Applied Voltage", this.appliedVoltage);
+        this.logger.log("Control Mode", this.controlMode);
+        this.logger.log("Goal Output No-Units", this.goalOutput);
+        this.logger.log("Current Motor Position", this.simMotor.getAngularPositionRotations());
+        this.logger.log("Current Motor Velocity", this.simMotor.getAngularVelocityRPM());
+        this.logger.log("Motion Profile Time", motionTimer.get());
         
         this.simEncoder.setDistance(simMotor.getAngularPositionRotations());
         this.simMotor.update(dt);
 
-        this.lastDesiredOutput = desiredOutput;
+        this.lastDesiredOutput = goalOutput;
         this.lastControlMode = controlMode;
     }
 
