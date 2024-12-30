@@ -1,6 +1,6 @@
-package com.lib.team8592.hardware.motor.spark;
+package org.team8592.lib.hardware.motor.spark;
 
-import com.lib.team8592.hardware.motor.MotorConstants;
+import org.team8592.lib.hardware.motor.MotorConstants;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 

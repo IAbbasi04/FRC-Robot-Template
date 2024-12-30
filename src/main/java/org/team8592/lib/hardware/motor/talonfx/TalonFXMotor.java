@@ -1,24 +1,15 @@
-<<<<<<<< HEAD:src/main/java/org/team8592/lib/hardware/motor/talonfx/TalonFXMotor.java
-package com.lib.team8592.hardware.motor.talonfx;
-========
-package org.team8592.lib.hardware.motor;
+package org.team8592.lib.hardware.motor.talonfx;
 
 import org.team8592.lib.PIDProfile;
 import org.team8592.lib.Utils;
->>>>>>>> main:src/main/java/org/team8592/lib/hardware/motor/TalonFXMotorController.java
 
 import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.controls.*;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-<<<<<<<< HEAD:src/main/java/org/team8592/lib/hardware/motor/talonfx/TalonFXMotor.java
-import com.lib.team8592.PIDProfile;
-import com.lib.team8592.Utils;
-import com.lib.team8592.hardware.motor.NewtonMotor;
-import com.lib.team8592.hardware.motor.MotorConstants;
-========
->>>>>>>> main:src/main/java/org/team8592/lib/hardware/motor/TalonFXMotorController.java
+import org.team8592.lib.hardware.motor.NewtonMotor;
+import org.team8592.lib.hardware.motor.MotorConstants;
 
 public abstract class TalonFXMotor extends NewtonMotor {
     protected TalonFX motor;

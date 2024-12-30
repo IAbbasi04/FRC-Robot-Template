@@ -1,17 +1,17 @@
-package com.lib.team8592.hardware.motor;
+package org.team8592.lib.hardware.motor;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.lib.team8592.PIDProfile;
-import com.lib.team8592.hardware.NewtonFeedForward;
-import com.lib.team8592.hardware.motor.spark.SparkFlexMotor;
-import com.lib.team8592.hardware.motor.spark.SparkMaxMotor;
-import com.lib.team8592.hardware.motor.talonfx.Falcon500FOCMotor;
-import com.lib.team8592.hardware.motor.talonfx.Falcon500Motor;
-import com.lib.team8592.hardware.motor.talonfx.KrakenX60FOCMotor;
-import com.lib.team8592.hardware.motor.talonfx.KrakenX60Motor;
-import com.lib.team8592.hardware.motor.talonfx.TalonFXMotor;
+import org.team8592.lib.PIDProfile;
+import org.team8592.lib.hardware.NewtonFeedForward;
+import org.team8592.lib.hardware.motor.spark.SparkFlexMotor;
+import org.team8592.lib.hardware.motor.spark.SparkMaxMotor;
+import org.team8592.lib.hardware.motor.talonfx.Falcon500FOCMotor;
+import org.team8592.lib.hardware.motor.talonfx.Falcon500Motor;
+import org.team8592.lib.hardware.motor.talonfx.KrakenX60FOCMotor;
+import org.team8592.lib.hardware.motor.talonfx.KrakenX60Motor;
+import org.team8592.lib.hardware.motor.talonfx.TalonFXMotor;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;

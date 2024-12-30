@@ -1,4 +1,4 @@
-package com.lib.team8592.hardware.motor;
+package org.team8592.lib.hardware.motor;
 
 public class MotorConstants {
     public final double MAX_VELOCITY_RPM;

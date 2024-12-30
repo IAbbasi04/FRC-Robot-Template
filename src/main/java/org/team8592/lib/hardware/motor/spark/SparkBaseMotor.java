@@ -1,30 +1,19 @@
-<<<<<<<< HEAD:src/main/java/org/team8592/lib/hardware/motor/spark/SparkBaseMotor.java
-package com.lib.team8592.hardware.motor.spark;
-
-========
-package org.team8592.lib.hardware.motor;
+package org.team8592.lib.hardware.motor.spark;
 
 import org.team8592.lib.PIDProfile;
 import org.team8592.lib.Utils;
 
-import com.revrobotics.CANSparkFlex;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
->>>>>>>> main:src/main/java/org/team8592/lib/hardware/motor/SparkFlexMotorController.java
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.SoftLimitDirection;
-import com.frc.robot.Robot;
-import com.lib.team8592.PIDProfile;
-import com.lib.team8592.Utils;
-import com.lib.team8592.hardware.motor.NewtonMotor;
-import com.lib.team8592.hardware.motor.MotorConstants;
+import org.team8592.frc.robot.Robot;
+import org.team8592.lib.hardware.motor.NewtonMotor;
+import org.team8592.lib.hardware.motor.MotorConstants;
 import com.revrobotics.CANSparkBase;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkPIDController.AccelStrategy;
 
-import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import edu.wpi.first.wpilibj.simulation.EncoderSim;
+import edu.wpi.first.wpilibj.simulation.*;
 
 public abstract class SparkBaseMotor<M extends CANSparkBase> extends NewtonMotor {
     protected M motor;

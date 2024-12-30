@@ -1,6 +1,6 @@
-package com.lib.team8592.hardware.motor.talonfx;
+package org.team8592.lib.hardware.motor.talonfx;
 
-import com.lib.team8592.hardware.motor.MotorConstants;
+import org.team8592.lib.hardware.motor.MotorConstants;
 
 public class Falcon500Motor extends TalonFXMotor {
     public Falcon500Motor(int motorID) {

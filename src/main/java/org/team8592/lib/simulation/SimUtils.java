@@ -1,4 +1,4 @@
-package com.lib.team8592.simulation;
+package org.team8592.lib.simulation;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;

@@ -1,4 +1,4 @@
-package com.lib.team8592.hardware;
+package org.team8592.lib.hardware;
 
 import java.util.function.DoubleSupplier;
 

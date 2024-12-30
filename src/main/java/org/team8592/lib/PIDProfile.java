@@ -6,8 +6,8 @@ import edu.wpi.first.util.sendable.*;
 
 import java.util.function.DoubleSupplier;
 
-import com.lib.team8592.hardware.NewtonFeedForward;
-import com.lib.team8592.logging.SmartLogger;
+import org.team8592.lib.hardware.NewtonFeedForward;
+import org.team8592.lib.logging.SmartLogger;
 
 public class PIDProfile implements Sendable {
     private SmartLogger gainsLogger;
