@@ -10,6 +10,8 @@ import edu.wpi.first.wpilibj2.command.*;
 
 public class SubsystemManager extends SubsystemBase {
     private SwerveSubsystem swerveSubsystem;
+    private IntakeSubsystem intakeSubsystem;
+    private PivotSubsystem pivotSubsystem;
 
     private List<NewtonSubsystem> activeSubystems = new ArrayList<>();
 
@@ -18,7 +20,9 @@ public class SubsystemManager extends SubsystemBase {
 
         this.activeSubystems = List.of(
             // Add all active subsystems here
-            swerveSubsystem
+            swerveSubsystem,
+            intakeSubsystem,
+            pivotSubsystem
         );
 
         this.activeSubystems.forEach(s -> {
@@ -95,5 +99,13 @@ public class SubsystemManager extends SubsystemBase {
 
     public SwerveSubsystem getSwerve() {
         return this.swerveSubsystem;
+    }
+
+    public IntakeSubsystem getIntake() {
+        return this.intakeSubsystem;
+    }
+
+    public PivotSubsystem getPivot() {
+        return this.pivotSubsystem;
     }
 }

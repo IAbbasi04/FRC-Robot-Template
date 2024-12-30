@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.team8592.lib.PIDProfile;
 
-public abstract class MotorController {
+public abstract class NewtonMotor {
     protected List<PIDProfile> motorPIDGains = new ArrayList<>();
 
     public enum IdleMode {
@@ -31,9 +31,9 @@ public abstract class MotorController {
         setPositionSmartMotion(desiredRotations, 0);
     }
     
-    public abstract void setFollowerTo(MotorController master, boolean reversed);
+    public abstract void setFollowerTo(NewtonMotor master, boolean reversed);
     
-    public void setFollowerTo(MotorController master) {
+    public void setFollowerTo(NewtonMotor master) {
         setFollowerTo(master, false);
     }
 

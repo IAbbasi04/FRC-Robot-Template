@@ -11,7 +11,7 @@ import com.revrobotics.CANSparkBase.SoftLimitDirection;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.SparkPIDController.AccelStrategy;
 
-public class SparkFlexMotorController extends MotorController {
+public class SparkFlexMotorController extends NewtonMotor {
     public CANSparkFlex motor; // Made public so it can be accessed as a follower
     private SparkPIDController motorCtrl;
     private RelativeEncoder encoder;
@@ -86,7 +86,7 @@ public class SparkFlexMotorController extends MotorController {
     }
 
     @Override
-    public void setFollowerTo(MotorController master, boolean reversed) {
+    public void setFollowerTo(NewtonMotor master, boolean reversed) {
         motor.follow(master.getAsSparkFlex().motor, reversed);
     }
 

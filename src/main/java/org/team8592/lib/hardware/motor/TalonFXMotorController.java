@@ -9,7 +9,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-public class TalonFXMotorController extends MotorController {
+public class TalonFXMotorController extends NewtonMotor {
     public TalonFX motor; // Made public so it can be accessed as a follower
 
     private TalonFXConfiguration configuration;
@@ -129,7 +129,7 @@ public class TalonFXMotorController extends MotorController {
     }
 
     @Override
-    public void setFollowerTo(MotorController master, boolean reversed) {
+    public void setFollowerTo(NewtonMotor master, boolean reversed) {
         this.motor.setControl(new Follower(master.getAsTalonFX().motor.getDeviceID(), reversed));
     }
 

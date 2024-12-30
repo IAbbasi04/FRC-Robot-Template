@@ -11,7 +11,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkPIDController.AccelStrategy;
 
-public class SparkMaxMotorController extends MotorController {
+public class SparkMaxMotorController extends NewtonMotor {
     public CANSparkMax motor; // Made public so it can be accessed as a follower
     private SparkPIDController motorCtrl;
     private RelativeEncoder encoder;
@@ -78,7 +78,7 @@ public class SparkMaxMotorController extends MotorController {
     }
 
     @Override
-    public void setFollowerTo(MotorController master, boolean reversed) {
+    public void setFollowerTo(NewtonMotor master, boolean reversed) {
         motor.follow(master.getAsSparkFlex().motor, reversed);
     }
 

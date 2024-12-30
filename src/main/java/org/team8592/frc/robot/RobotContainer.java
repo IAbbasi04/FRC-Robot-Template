@@ -4,7 +4,9 @@
 
 package org.team8592.frc.robot;
 
+import org.team8592.lib.MatchMode;
 import org.team8592.lib.logging.LogUtils;
+
 import org.team8592.frc.robot.Controls.ControlSets;
 import org.team8592.frc.robot.autonomous.AutoManager;
 import org.team8592.frc.robot.commands.*;
@@ -12,7 +14,6 @@ import org.team8592.frc.robot.commands.proxies.NewtonWrapperCommand;
 import org.team8592.frc.robot.subsystems.*;
 import org.team8592.frc.robot.subsystems.SwerveSubsystem.DriveModes;
 import org.team8592.frc.robot.unittest.UnitTestScheduler;
-import org.team8592.lib.MatchMode;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.*;
@@ -20,6 +21,8 @@ import edu.wpi.first.wpilibj2.command.*;
 public class RobotContainer {
     private SubsystemManager activeSubsystemsManager;
     private SwerveSubsystem swerve;
+    @SuppressWarnings("unused") private IntakeSubsystem intake;
+    @SuppressWarnings("unused") private PivotSubsystem pivot;
 
     private UnitTestScheduler testScheduler;
 
@@ -42,7 +45,9 @@ public class RobotContainer {
         Controls.initializeShuffleboardLogs(logToShuffleboard);
 
         // Add subsystems here
-        swerve = activeSubsystemsManager.getSwerve();
+        this.swerve = activeSubsystemsManager.getSwerve();
+        this.intake = activeSubsystemsManager.getIntake();
+        this.pivot = activeSubsystemsManager.getPivot();
 
         this.configureBindings(ControlSets.DUAL_DRIVER);
         this.configureDefaults();
