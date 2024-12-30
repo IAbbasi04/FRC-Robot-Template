@@ -72,8 +72,6 @@ public class RobotContainer {
                 Controls.driveRotate.getAsDouble()
             ), DriveModes.AUTOMATIC);
         }));
-
-        activeSubsystemsManager.getIntake().setStopAsDefaultCommand();
     }
 
     public void removeDefaults() {
@@ -137,18 +135,6 @@ public class RobotContainer {
                 Controls.driveTranslateX,
                 Controls.driveTranslateY
             )
-        );
-
-        Controls.getDriver().leftTrigger().whileTrue(
-            activeSubsystemsManager.getIntake().run(() -> {
-                activeSubsystemsManager.getIntake().setRollerVelocity(2000);
-            })
-        );
-
-        Controls.getDriver().rightTrigger().whileTrue(
-            activeSubsystemsManager.getIntake().run(() -> {
-                activeSubsystemsManager.getIntake().setRollerVelocity(-2000);
-            })
         );
     }
 
