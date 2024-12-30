@@ -1,4 +1,4 @@
-package org.team8592.lib.hardware.motor;
+package org.team8592.lib.hardware.motor.talonfx;
 
 import org.team8592.lib.PIDProfile;
 import org.team8592.lib.Utils;
@@ -8,25 +8,29 @@ import com.ctre.phoenix6.controls.*;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import org.team8592.lib.hardware.motor.NewtonMotor;
+import org.team8592.lib.hardware.motor.MotorConstants;
 
-public class TalonFXMotorController extends NewtonMotor {
-    public TalonFX motor; // Made public so it can be accessed as a follower
+public abstract class TalonFXMotor extends NewtonMotor {
+    protected TalonFX motor;
 
     private TalonFXConfiguration configuration;
 
     private PositionVoltage positionOutput;
     private VelocityVoltage velocityOutput;
 
-    public TalonFXMotorController(int motorID) {
-        this(motorID, false);
+    protected TalonFXMotor(int motorID, MotorConstants constants) {
+        this(motorID, false, constants);
     }
 
-    public TalonFXMotorController(int motorID, boolean reversed) {
+    protected TalonFXMotor(int motorID, boolean inverted, MotorConstants constants) {
+        super(motorID, inverted, constants);
+        
         this.motor = new TalonFX(motorID);
-        this.motor.setInverted(reversed);
+        this.motor.setInverted(inverted);
 
         this.configuration = new TalonFXConfiguration();
-        this.configuration.MotorOutput.Inverted = reversed ? 
+        this.configuration.MotorOutput.Inverted = inverted ? 
             InvertedValue.Clockwise_Positive :
             InvertedValue.CounterClockwise_Positive;
 
@@ -51,10 +55,10 @@ public class TalonFXMotorController extends NewtonMotor {
                     .withKP(gains.kP)
                     .withKI(gains.kI)
                     .withKD(gains.kD)
-                    .withKA(gains.kA)
-                    .withKV(gains.kV)
-                    .withKG(gains.kG)
-                    .withKS(gains.kS);
+                    .withKA(gains.feedForward.kA)
+                    .withKV(gains.feedForward.kV)
+                    .withKG(gains.feedForward.kG)
+                    .withKS(gains.feedForward.kS);
 
                 this.motor.getConfigurator().apply(slot0Config);
             case 1:
@@ -62,10 +66,10 @@ public class TalonFXMotorController extends NewtonMotor {
                     .withKP(gains.kP)
                     .withKI(gains.kI)
                     .withKD(gains.kD)
-                    .withKA(gains.kA)
-                    .withKV(gains.kV)
-                    .withKG(gains.kG)
-                    .withKS(gains.kS);
+                    .withKA(gains.feedForward.kA)
+                    .withKV(gains.feedForward.kV)
+                    .withKG(gains.feedForward.kG)
+                    .withKS(gains.feedForward.kS);
 
                 this.motor.getConfigurator().apply(slot1Config);
                 break;
@@ -74,10 +78,10 @@ public class TalonFXMotorController extends NewtonMotor {
                     .withKP(gains.kP)
                     .withKI(gains.kI)
                     .withKD(gains.kD)
-                    .withKA(gains.kA)
-                    .withKV(gains.kV)
-                    .withKG(gains.kG)
-                    .withKS(gains.kS);
+                    .withKA(gains.feedForward.kA)
+                    .withKV(gains.feedForward.kV)
+                    .withKG(gains.feedForward.kG)
+                    .withKS(gains.feedForward.kS);
 
                 this.motor.getConfigurator().apply(slot2Config);
                 break;
@@ -86,10 +90,10 @@ public class TalonFXMotorController extends NewtonMotor {
                     .withKP(gains.kP)
                     .withKI(gains.kI)
                     .withKD(gains.kD)
-                    .withKA(gains.kA)
-                    .withKV(gains.kV)
-                    .withKG(gains.kG)
-                    .withKS(gains.kS);
+                    .withKA(gains.feedForward.kA)
+                    .withKV(gains.feedForward.kV)
+                    .withKG(gains.feedForward.kG)
+                    .withKS(gains.feedForward.kS);
 
                 this.motor.getConfigurator().apply(slotConfig);
                 break;
@@ -101,6 +105,11 @@ public class TalonFXMotorController extends NewtonMotor {
     @Override
     public void setPercentOutput(double percent) {
         this.motor.set(percent);
+    }
+
+    @Override
+    public void setVoltage(double voltage, int slot) {
+        this.motor.setVoltage(voltage);
     }
 
     @Override
@@ -164,6 +173,11 @@ public class TalonFXMotorController extends NewtonMotor {
     @Override
     public double getRotations() {
         return this.motor.getPosition().getValueAsDouble();
+    }
+
+    @Override
+    public double getAppliedVoltage() {
+        return this.motor.getMotorVoltage().getValueAsDouble();
     }
 
     @Override

@@ -68,4 +68,6 @@ public final class Suppliers {
      * Whether we are using a physical robot or simulating one
      */
     public static final BooleanSupplier robotIsReal = () -> Robot.isReal();
+
+    public static final DoubleSupplier robotDt = () -> Robot.CLOCK.dt();
 }

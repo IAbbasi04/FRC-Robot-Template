@@ -72,7 +72,7 @@ public class SubsystemManager extends SubsystemBase {
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("SubsystemManager");
         activeSubystems.forEach(sub -> {
-            builder.addBooleanProperty(sub.getName() + " Enabled", 
+            builder.addBooleanProperty(sub.getName() + "/Enabled", 
                 sub::isEnabled, 
                 (enable) -> {
                     sub.enableSubsystem(enable);

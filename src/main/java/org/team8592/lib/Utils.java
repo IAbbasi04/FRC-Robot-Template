@@ -46,4 +46,8 @@ public class Utils {
 
         return newPose;
     }
+
+    public static double getMOIForRoller(double massKG, double radiusMeters) {
+        return (massKG * Math.pow(radiusMeters, 2d)) / 2d;
+    }
 }

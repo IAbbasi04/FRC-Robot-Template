@@ -1,31 +1,38 @@
-package org.team8592.lib.hardware.motor;
+package org.team8592.lib.hardware.motor.spark;
 
 import org.team8592.lib.PIDProfile;
 import org.team8592.lib.Utils;
 
-import com.revrobotics.CANSparkFlex;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.SoftLimitDirection;
-import com.revrobotics.CANSparkLowLevel.MotorType;
+import org.team8592.frc.robot.Robot;
+import org.team8592.lib.hardware.motor.NewtonMotor;
+import org.team8592.lib.hardware.motor.MotorConstants;
+import com.revrobotics.CANSparkBase;
 import com.revrobotics.SparkPIDController.AccelStrategy;
 
-public class SparkFlexMotorController extends NewtonMotor {
-    public CANSparkFlex motor; // Made public so it can be accessed as a follower
-    private SparkPIDController motorCtrl;
-    private RelativeEncoder encoder;
+import edu.wpi.first.wpilibj.simulation.*;
 
-    public SparkFlexMotorController(int motorID) {
-        this(motorID, false);
-    }
+public abstract class SparkBaseMotor<M extends CANSparkBase> extends NewtonMotor {
+    protected M motor;
+    protected SparkPIDController motorCtrl;
+    protected RelativeEncoder encoder;
 
-    public SparkFlexMotorController(int motorID, boolean reversed) {
-        this.motor = new CANSparkFlex(motorID, MotorType.kBrushless);
+    protected SparkBaseMotor(M motor, boolean inverted, MotorConstants constants) {
+        super(motor.getDeviceId(), inverted, constants);
+        this.motor = motor;
         this.motorCtrl = motor.getPIDController();
         this.encoder = motor.getEncoder();
+        this.motor.setInverted(inverted);
 
-        this.motor.setInverted(reversed);
+        super.simEncoder = EncoderSim.createForIndex(deviceID);
+        super.simMotor = new DCMotorSim(
+            NewtonMotor.getDCMotor(this, 1),
+            deviceID, 
+            1d
+        );
     }
 
     @Override
@@ -36,11 +43,10 @@ public class SparkFlexMotorController extends NewtonMotor {
     @Override
     public void withGains(PIDProfile gains) {
         super.motorPIDGains.add(gains.getSlot(), gains);
-
+        
         this.motorCtrl.setP(gains.kP);
         this.motorCtrl.setI(gains.kI);
         this.motorCtrl.setD(gains.kD);
-        this.motorCtrl.setFF(gains.kFF);
 
         if (gains.softLimit) { // If soft limit values applied in the gains profile
             this.motor.enableSoftLimit(SoftLimitDirection.kForward, true);
@@ -50,27 +56,44 @@ public class SparkFlexMotorController extends NewtonMotor {
             this.motor.setSoftLimit(SoftLimitDirection.kReverse, (float)gains.softLimitMin);
         }
 
-        this.motorCtrl.setSmartMotionAccelStrategy(AccelStrategy.kTrapezoidal, gains.pidSlot);
-        this.motorCtrl.setSmartMotionAllowedClosedLoopError(gains.tolerance, gains.pidSlot);
-        this.motorCtrl.setSmartMotionMaxVelocity(gains.maxVelocity, gains.pidSlot);
-        this.motorCtrl.setSmartMotionMaxAccel(gains.maxAcceleration, gains.pidSlot);
+        this.motorCtrl.setSmartMotionAllowedClosedLoopError(gains.getTolerance(), gains.getSlot());
+        this.motorCtrl.setSmartMotionAccelStrategy(AccelStrategy.kTrapezoidal, gains.getSlot());
+        this.motorCtrl.setSmartMotionMaxVelocity(gains.getMaxVelocity(), gains.getSlot());
+        this.motorCtrl.setSmartMotionMaxAccel(gains.getMaxAcceleration(), gains.getSlot());
     }
 
     @Override
     public void setPercentOutput(double percent) {
         this.motor.set(percent);
+        this.simEncoder.setDistance(percent);
+    }
+
+    @Override
+    public void setVoltage(double voltage, int slot) {
+        this.motor.setVoltage(voltage);
     }
 
     @Override
     public void setVelocity(double desiredVelocityRPM, int pidSlot) {
-        if (motorPIDGains != null && motorPIDGains.size() > 0) {
+        if (motorPIDGains.size() > 0) {
             Utils.clamp(
                 desiredVelocityRPM, 
                 -motorPIDGains.get(pidSlot).maxVelocity,
                 motorPIDGains.get(pidSlot).maxVelocity
             );
         }
-        this.motorCtrl.setReference(desiredVelocityRPM, ControlType.kSmartVelocity);
+
+        double arbFF = 0d;
+        if (feedForward.size() > 0) {
+            arbFF = feedForward.get(pidSlot).calculate(getVelocityRPM(), Robot.CLOCK.dt());
+        }
+
+        this.motorCtrl.setReference(
+            desiredVelocityRPM, 
+            ControlType.kSmartVelocity, 
+            pidSlot, 
+            arbFF
+        );
     }
 
     @Override
@@ -118,6 +141,11 @@ public class SparkFlexMotorController extends NewtonMotor {
     @Override
     public double getRotations() {
         return encoder.getPosition();
+    }
+
+    @Override
+    public double getAppliedVoltage() {
+        return motor.getBusVoltage();
     }
 
     @Override
