@@ -1,11 +1,10 @@
 package org.team8592.frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import org.team8592.lib.logging.SmartLogger;
+
 import org.team8592.lib.MatchMode;
+import org.team8592.lib.logging.SmartLogger;
 
 public abstract class NewtonSubsystem extends SubsystemBase {
     protected SmartLogger logger;

@@ -21,8 +21,8 @@ import edu.wpi.first.wpilibj2.command.*;
 public class RobotContainer {
     private SubsystemManager activeSubsystemsManager;
     private SwerveSubsystem swerve;
-    @SuppressWarnings("unused") private IntakeSubsystem intake;
-    @SuppressWarnings("unused") private PivotSubsystem pivot;
+    private IntakeSubsystem intake;
+    private PivotSubsystem pivot;
 
     private UnitTestScheduler testScheduler;
 
@@ -69,13 +69,16 @@ public class RobotContainer {
      */
     public void configureDefaults(){
         // Set the swerve's default command to drive with joysticks
-        swerve.setDefaultCommand(swerve.run(() -> {
+        this.swerve.setDefaultCommand(swerve.run(() -> {
             swerve.drive(swerve.processJoystickInputs(
                 Controls.driveTranslateX.getAsDouble(),
                 Controls.driveTranslateY.getAsDouble(),
                 Controls.driveRotate.getAsDouble()
             ), DriveModes.AUTOMATIC);
         }));
+
+        this.intake.setStopAsDefaultCommand();
+        // this.pivot.setStopAsDefaultCommand();
     }
 
     public void removeDefaults() {
@@ -140,6 +143,21 @@ public class RobotContainer {
                 Controls.driveTranslateY
             )
         );
+
+        Controls.groundIntake.whileTrue(NewtonCommands.setGroundIntakingCommand());
+        Controls.groundIntakeUpright.whileTrue(NewtonCommands.setUprightIntakingCommand());
+        Controls.hpIntake.whileTrue(NewtonCommands.setHPIntakingCommand());
+        Controls.primeGridScore.whileTrue(NewtonCommands.primeGridScoreCommand());
+        Controls.primeLowScore.whileTrue(NewtonCommands.primeLowScoreCommand());
+        Controls.primeHighScore.whileTrue(NewtonCommands.primeHighScoreCommand());
+        Controls.score.whileTrue(NewtonCommands.setRollersScoringCommand());
+        Controls.spit.whileTrue(NewtonCommands.setRollersSpittingCommand());
+        Controls.stow.onTrue(NewtonCommands.setStowStateCommand());
+
+        Controls.raisePivot.whileTrue(NewtonCommands.setPivotVelocityCommand(() -> 500d))
+            .onFalse(pivot.getStopCommand());
+        Controls.lowerPivot.whileTrue(NewtonCommands.setPivotVelocityCommand(() -> -500d))
+            .onFalse(pivot.getStopCommand());
     }
 
     /**

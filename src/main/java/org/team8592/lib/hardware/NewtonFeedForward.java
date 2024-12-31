@@ -2,6 +2,8 @@ package org.team8592.lib.hardware;
 
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+
 public class NewtonFeedForward {
     public double kV = 0d;
     public double kA = 0d;
@@ -49,5 +51,11 @@ public class NewtonFeedForward {
 
     public double calculate(double velocity, double dt) {
         return this.get(velocity, (velocity - lastVelocity) / dt);
+    }
+
+    public void a() {
+        SimpleMotorFeedforward b = new SimpleMotorFeedforward(kS, kV);
+
+        b.calculate(lastVelocity);
     }
 }

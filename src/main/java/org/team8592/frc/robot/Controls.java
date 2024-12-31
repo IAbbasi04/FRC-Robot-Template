@@ -44,6 +44,21 @@ public final class Controls {
     protected static Trigger snapLeft = new Trigger(() -> false);
     protected static Trigger snapRight = new Trigger(() -> false);
 
+    protected static Trigger groundIntake = new Trigger(() -> false);
+    protected static Trigger groundIntakeUpright = new Trigger(() -> false);
+    protected static Trigger hpIntake = new Trigger(() -> false);
+    protected static Trigger score = new Trigger(() -> false);
+    protected static Trigger spit = new Trigger(() -> false);
+    protected static Trigger primeGridScore = new Trigger(() -> false);
+    protected static Trigger primeLowScore = new Trigger(() -> false);
+    protected static Trigger primeHighScore = new Trigger(() -> false);
+    protected static Trigger raisePivot = new Trigger(() -> false);
+    protected static Trigger lowerPivot = new Trigger(() -> false);
+
+    protected static Trigger stow = new Trigger(() -> false);
+
+    protected static Trigger shift = new Trigger(() -> false);
+
     /**
      * Sets the controls for the drivebase movement
      */
@@ -52,8 +67,9 @@ public final class Controls {
         driveTranslateY = () -> -driverController.getLeftY();
         driveRotate = () -> -driverController.getRightX();
 
-        slowMode = driverController.rightBumper();
-        robotRelative = driverController.leftBumper();
+        // slowMode = driverController.rightBumper();
+        slowMode = driverController.leftStick();
+        // robotRelative = driverController.leftBumper();
         zeroGryoscope = driverController.back();
 
         snapForward = driverController.pov(0);
@@ -70,8 +86,23 @@ public final class Controls {
      */
     protected static void applyControlSet(ControlSets set){
         Controls.applyDrivetrainControls();
+        shift = getDriver().leftBumper(); // Shift key to adjust control mapping
 
         // Add controls that do not rely on control set below
+        groundIntake = getDriver().leftTrigger().and(shift.negate());
+        groundIntakeUpright = getDriver().leftTrigger().and(shift);
+        hpIntake = getDriver().b();
+
+        score = getDriver().rightTrigger().and(shift.negate());
+        spit = getDriver().rightTrigger().and(shift);
+
+        stow = getDriver().rightBumper();
+
+        primeGridScore = getDriver().x();
+        primeLowScore = getDriver().a();
+        primeHighScore = getDriver().y();
+        raisePivot = getDriver().povUp();
+        lowerPivot = getDriver().povDown();
 
         // Use the controls set if we have differentiating inputs for a certain control
         // i.e. if single driver intaking is driver left trigger whereas 

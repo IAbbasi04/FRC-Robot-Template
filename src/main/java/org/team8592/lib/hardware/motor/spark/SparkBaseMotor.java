@@ -5,11 +5,9 @@ import org.team8592.lib.Utils;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
-import com.revrobotics.CANSparkBase.ControlType;
-import com.revrobotics.CANSparkBase.SoftLimitDirection;
+import com.revrobotics.CANSparkBase.*;
 import org.team8592.frc.robot.Robot;
-import org.team8592.lib.hardware.motor.NewtonMotor;
-import org.team8592.lib.hardware.motor.MotorConstants;
+import org.team8592.lib.hardware.motor.*;
 import com.revrobotics.CANSparkBase;
 import com.revrobotics.SparkPIDController.AccelStrategy;
 
@@ -19,6 +17,7 @@ public abstract class SparkBaseMotor<M extends CANSparkBase> extends NewtonMotor
     protected M motor;
     protected SparkPIDController motorCtrl;
     protected RelativeEncoder encoder;
+    protected double simVelocity = 0d;
 
     protected SparkBaseMotor(M motor, boolean inverted, MotorConstants constants) {
         super(motor.getDeviceId(), inverted, constants);
@@ -65,7 +64,7 @@ public abstract class SparkBaseMotor<M extends CANSparkBase> extends NewtonMotor
     @Override
     public void setPercentOutput(double percent) {
         this.motor.set(percent);
-        this.simEncoder.setDistance(percent);
+        // this.simEncoder.setDistance(percent);
     }
 
     @Override
@@ -75,17 +74,21 @@ public abstract class SparkBaseMotor<M extends CANSparkBase> extends NewtonMotor
 
     @Override
     public void setVelocity(double desiredVelocityRPM, int pidSlot) {
+        this.lastAppliedPIDSlot = pidSlot;
+
+        double arbFF = 0d;
         if (motorPIDGains.size() > 0) {
-            Utils.clamp(
+            desiredVelocityRPM = Utils.clamp(
                 desiredVelocityRPM, 
                 -motorPIDGains.get(pidSlot).maxVelocity,
                 motorPIDGains.get(pidSlot).maxVelocity
             );
-        }
 
-        double arbFF = 0d;
-        if (feedForward.size() > 0) {
-            arbFF = feedForward.get(pidSlot).calculate(getVelocityRPM(), Robot.CLOCK.dt());
+            double appliedVelocity = 
+                motorPIDGains.get(pidSlot).toProfiledPIDController()
+                    .calculate(getVelocityRPM(), desiredVelocityRPM);
+
+            arbFF = motorPIDGains.get(pidSlot).feedForward.calculate(appliedVelocity, Robot.CLOCK.dt());
         }
 
         this.motorCtrl.setReference(

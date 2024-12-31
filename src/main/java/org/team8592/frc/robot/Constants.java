@@ -175,6 +175,15 @@ public final class Constants {
         ;
     }
 
+    public final class PIVOT {
+        /**
+         * 125:1 Gearbox reduction
+         * 36:15 Pivot Sprocket Teeth Ratio
+         */
+        public static final double MOTOR_TO_PIVOT_GEAR_RATIO = (125d / 1d) * (36d / 15d);
+        public static final double MOTOR_ROTATIONS_TO_PIVOT_DEGREES = 360d / MOTOR_TO_PIVOT_GEAR_RATIO;
+    }
+
     public final class VISION {
         public static final AprilTagFieldLayout APRIL_TAG_LAYOUT = AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo);
         public static final Transform3d CAMERA_POSE_TO_ROBOT_POSE = new Transform3d();

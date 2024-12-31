@@ -4,28 +4,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.team8592.lib.PIDProfile;
-import org.team8592.lib.hardware.NewtonFeedForward;
-import org.team8592.lib.hardware.motor.spark.SparkFlexMotor;
-import org.team8592.lib.hardware.motor.spark.SparkMaxMotor;
-import org.team8592.lib.hardware.motor.talonfx.Falcon500FOCMotor;
-import org.team8592.lib.hardware.motor.talonfx.Falcon500Motor;
-import org.team8592.lib.hardware.motor.talonfx.KrakenX60FOCMotor;
-import org.team8592.lib.hardware.motor.talonfx.KrakenX60Motor;
-import org.team8592.lib.hardware.motor.talonfx.TalonFXMotor;
+import org.team8592.lib.hardware.motor.spark.*;
+import org.team8592.lib.hardware.motor.talonfx.*;
 
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import edu.wpi.first.wpilibj.simulation.EncoderSim;
+import edu.wpi.first.wpilibj.simulation.*;
 
 public abstract class NewtonMotor {
     protected List<PIDProfile> motorPIDGains = new ArrayList<>();
-    protected List<NewtonFeedForward> feedForward = new ArrayList<>();
+    // protected List<NewtonFeedForward> feedForward = new ArrayList<>();
     protected int deviceID = 0;
     protected boolean inverted = false;
     protected MotorConstants motorConstants = null;
     protected double desiredVelocityRPM = 0d;
     protected EncoderSim simEncoder; 
     protected DCMotorSim simMotor;
+
+    protected int lastAppliedPIDSlot = 0;
 
     protected NewtonMotor(int id, boolean inverted, MotorConstants constants) {
         this.deviceID = id;

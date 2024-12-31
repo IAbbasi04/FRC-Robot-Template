@@ -17,6 +17,8 @@ public class SubsystemManager extends SubsystemBase {
 
     public SubsystemManager(boolean logToShuffleboard) {
         this.swerveSubsystem = new SwerveSubsystem(logToShuffleboard);
+        this.intakeSubsystem = new IntakeSubsystem(logToShuffleboard);
+        this.pivotSubsystem = new PivotSubsystem(logToShuffleboard);
 
         this.activeSubystems = List.of(
             // Add all active subsystems here
