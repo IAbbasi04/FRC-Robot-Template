@@ -69,5 +69,8 @@ public final class Suppliers {
      */
     public static final BooleanSupplier robotIsReal = () -> Robot.isReal();
 
+    /**
+     * The period of time between robot cycles (typically around 0.02 seconds / 20 ms)
+     */
     public static final DoubleSupplier robotDt = () -> Robot.CLOCK.dt();
 }
