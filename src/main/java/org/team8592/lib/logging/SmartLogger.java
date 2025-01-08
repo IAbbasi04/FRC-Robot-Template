@@ -12,6 +12,7 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.util.struct.StructSerializable;
 import edu.wpi.first.wpilibj.shuffleboard.*;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SmartLogger {
     private String tableName = "";
@@ -160,6 +161,10 @@ public class SmartLogger {
 
     public void addSendable(Sendable sendable, WidgetProfile constants) {
         this.shuffleboardTab.add(sendable).withPosition(constants.column, constants.row);
+    }
+
+    public void addData(String key, Sendable sendable) {
+        SmartDashboard.putData(key, sendable);
     }
 
     // TODO - Try to fix this sometime

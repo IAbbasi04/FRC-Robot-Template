@@ -24,7 +24,7 @@ public abstract class NewtonMotor {
     protected boolean inverted = false;
     protected MotorConstants motorConstants = null;
     protected double desiredVelocityRPM = 0d;
-    protected EncoderSim simEncoder; 
+    protected EncoderSim simEncoder;
     protected DCMotorSim simMotor;
 
     protected NewtonMotor(int id, boolean inverted, MotorConstants constants) {
