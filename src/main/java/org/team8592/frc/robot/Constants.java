@@ -2,7 +2,6 @@ package org.team8592.frc.robot;
 
 import org.team8592.lib.PIDProfile;
 
-import edu.wpi.first.apriltag.*;
 import edu.wpi.first.math.geometry.*;
 
 public final class Constants {
@@ -173,11 +172,6 @@ public final class Constants {
         .setI(SWERVE.SNAP_TO_kI)
         .setD(SWERVE.SNAP_TO_kD)
         ;
-    }
-
-    public final class VISION {
-        public static final AprilTagFieldLayout APRIL_TAG_LAYOUT = AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo);
-        public static final Transform3d CAMERA_POSE_TO_ROBOT_POSE = new Transform3d();
     }
 
     public final class ROBOT {
