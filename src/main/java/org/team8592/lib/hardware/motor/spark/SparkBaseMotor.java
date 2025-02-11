@@ -1,71 +1,91 @@
 package org.team8592.lib.hardware.motor.spark;
 
-import org.team8592.lib.PIDProfile;
-import org.team8592.lib.Utils;
-
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkPIDController;
-import com.revrobotics.CANSparkBase.ControlType;
-import com.revrobotics.CANSparkBase.SoftLimitDirection;
-import org.team8592.frc.robot.Robot;
-import org.team8592.lib.hardware.motor.NewtonMotor;
-import org.team8592.lib.hardware.motor.MotorConstants;
-import com.revrobotics.CANSparkBase;
-import com.revrobotics.SparkPIDController.AccelStrategy;
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.SparkBase.*;
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.config.SparkBaseConfig;
 
-import edu.wpi.first.wpilibj.simulation.*;
+import frc.robot.helpers.motor.MotorConstants;
+import frc.robot.helpers.motor.NewtonMotor;
 
-public abstract class SparkBaseMotor<M extends CANSparkBase> extends NewtonMotor {
+public abstract class SparkBaseMotor<M extends SparkBase, C extends SparkBaseConfig> extends NewtonMotor {
     protected M motor;
-    protected SparkPIDController motorCtrl;
+    protected SparkClosedLoopController motorCtrl;
     protected RelativeEncoder encoder;
+    protected C config;
 
-    protected SparkBaseMotor(M motor, boolean inverted, MotorConstants constants) {
+    protected SparkBaseMotor(M motor, C config, boolean inverted, MotorConstants constants) {
         super(motor.getDeviceId(), inverted, constants);
         this.motor = motor;
-        this.motorCtrl = motor.getPIDController();
+        this.motorCtrl = motor.getClosedLoopController();
         this.encoder = motor.getEncoder();
-        this.motor.setInverted(inverted);
+        
+        this.config = config;
+        this.config.inverted(inverted);
+    }
 
-        super.simEncoder = EncoderSim.createForIndex(deviceID);
-        super.simMotor = new DCMotorSim(
-            NewtonMotor.getDCMotor(this, 1),
-            deviceID, 
-            1d
-        );
+    @Override
+    public void configureMotionProfile(double maxVelocity, double maxAcceleration) {
+        this.config.closedLoop.maxMotion
+            .maxVelocity(maxVelocity, ClosedLoopSlot.kSlot0)
+            .maxAcceleration(maxAcceleration, ClosedLoopSlot.kSlot0)
+            .positionMode(com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode.kMAXMotionTrapezoidal, ClosedLoopSlot.kSlot0)
+            .allowedClosedLoopError(0, ClosedLoopSlot.kSlot0)
+        ;
+
+        this.motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     @Override
     public void setInverted(boolean inverted) {
-        this.motor.setInverted(inverted);
+        this.config.inverted(inverted);
+        this.motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     @Override
     public void withGains(PIDProfile gains) {
         super.motorPIDGains.add(gains.getSlot(), gains);
         
-        this.motorCtrl.setP(gains.kP);
-        this.motorCtrl.setI(gains.kI);
-        this.motorCtrl.setD(gains.kD);
-
-        if (gains.softLimit) { // If soft limit values applied in the gains profile
-            this.motor.enableSoftLimit(SoftLimitDirection.kForward, true);
-            this.motor.enableSoftLimit(SoftLimitDirection.kReverse, true);
-
-            this.motor.setSoftLimit(SoftLimitDirection.kForward, (float)gains.softLimitMax);
-            this.motor.setSoftLimit(SoftLimitDirection.kReverse, (float)gains.softLimitMin);
+        ClosedLoopSlot slot;
+        if (gains.getSlot() == 1) {
+            slot = ClosedLoopSlot.kSlot1;
+        } else if (gains.getSlot() == 2) {
+            slot = ClosedLoopSlot.kSlot2;
+        } else if (gains.getSlot() == 3) {
+            slot = ClosedLoopSlot.kSlot3;
+        } else {
+            slot = ClosedLoopSlot.kSlot0;
         }
 
-        this.motorCtrl.setSmartMotionAllowedClosedLoopError(gains.getTolerance(), gains.getSlot());
-        this.motorCtrl.setSmartMotionAccelStrategy(AccelStrategy.kTrapezoidal, gains.getSlot());
-        this.motorCtrl.setSmartMotionMaxVelocity(gains.getMaxVelocity(), gains.getSlot());
-        this.motorCtrl.setSmartMotionMaxAccel(gains.getMaxAcceleration(), gains.getSlot());
+        this.config.closedLoop
+            .p(gains.kP, slot)
+            .i(gains.kI, slot)
+            .d(gains.kD, slot)
+            .velocityFF(gains.kV, slot)
+            ;
+
+        if (gains.softLimit) {
+            this.config.softLimit.forwardSoftLimitEnabled(gains.softLimit);
+            this.config.softLimit.forwardSoftLimit(gains.softLimitMax);
+            this.config.softLimit.reverseSoftLimitEnabled(gains.softLimit);
+            this.config.softLimit.reverseSoftLimit(gains.softLimitMax);
+        }
+
+        this.config.closedLoop.maxMotion
+            .maxVelocity(gains.maxVelocity, slot)
+            .maxAcceleration(gains.maxAcceleration, slot)
+            .positionMode(com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode.kMAXMotionTrapezoidal, slot)
+            .allowedClosedLoopError(gains.tolerance, slot)
+        ;
+
+        this.motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     @Override
     public void setPercentOutput(double percent) {
         this.motor.set(percent);
-        this.simEncoder.setDistance(percent);
     }
 
     @Override
@@ -83,21 +103,22 @@ public abstract class SparkBaseMotor<M extends CANSparkBase> extends NewtonMotor
             );
         }
 
-        double arbFF = 0d;
-        if (feedForward.size() > 0) {
-            arbFF = feedForward.get(pidSlot).calculate(getVelocityRPM(), Robot.CLOCK.dt());
-        }
+        ClosedLoopSlot slot = getSlot(pidSlot);
+
+        // double arbFF = 0d;
+        // if (feedForward.size() > 0) {
+        //     arbFF = feedForward.get(pidSlot).calculate(getVelocityRPM(), Robot.CLOCK.dt());
+        // }
 
         this.motorCtrl.setReference(
             desiredVelocityRPM, 
-            ControlType.kSmartVelocity, 
-            pidSlot, 
-            arbFF
+            ControlType.kMAXMotionVelocityControl, 
+            slot
         );
     }
 
     @Override
-    public void setPositionSmartMotion(double desiredRotations, int pidSlot) {
+    public void setPosition(double desiredRotations, int pidSlot) {
         if (motorPIDGains != null) {
             Utils.clamp(
                 desiredRotations, 
@@ -105,32 +126,39 @@ public abstract class SparkBaseMotor<M extends CANSparkBase> extends NewtonMotor
                 motorPIDGains.get(pidSlot).softLimitMax
             );
         }
-        this.motorCtrl.setReference(desiredRotations, ControlType.kSmartMotion);
+        
+        this.motorCtrl.setReference(desiredRotations, ControlType.kMAXMotionPositionControl, getSlot(pidSlot));
     }
 
     @Override
     public void setFollowerTo(NewtonMotor master, boolean reversed) {
-        motor.follow(master.getAsSparkFlex().motor, reversed);
+        this.config.follow(master.getAsSparkFlex().motor);
+        this.motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     @Override
     public void setCurrentLimit(int currentAmps) {
-        this.motor.setSmartCurrentLimit(currentAmps);
-        this.motor.setSecondaryCurrentLimit(currentAmps);
+        this.config.smartCurrentLimit(currentAmps);
+        this.config.secondaryCurrentLimit(currentAmps);
+        this.motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     @Override
     public void setIdleMode(IdleMode idleMode) {
+        com.revrobotics.spark.config.SparkBaseConfig.IdleMode mode;
         switch (idleMode) {
             case kCoast:
-                motor.setIdleMode(com.revrobotics.CANSparkBase.IdleMode.kCoast);
+                mode = com.revrobotics.spark.config.SparkBaseConfig.IdleMode.kCoast;
                 break;
             case kBrake:
             // On default set to brake mode
             default:
-                motor.setIdleMode(com.revrobotics.CANSparkBase.IdleMode.kBrake);
+            mode = com.revrobotics.spark.config.SparkBaseConfig.IdleMode.kBrake;
                 break;
         }
+
+        this.config.idleMode(mode);
+        this.motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     @Override
@@ -151,5 +179,32 @@ public abstract class SparkBaseMotor<M extends CANSparkBase> extends NewtonMotor
     @Override
     public void resetEncoderPosition(double rotations) {
         this.encoder.setPosition(rotations);
+    }
+
+    @Override
+    public double getVoltage() {
+        return motor.getAppliedOutput();
+    }
+
+    @Override
+    public void setSoftLimits(double min, double max) {
+        this.config.softLimit.forwardSoftLimitEnabled(true);
+        this.config.softLimit.forwardSoftLimit(max);
+
+        this.config.softLimit.reverseSoftLimitEnabled(true);
+        this.config.softLimit.reverseSoftLimit(min);
+    }
+
+    private ClosedLoopSlot getSlot(int slot) {
+        switch (slot) {
+            case 1:
+                return ClosedLoopSlot.kSlot1;
+            case 2:
+                return ClosedLoopSlot.kSlot2;
+            case 3:
+                return ClosedLoopSlot.kSlot3;
+            default:
+                return ClosedLoopSlot.kSlot0;
+        }
     }
 }

@@ -1,25 +1,17 @@
-package org.team8592.lib.hardware.motor;
+package frc.robot.helpers.motor;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.team8592.lib.PIDProfile;
-import org.team8592.lib.hardware.NewtonFeedForward;
-import org.team8592.lib.hardware.motor.spark.SparkFlexMotor;
-import org.team8592.lib.hardware.motor.spark.SparkMaxMotor;
-import org.team8592.lib.hardware.motor.talonfx.Falcon500FOCMotor;
-import org.team8592.lib.hardware.motor.talonfx.Falcon500Motor;
-import org.team8592.lib.hardware.motor.talonfx.KrakenX60FOCMotor;
-import org.team8592.lib.hardware.motor.talonfx.KrakenX60Motor;
-import org.team8592.lib.hardware.motor.talonfx.TalonFXMotor;
-
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
+import frc.robot.helpers.PIDProfile;
+import frc.robot.helpers.motor.spark.SparkFlexMotor;
+import frc.robot.helpers.motor.spark.SparkMaxMotor;
+import frc.robot.helpers.motor.talonfx.TalonFXMotor;
 
 public abstract class NewtonMotor {
     protected List<PIDProfile> motorPIDGains = new ArrayList<>();
-    protected List<NewtonFeedForward> feedForward = new ArrayList<>();
     protected int deviceID = 0;
     protected boolean inverted = false;
     protected MotorConstants motorConstants = null;
@@ -41,6 +33,10 @@ public abstract class NewtonMotor {
     public abstract void setInverted(boolean inverted);
 
     public abstract void withGains(PIDProfile gains);
+
+    public void withGains(PIDProfile gains, int slot) {
+        this.withGains(gains.setSlot(slot));
+    }
     
     public abstract void setPercentOutput(double percent);
 
@@ -56,10 +52,10 @@ public abstract class NewtonMotor {
         setVelocity(desiredRPM, 0);
     }
 
-    public abstract void setPositionSmartMotion(double desiredRotations, int pidSlot);
+    public abstract void setPosition(double desiredRotations, int pidSlot);
 
-    public void setPositionSmartMotion(double desiredRotations) {
-        setPositionSmartMotion(desiredRotations, 0);
+    public void setPosition(double desiredRotations) {
+        setPosition(desiredRotations, 0);
     }
     
     public abstract void setFollowerTo(NewtonMotor master, boolean reversed);
@@ -80,23 +76,11 @@ public abstract class NewtonMotor {
 
     public abstract void resetEncoderPosition(double rotations);
 
-    public static <M extends NewtonMotor> DCMotor getDCMotor(M motor, int numMotors) {
-        DCMotor dcMotor = null;
-        if (motor.getClass().equals(SparkFlexMotor.class)) { // Vortex Motor
-            dcMotor = DCMotor.getNeoVortex(numMotors);
-        } else if (motor.getClass().equals(SparkMaxMotor.class)) { // Neo Motor
-            dcMotor = DCMotor.getNEO(numMotors);
-        } else if (motor.getClass().equals(Falcon500Motor.class)) {
-            dcMotor = DCMotor.getFalcon500(numMotors);
-        } else if (motor.getClass().equals(Falcon500FOCMotor.class)) {
-            dcMotor = DCMotor.getFalcon500Foc(numMotors);
-        } else if (motor.getClass().equals(KrakenX60Motor.class)) {
-            dcMotor = DCMotor.getKrakenX60(numMotors);
-        } else if (motor.getClass().equals(KrakenX60FOCMotor.class)) {
-            dcMotor = DCMotor.getKrakenX60Foc(numMotors);
-        }
-        return dcMotor;
-    }
+    public abstract void setSoftLimits(double min, double max);
+
+    public abstract void configureMotionProfile(double maxVelocity, double maxAcceleration);
+
+    public abstract double getVoltage();
 
     public boolean isInverted() {
         return this.inverted;

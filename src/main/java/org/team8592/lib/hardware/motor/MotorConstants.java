@@ -1,4 +1,4 @@
-package org.team8592.lib.hardware.motor;
+package frc.robot.helpers.motor;
 
 public class MotorConstants {
     public final double MAX_VELOCITY_RPM;
