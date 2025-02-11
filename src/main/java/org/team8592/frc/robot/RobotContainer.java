@@ -4,142 +4,129 @@
 
 package org.team8592.frc.robot;
 
-import org.team8592.lib.logging.LogUtils;
-import org.team8592.frc.robot.Controls.ControlSets;
-import org.team8592.frc.robot.autonomous.AutoManager;
-import org.team8592.frc.robot.commands.*;
-import org.team8592.frc.robot.commands.proxies.NewtonWrapperCommand;
-import org.team8592.frc.robot.subsystems.*;
-import org.team8592.frc.robot.subsystems.SwerveSubsystem.DriveModes;
-import org.team8592.frc.robot.unittest.UnitTestScheduler;
-import org.team8592.lib.MatchMode;
+import static org.team8592.frc.robot.commands.NewtonCommands.*;
 
+import org.team8592.frc.robot.commands.autonomous.*;
+import org.team8592.frc.robot.commands.largecommands.LargeCommand;
+import org.team8592.frc.robot.subsystems.SubsystemManager;
+import org.team8592.frc.robot.subsystems.swerve.SwerveSubsystem.DriveModes;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj2.command.*;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
+
 
 public class RobotContainer {
-    private SubsystemManager activeSubsystemsManager;
-    // private SwerveSubsystem swerve;
-
-    private UnitTestScheduler testScheduler;
-
-    private boolean logToShuffleboard = false;
+    // The robot's subsystems
+    private final SubsystemManager manager;
 
     /**
      * Create the robot container. This creates and configures subsystems, sets
      * up button bindings, and prepares for autonomous.
      */
     public RobotContainer(boolean logToShuffleboard) {
-        this.activeSubsystemsManager = new SubsystemManager(logToShuffleboard);
-        this.testScheduler = new UnitTestScheduler(activeSubsystemsManager);
+        manager = new SubsystemManager(logToShuffleboard);
 
-        this.logToShuffleboard = logToShuffleboard;
-        
-        NewtonCommands.initialize(activeSubsystemsManager);
-        NewtonWrapperCommand.initialize(activeSubsystemsManager);
-        AutoManager.prepare(activeSubsystemsManager);
+        passSubsystems();
+        configureBindings();
+        configureDefaults();
 
-        Controls.initializeShuffleboardLogs(logToShuffleboard);
-
-        // Add subsystems here
-        // swerve = activeSubsystemsManager.getSwerve();
-
-        this.configureBindings(ControlSets.DUAL_DRIVER);
-        this.configureDefaults();
-        this.registerNamedCommands();
-
-        this.activeSubsystemsManager.onRobotInit();
-        LogUtils.addSendable(activeSubsystemsManager);
+        AutoManager.prepare();
     }
 
     /**
-     * Registers all named commands to be used as events in PathPlanner autos
+     * Pass subsystems everywhere they're needed
      */
-    private void registerNamedCommands() {
-        // Register named commands for PathPlanner event markers
+    private void passSubsystems(){
+        AutoManager.addSubsystems(manager);
+        AutoCommand.addSubsystems(manager);
+        LargeCommand.addSubsystems(manager);
+        Suppliers.addSubsystems(manager);
     }
 
     /**
      * Configure default commands for the subsystems
      */
-    public void configureDefaults(){
+    private void configureDefaults(){
         // Set the swerve's default command to drive with joysticks
-        // swerve.setDefaultCommand(swerve.run(() -> {
-        //     swerve.drive(swerve.processJoystickInputs(
-        //         Controls.driveTranslateX.getAsDouble(),
-        //         Controls.driveTranslateY.getAsDouble(),
-        //         Controls.driveRotate.getAsDouble()
-        //     ), DriveModes.AUTOMATIC);
-        // }));
-
-        activeSubsystemsManager.getIntake().setDefaultCommand(activeSubsystemsManager.getIntake().run(() -> {
-            activeSubsystemsManager.getIntake().setRollerVelocity(Controls.getDriver().getLeftY()*1000);
-        }));
+        setDefaultCommand(manager.swerveSubsystem, manager.swerveSubsystem.run(() -> {
+            manager.swerveSubsystem.drive(manager.swerveSubsystem.processJoystickInputs(
+                Controls.driveTranslateX.getAsDouble(),
+                Controls.driveTranslateY.getAsDouble(),
+                Controls.driveRotate.getAsDouble()
+            ), DriveModes.AUTOMATIC);
+        }).withInterruptBehavior(InterruptionBehavior.kCancelSelf));
     }
 
-    public void removeDefaults() {
-        // swerve.removeDefaultCommand();
-    }
+
+    //Any commands that are reused a lot but can't go in a separate class go here
 
     /**
      * Configure all button bindings
-     *
-     * @param controlSet the set of controls to use
      */
-    private void configureBindings(ControlSets controlSet) {
-        CommandScheduler.getInstance().getDefaultButtonLoop().clear();
-        Controls.applyControlSet(controlSet);
+    private void configureBindings() {
+        // Driver controls:
+        // Operator:
+        Controls.slowMode.onTrue(
+            // The Commands.runOnce (instead of swerve.runOnce) is a special case here
+            // to allow this to run while other swerve commands (the default driving
+            // command, for example) run. This is usually a horrible idea and shouldn't
+            // be used outside of special cases like this.
 
-        // Controls.slowMode.onTrue(
-        //     Commands.runOnce(() -> swerve.setSlowMode(true)).ignoringDisable(true)
-        // ).onFalse(
-        //     Commands.runOnce(() -> swerve.setSlowMode(false)).ignoringDisable(true)
-        // );
+            // The .ignoringDisable makes sure slow mode won't get stuck on or off if
+            // the robot is disabled.
+            Commands.runOnce(() -> manager.swerveSubsystem.setSlowMode(true)).ignoringDisable(true)
+        ).onFalse(
+            Commands.runOnce(() -> manager.swerveSubsystem.setSlowMode(false)).ignoringDisable(true)
+        );
 
-        // Controls.zeroGryoscope.onTrue(
-        //     // Similar comment on Commands.runOnce as slow mode above
-        //     Commands.runOnce(() -> swerve.resetHeading())
-        // );
+        Controls.zeroGryoscope.onTrue(
+            // Similar comment on Commands.runOnce as slow mode above
+            Commands.runOnce(() -> manager.swerveSubsystem.resetHeading())
+        );
 
-        // Controls.robotRelative.onTrue(
-        //     // Similar comment on Commands.runOnce and ignoringDisable as slow mode above
-        //     Commands.runOnce(() -> swerve.setRobotRelative(true)).ignoringDisable(true)
-        // ).onFalse(
-        //     Commands.runOnce(() -> swerve.setRobotRelative(false)).ignoringDisable(true)
-        // );
+        Controls.robotRelative.onTrue(
+            // Similar comment on Commands.runOnce and ignoringDisable as slow mode above
+            Commands.runOnce(() -> manager.swerveSubsystem.setRobotRelative(true)).ignoringDisable(true)
+        ).onFalse(
+            Commands.runOnce(() -> manager.swerveSubsystem.setRobotRelative(false)).ignoringDisable(true)
+        );
 
-        Controls.snapForward.whileTrue(
-            NewtonCommands.swerveSnapToCommand(
+        Controls.snapNorth.whileTrue(
+            swerveSnapToCommand(
                 Rotation2d.fromDegrees(0),
-                Controls.driveTranslateX,
-                Controls.driveTranslateY
+                () -> Controls.driveTranslateX.getAsDouble(),
+                () -> Controls.driveTranslateY.getAsDouble()
             )
         );
 
-        Controls.snapBack.whileTrue(
-            NewtonCommands.swerveSnapToCommand(
+        Controls.snapSouth.whileTrue(
+            swerveSnapToCommand(
                 Rotation2d.fromDegrees(180),
-                Controls.driveTranslateX,
-                Controls.driveTranslateY
+                () -> Controls.driveTranslateX.getAsDouble(),
+                () -> Controls.driveTranslateY.getAsDouble()
             )
         );
 
-        Controls.snapRight.whileTrue(
-            NewtonCommands.swerveSnapToCommand(
+        Controls.snapEast.whileTrue(
+            swerveSnapToCommand(
                 Rotation2d.fromDegrees(270),
-                Controls.driveTranslateX,
-                Controls.driveTranslateY
+                () -> Controls.driveTranslateX.getAsDouble(),
+                () -> Controls.driveTranslateY.getAsDouble()
             )
         );
 
-        Controls.snapLeft.whileTrue(
-            NewtonCommands.swerveSnapToCommand(
+        Controls.snapWest.whileTrue(
+            swerveSnapToCommand(
                 Rotation2d.fromDegrees(90),
-                Controls.driveTranslateX,
-                Controls.driveTranslateY
-            )
+                () -> Controls.driveTranslateX.getAsDouble(),
+                () -> Controls.driveTranslateY.getAsDouble()
+            ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
-    }
+    };
+
+
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -151,23 +138,21 @@ public class RobotContainer {
     }
 
     /**
-     * Whether we want to log to shuffleboard
+     * Set the default command of a subsystem (what to run if no other command requiring it is running).
+     * <p> NOTE: all subsystems also have a setDefaultCommand method; this version includes a check for
+     * default commands that cancel incoming commands that require the subsystem. Unless you're sure
+     * of what you're doing, you should use this one.
+     *
+     * @param subsystem the subsystem to apply the default command to
+     * @param command to command to set as default
      */
-    public boolean logToShuffleboard() {
-        return logToShuffleboard;
-    }
-
-    /**
-     * Runs the onInit() method for each active subsystem based on the given mode
-     */
-    public void runSubsystemsInit(MatchMode mode) {
-        activeSubsystemsManager.onInit(mode);
-    }
-
-    public void scheduleUnitTests() {
-        testScheduler.getUnitTestCommand();
-        CommandScheduler.getInstance().schedule(
-            testScheduler.getUnitTestCommand()
-        );
+    private void setDefaultCommand(SubsystemBase subsystem, Command command){
+        if(command.getInterruptionBehavior() == InterruptionBehavior.kCancelSelf){
+            subsystem.setDefaultCommand(command);
+        }
+        else{
+            //If you want to force-allow setting a cancel-incoming default command, directly call `subsystem.setDefaultCommand()` instead
+            throw new UnsupportedOperationException("Can't set a default command that cancels incoming!");
+        }
     }
 }

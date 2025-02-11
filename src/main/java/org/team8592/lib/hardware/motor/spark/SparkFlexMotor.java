@@ -12,11 +12,16 @@ public class SparkFlexMotor extends SparkBaseMotor<SparkFlex, SparkFlexConfig> {
     }
 
     public SparkFlexMotor(int motorID, boolean inverted) {
-        super(new SparkFlex(motorID, MotorType.kBrushless), inverted, new MotorConstants(
-            6784d, 
-            211d, 
-            3.6, 
-            575.1
-        ));
+        super(
+            new SparkFlex(motorID, MotorType.kBrushless), 
+            new SparkFlexConfig(),
+            inverted,
+            new MotorConstants(
+                6784d, 
+                211d, 
+                3.6, 
+                575.1
+            )
+        );
     }
 }

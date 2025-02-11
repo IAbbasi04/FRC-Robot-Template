@@ -1,35 +1,17 @@
 package org.team8592.frc.robot;
 
-import org.team8592.lib.PIDProfile;
-
-import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
 
 public final class Constants {
     public final class SHARED {
         public static final String LOG_FOLDER = "CustomLogs";
     }
-
-    public final class FIELD {
-        public static final double RED_WALL_X = 16.542; // distance in meters between red and blue sides
-    }
-
-    public final class LOGGER {
-        public static final String GAME = "_GAME_";
-        public static final String YEAR = "_YEAR_";
-        public static final String ROBOT = "_ROBOT_";
-        public static final String TEAM = "_TEAM_";
-    }
-
-    public final class SIMULATION {
-        public static final double SWERVE_TRANSLATE_DELTA = 0.02; // How much to update the translational velocity of the swerve in simulation
-        public static final double SWERVE_ROTATE_DELTA = 0.02; // How much to update the rotational velocity of the swerve in simulation
-        
-        public static final double SIMULATED_STEER_INERTIA = 0.00001;
-        public static final double SIMULATED_DRIVE_INERTIA = 0.06;
-        
-        public static final double SIMULATION_LOOP_PERIOD = 0.005;
-    }
-
     public final class CONVERSIONS {
         public static final double METERS_SECOND_TO_TICKS_TALONFX = ((2048 * 6.75 * 60) / (200 * Math.PI * 0.0508));
 
@@ -45,14 +27,34 @@ public final class Constants {
     }
 
     public final class MEASUREMENTS {
-        public static final double FIELD_LENGTH_METERS = 16.5410515;
+        public static final double FIELD_LENGTH_METERS = 17.548;
+        public static final double FIELD_WIDTH_METERS = 8.052;
     }
 
     public final class CONTROLLERS {
         public static final int DRIVER_PORT = 0;
         public static final int OPERATOR_PORT = 1;
+        public static final int CORAL_SELECTOR_PORT = 2;
 
-        public static final double TRIGGER_PRESS_DEADBAND = 0.1;
+        // Assignments for coralController buttons
+        public static final int CORAL_CONTROLLER_L1 = 7;
+        public static final int CORAL_CONTROLLER_L2 = 8;
+        public static final int CORAL_CONTROLLER_L3 = 2;
+        public static final int CORAL_CONTROLLER_L4 = 3;
+        public static final int CORAL_CONTROLLER_R1 = 5;
+        public static final int CORAL_CONTROLLER_R2 = 6;
+        public static final int CORAL_CONTROLLER_R3 = 1;
+        public static final int CORAL_CONTROLLER_R4 = 4;
+    }
+
+    public final class CAN {
+        public static final int INTAKE_MOTOR_CAN_ID = 12;
+        public static final int PDH_CAN_ID = 1;
+
+        public static final int BACK_EXTENSION_MOTOR_CAN_ID = 44;
+        public static final int FORWARD_EXTENSION_MOTOR_CAN_ID = 43;
+        public static final int CLOCK_ARM_CAN_ID = 41;
+        public static final int WRIST_CAN_ID = 40;
     }
 
     public final class POWER {
@@ -61,6 +63,63 @@ public final class Constants {
         public static final int SWERVE_STEER_CURRENT_LIMIT = 40;
     }
 
+    public final class CORAL_ALIGN {
+        public static final double X_KP = 1; // Used to be 1. Currently testing x_KP of 0
+        public static final double X_KI = 0;
+        public static final double X_KD = 0.01;
+
+        public static final double Y_KP = 0.8; // Originally set to 0.5
+        public static final double Y_KI = 0;
+        public static final double Y_KD = 0;
+
+        public static final double ROT_KP = 0.01; // 0.015 was the original value but set to 0 for testing y axis
+        public static final double ROT_KI = 0;
+        public static final double ROT_KD = 0.0001;
+
+        public static final double OFFSET_DEPTH = 0.50;
+        public static final double OFFSET_LEFT_METERS = -0.175;
+        public static final double OFFSET_RIGHT_METERS = 0.175;
+        public static final double ROT_OFFSET = 0d;
+        public static final double SPEED_SCALE = 1.0;
+        public static final double SPEED_MAX = 0.2; // originally 0.65
+
+        public static final int MAX_LOCK_LOSS_TICKS = 20;
+
+        public static final Transform3d CAMERA_OFFSETS = new Transform3d(new Translation3d(0.60, -0.05, 0.245), new Rotation3d(0, Math.toRadians(-12), 0));
+
+        public static final Pose3d SOUTH_BLUE_POSE = AprilTagFields.k2025Reefscape.loadAprilTagLayoutField().getTagPose(18).get();
+        public static final Pose3d SOUTH_WEST_BLUE_POSE = AprilTagFields.k2025Reefscape.loadAprilTagLayoutField().getTagPose(19).get();
+        public static final Pose3d NORTH_WEST_BLUE_POSE = AprilTagFields.k2025Reefscape.loadAprilTagLayoutField().getTagPose(20).get();
+        public static final Pose3d NORTH_BLUE_POSE = AprilTagFields.k2025Reefscape.loadAprilTagLayoutField().getTagPose(21).get();
+        public static final Pose3d NORTH_EAST_BLUE_POSE = AprilTagFields.k2025Reefscape.loadAprilTagLayoutField().getTagPose(22).get();
+        public static final Pose3d SOUTH_EAST_BLUE_POSE = AprilTagFields.k2025Reefscape.loadAprilTagLayoutField().getTagPose(17).get();
+
+        public static final Pose3d SOUTH_RED_POSE = AprilTagFields.k2025Reefscape.loadAprilTagLayoutField().getTagPose(7).get();
+        public static final Pose3d SOUTH_WEST_RED_POSE = AprilTagFields.k2025Reefscape.loadAprilTagLayoutField().getTagPose(6).get();
+        public static final Pose3d NORTH_WEST_RED_POSE = AprilTagFields.k2025Reefscape.loadAprilTagLayoutField().getTagPose(11).get();
+        public static final Pose3d NORTH_RED_POSE = AprilTagFields.k2025Reefscape.loadAprilTagLayoutField().getTagPose(10).get();
+        public static final Pose3d NORTH_EAST_RED_POSE = AprilTagFields.k2025Reefscape.loadAprilTagLayoutField().getTagPose(9).get();
+        public static final Pose3d SOUTH_EAST_RED_POSE = AprilTagFields.k2025Reefscape.loadAprilTagLayoutField().getTagPose(8).get();
+    
+        public static final int[] BLUE_REEF_TAGS = {17, 18, 19, 20, 21, 22};
+        public static final int[] RED_REEF_TAGS = {6, 7, 8, 9, 10, 11};
+
+        public static final int[] BLUE_HPLAYER_TAGS = {12, 13};
+        public static final int[] RED_HPLAYER_TAGS = {1, 2};
+
+    }
+    public final class NAVIGATION {
+        public static final double MAX_ACCEPTABLE_AMBIGUITY = 0.2;
+    }
+   
+    
+    public final class INTAKE {
+        public static final String LOG_PATH = SHARED.LOG_FOLDER+"/Intake/";
+        public static final int INTAKE_BEAM_BREAK_DIGITAL_ID = 0; // TODO: Set the ID
+
+    }
+
+    
     public final class SWERVE {
         public static final String LOG_PATH = SHARED.LOG_FOLDER+"/Swerve/";
 
@@ -88,6 +147,8 @@ public final class Constants {
         public static final int CALCULATED_SLIP_CURRENT = 150;
 
         public static final double MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND = 4.73;
+        public static final double MAX_TRANSLATIONAL_ACCELERATION = 2;
+        public static final TrajectoryConfig PATH_FOLLOW_TRAJECTORY_CONFIG = new TrajectoryConfig(4, 2);
         public static final double MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND = Math.toRadians(720);
         public static final double COUPLING_GEAR_RATIO = 3.5714285714285716;
         public static final double DRIVE_GEAR_RATIO = 6.746031746031747;
@@ -97,27 +158,26 @@ public final class Constants {
         public static final boolean INVERT_LEFT_SIDE = false;
         public static final boolean INVERT_RIGHT_SIDE = true;
 
+        public static final double SIMULATED_STEER_INERTIA = 0.00001;
+        public static final double SIMULATED_DRIVE_INERTIA = 0.06;
+        public static final double SIMULATION_LOOP_PERIOD = 0.005;
         public static final double STEER_FRICTION_VOLTAGE = 0.25;
         public static final double DRIVE_FRICTION_VOLTAGE = 0.25;
 
         //TODO: Tone these down appropriately as per BB rules
-        public static final double TRANSLATE_POWER_FAST = 1.0;
-        public static final double ROTATE_POWER_FAST = 0.75;
-        public static final double TRANSLATE_POWER_SLOW = 0.15;
-        public static final double ROTATE_POWER_SLOW = 0.15;
+        public static final double TRANSLATE_POWER_FAST = 1.0; 
+        public static final double ROTATE_POWER_FAST = 0.75; 
+        public static final double TRANSLATE_POWER_SLOW = 0.5;
+        public static final double ROTATE_POWER_SLOW = 0.3;
 
         public static final int TRANSLATION_SMOOTHING_AMOUNT = 3;
         public static final int ROTATION_SMOOTHING_AMOUNT = 1;
 
-        public static final double JOYSTICK_EXPONENT = 2;
+        public static final double JOYSTICK_EXPONENT = 1.2;
 
         public static final Rotation2d BLUE_PERSPECTIVE_ROTATION = Rotation2d.fromDegrees(0);
         public static final Rotation2d RED_PERSPECTIVE_ROTATION = Rotation2d.fromDegrees(180);
 
-        // public static final double BLACK_FRONT_LEFT_STEER_OFFSET = -0.388427734375;
-        // public static final double ORANGE_FRONT_RIGHT_STEER_OFFSET = -0.462646484375;
-        // public static final double TEAL_BACK_LEFT_STEER_OFFSET = -0.18017578125;
-        // public static final double WHITE_BACK_RIGHT_STEER_OFFSET = -0.4853515625;
 
         //TODO: Set these
         public static final double BLACK_FRONT_LEFT_STEER_OFFSET = 0.062255859375;
@@ -148,46 +208,20 @@ public final class Constants {
         public static final double WHITE_BACK_RIGHT_Y_POSITION = -8.375;
 
         //TODO: Double check that these still work
-        public static final double PATH_FOLLOW_TRANSLATE_kP = 6d;
+        public static final double PATH_FOLLOW_TRANSLATE_kP = 8d;
         public static final double PATH_FOLLOW_TRANSLATE_kI = 0d;
         public static final double PATH_FOLLOW_TRANSLATE_kD = 0d;
 
         //TODO: Double check that these still work
-        public static final double PATH_FOLLOW_ROTATE_kP = 3.7;
+        public static final double PATH_FOLLOW_ROTATE_kP = 6d;
         public static final double PATH_FOLLOW_ROTATE_kI = 0d;
         public static final double PATH_FOLLOW_ROTATE_kD = 0.1;
 
         public static final double PATH_FOLLOW_ROTATE_MAX_VELOCITY = 4 * Math.PI;
-        public static final double PATH_FOLLOW_ROTATE_MAX_ACCELLERATION = 2 * Math.PI;
+        public static final double PATH_FOLLOW_ROTATE_MAX_ACCELLERATION = 4 * Math.PI;
 
-        public static final double PATH_FOLLOW_POSITION_TOLERANCE = 0.1;
-        public static final double PATH_FOLLOW_VELOCITY_TOLERANCE = 0.1;
-
-        public static final double MAX_VELOCITY_METERS_PER_SECOND = 4.5;
-
-        public static final double DRIVE_TRAIN_RADIUS = 0.6;
-
-        public static final PIDProfile SNAP_TO_GAINS = new PIDProfile()
-        .setP(SWERVE.SNAP_TO_kP)
-        .setI(SWERVE.SNAP_TO_kI)
-        .setD(SWERVE.SNAP_TO_kD)
-        ;
-    }
-
-    public final class INTAKE {
-        public static final double AT_VELOCITY_THRESHOLD = 25d; // RPM
-
-        public static final PIDProfile OUTER_ROLLER_GAINS = new PIDProfile()
-            .setP(1E-3)
-            .setV(1.5)
-            .setMaxVelocity(5000)
-        ;
-
-        public static final PIDProfile INNER_ROLLER_GAINS = new PIDProfile()
-            .setP(1E-3)
-            .setV(1.5)
-            .setMaxVelocity(5000)
-        ;
+        public static final double PATH_FOLLOW_POSITION_TOLERANCE = 0.01;
+        public static final double PATH_FOLLOW_VELOCITY_TOLERANCE = 0.01;
     }
 
     public final class ROBOT {
@@ -197,4 +231,80 @@ public final class Constants {
     public class SUPPLIERS{
         public static final String LOG_PATH = SHARED.LOG_FOLDER+"/Suppliers/";
     }
+
+    public class ELEVATOR{
+        public static final String EXTENSION_LOG_PATH = SHARED.LOG_FOLDER+"/Extension/";
+
+        public static final double EXTENSION_GEAR_RATIO = 0.25;
+        public static final double EXTENSION_DRUM_DIAMTER_INCHES = 1.0;
+
+        public static final double EXTENSION_INCHES_MAX = 19.5; //this is in inches
+        public static final double EXTENSION_INCHES_MIN = 0.5;
+
+        public static final double EXTENSION_POSITION_TOLERANCE = 1.0;
+
+        public static final int ELEVATOR_CURRENT_LIMIT = 80;//amps
+
+        public static final double ELEVATOR_MAX_ACCELERATION = 200;
+        public static final double ELEVATOR_MAX_VELOCITY = 80;
+
+        public static final double ELEVATOR_POSITION_P = 3.5;
+        public static final double ELEVATOR_POSITION_I = 0;
+        public static final double ELEVATOR_POSITION_D = 0;
+        public static final double ELEVATOR_POSITION_S = 0;
+        public static final double ELEVATOR_POSITION_V = 0;
+        public static final double ELEVATOR_POSITION_A = 0;
+
+        public static final double ELEVATOR_VELOCITY_P = 0.001;
+        public static final double ELEVATOR_VELOCITY_I = 0;
+        public static final double ELEVATOR_VELOCITY_D = 0;
+        public static final double ELEVATOR_VELOCITY_S = 0.1;
+    }
+
+    public class ARM{
+        public static final String CLOCK_ARM_LOG_PATH = SHARED.LOG_FOLDER+"/Clock Arm/";
+        
+        public static final double CLOCK_ARM_GEAR_RATIO = 1/300.0;
+
+        public static final double ARM_ANGLE_DEGREES_MIN = 0d;
+        public static final double ARM_ANGLE_DEGREES_MAX = 180d;
+
+        public static final double CLOCK_ARM_POSITION_TOLERANCE = 2.0;
+
+        public static final int ARM_CURRENT_LIMIT = 80;//amps
+
+        public static final double ARM_MAX_ACCELERATION = 200;
+        public static final double ARM_MAX_VELOCITY = 80;
+
+        public static final double ARM_P = 3;
+        public static final double ARM_I = 0;
+        public static final double ARM_D = 0;
+        public static final double ARM_S = 0;
+        public static final double ARM_V = 0;
+        public static final double ARM_A = 0;
+    }
+
+    public class WRIST{
+        public static final String WRIST_LOG_PATH = SHARED.LOG_FOLDER+"/Wrist/";
+
+        public static final double WRIST_GEAR_RATIO = 1/75.0;
+
+        public static final double WRIST_ANGLE_DEGREES_MIN = -45d;
+        public static final double WRIST_ANGLE_DEGREES_MAX = 135d;
+
+        public static final double WRIST_POSITION_TOLERANCE = 2.0;
+
+        public static final int WRIST_CURRENT_LIMIT = 80;//amps
+
+        public static final double WRIST_MAX_ACCELERATION = 200;
+        public static final double WRIST_MAX_VELOCITY = 80;
+
+        public static final double WRIST_P = 3;
+        public static final double WRIST_I = 0;
+        public static final double WRIST_D = 0;
+        public static final double WRIST_S = 0;
+        public static final double WRIST_V = 0;
+        public static final double WRIST_A = 0;
+    }
+
 }

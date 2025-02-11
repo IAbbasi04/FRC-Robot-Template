@@ -13,9 +13,9 @@ import edu.wpi.first.wpilibj.Timer;
 
 import org.team8592.lib.logging.SmartLogger;
 import org.team8592.frc.robot.Robot;
+import org.team8592.frc.robot.subsystems.swerve.SwerveSubsystem;
 import org.team8592.frc.robot.Constants.MEASUREMENTS;
 import org.team8592.frc.robot.Constants.SWERVE;
-import org.team8592.frc.robot.subsystems.SwerveSubsystem;
 
 public class FollowPathCommand extends LargeCommand {
     // Pathing variables

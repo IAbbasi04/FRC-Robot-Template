@@ -4,16 +4,23 @@
 
 package org.team8592.frc.robot;
 
+import java.io.File;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import org.littletonrobotics.junction.LoggedRobot;
-import org.team8592.lib.MatchMode;
-import org.team8592.lib.RobotClock;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.*;
-import org.team8592.lib.field.FieldLayout;
-import org.team8592.lib.logging.LogUtils;
-import org.team8592.lib.logging.LogUtils.LogConstants;
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -26,11 +33,12 @@ import org.team8592.lib.logging.LogUtils.LogConstants;
  */
 public class Robot extends LoggedRobot {
     private Command autonomousCommand;
+
     private RobotContainer robotContainer;
 
-    public static MatchMode MODE = MatchMode.DISABLED;
-    public static RobotClock CLOCK = new RobotClock();
-    public static FieldLayout FIELD = FieldLayout.none();
+    public static Field2d FIELD = new Field2d();
+
+    public GenericHID coralController = new GenericHID(0);
 
     /**
      * This function is run when the robot is first started up and should be used
@@ -39,16 +47,40 @@ public class Robot extends LoggedRobot {
      */
     @Override
     public void robotInit() {
-        LogUtils.initialize(new LogConstants(
-            Constants.LOGGER.GAME, 
-            Constants.LOGGER.YEAR, 
-            Constants.LOGGER.ROBOT, 
-            Constants.LOGGER.TEAM
-        ), isSimulation());
+        Logger.recordMetadata("Game", "Crescendo");
+        Logger.recordMetadata("Year", "2024");
+        Logger.recordMetadata("Robot", "Zenith");
+        Logger.recordMetadata("Team", "8592");
 
-        this.robotContainer = new RobotContainer(!DriverStation.isFMSAttached());
-        
-        FIELD.logToShuffleboard(robotContainer.logToShuffleboard());
+        Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+        if (isReal()) { // If running on a real robot
+            String time = DateTimeFormatter.ofPattern("yy-MM-dd_HH-mm-ss").format(LocalDateTime.now());
+
+            File sda1 = new File("/media/sda1/logs");
+            if(sda1.exists()){
+                String path = "/media/sda1/"+time+".wpilog";
+                Logger.addDataReceiver(new WPILOGWriter(path));
+            }
+            else{
+                File sdb1 = new File("/media/sdb1/logs");
+                if(sdb1.exists()){
+                    String path = "/media/sdb2/"+time+".wpilog";
+                    Logger.addDataReceiver(new WPILOGWriter(path));
+                }
+                else{
+                    System.err.println("UNABLE TO LOG TO A USB STICK!");
+                }
+            }
+            LoggedPowerDistribution.getInstance(1, ModuleType.kRev);// Enables power distribution logging
+        }
+        else { // If simulated
+            SmartDashboard.putData(FIELD);
+        }
+
+        Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+        Logger.start();
+
+        robotContainer = new RobotContainer(Robot.isSimulation() || true); // TODO - Fix to only work when NOT in actual match
     }
 
     /**
@@ -70,21 +102,17 @@ public class Robot extends LoggedRobot {
         // and running subsystem periodic() methods. This must be called from the
         // robot's periodic
         // block in order for anything in the Command-based framework to work.
-        CommandScheduler.getInstance().run();
-        Controls.logControlsToShuffleboard();
-        CLOCK.update();
-        LogUtils.logToSmartDashboard("Clock dt", CLOCK.dt());
+        CommandScheduler.getInstance().run(); 
     }
 
     /** This function is called once each time the robot enters Disabled mode. */
     @Override
     public void disabledInit() {
-        MODE = MatchMode.DISABLED;
-        this.robotContainer.runSubsystemsInit(MODE);
     }
 
     @Override
-    public void disabledPeriodic() {}
+    public void disabledPeriodic() {
+    }
 
     /**
      * This autonomous runs the autonomous command selected by your
@@ -97,13 +125,12 @@ public class Robot extends LoggedRobot {
         if (autonomousCommand != null) {
             autonomousCommand.schedule();
         }
-
-        MODE = MatchMode.AUTONOMOUS;
     }
 
     /** This function is called periodically during autonomous. */
     @Override
-    public void autonomousPeriodic() {}
+    public void autonomousPeriodic() {
+    }
 
     @Override
     public void teleopInit() {
@@ -114,35 +141,35 @@ public class Robot extends LoggedRobot {
         if (autonomousCommand != null) {
             autonomousCommand.cancel();
         }
-
-        MODE = MatchMode.TELEOP;
-        this.robotContainer.configureDefaults();
-        this.robotContainer.runSubsystemsInit(MODE);
     }
 
     /** This function is called periodically during operator control. */
     @Override
-    public void teleopPeriodic() {}
+    public void teleopPeriodic() {
+
+    }
 
     @Override
     public void testInit() {
         // Cancels all running commands at the start of test mode.
         CommandScheduler.getInstance().cancelAll();
-        MODE = MatchMode.TEST;
-        this.robotContainer.removeDefaults();
-        this.robotContainer.runSubsystemsInit(MODE);
-        this.robotContainer.scheduleUnitTests();
     }
 
     /** This function is called periodically during test mode. */
     @Override
-    public void testPeriodic() {}
+    public void testPeriodic() {
+    }
 
     /** This function is called once when the robot is first started up. */
     @Override
-    public void simulationInit() {}
+    public void simulationInit() {
+    }
 
     /** This function is called periodically whilst in simulation. */
     @Override
-    public void simulationPeriodic() {}
+    public void simulationPeriodic() {
+        //drivetrain.simulationPeriodic();
+
+        //vision.simulationPeriodic(drivetrain.getSimPose());
+    }
 }

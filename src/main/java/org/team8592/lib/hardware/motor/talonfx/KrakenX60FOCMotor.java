@@ -14,5 +14,10 @@ public class KrakenX60FOCMotor extends TalonFXMotor {
             9.37,
             484.8
         ));
+
+        super.positionOutput.withEnableFOC(true);
+        super.velocityOutput.withEnableFOC(true);
+        super.percentOutput.withEnableFOC(true);
+        super.motionMagicOutput.withEnableFOC(true);
     }
 }

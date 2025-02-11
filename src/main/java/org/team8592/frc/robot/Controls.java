@@ -1,5 +1,6 @@
 package org.team8592.frc.robot;
 
+
 import java.lang.reflect.Field;
 import java.util.function.DoubleSupplier;
 
@@ -39,10 +40,10 @@ public final class Controls {
     protected static Trigger robotRelative = new Trigger(() -> false);
     protected static Trigger zeroGryoscope = new Trigger(() -> false);
 
-    protected static Trigger snapForward = new Trigger(() -> false);
-    protected static Trigger snapBack = new Trigger(() -> false);
-    protected static Trigger snapLeft = new Trigger(() -> false);
-    protected static Trigger snapRight = new Trigger(() -> false);
+    protected static Trigger snapNorth = new Trigger(() -> false);
+    protected static Trigger snapSouth = new Trigger(() -> false);
+    protected static Trigger snapWest = new Trigger(() -> false);
+    protected static Trigger snapEast = new Trigger(() -> false);
 
     /**
      * Sets the controls for the drivebase movement
@@ -56,10 +57,10 @@ public final class Controls {
         robotRelative = driverController.leftBumper();
         zeroGryoscope = driverController.back();
 
-        snapForward = driverController.pov(0);
-        snapBack = driverController.pov(180);
-        snapLeft = driverController.pov(270);
-        snapRight = driverController.pov(90);
+        snapNorth = driverController.pov(0);
+        snapSouth = driverController.pov(180);
+        snapWest = driverController.pov(270);
+        snapEast = driverController.pov(90);
     }
 
     /**

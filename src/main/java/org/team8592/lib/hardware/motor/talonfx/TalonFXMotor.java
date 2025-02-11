@@ -1,23 +1,31 @@
 package org.team8592.lib.hardware.motor.talonfx;
 
+
+import static edu.wpi.first.units.Units.RotationsPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Second;
+
 import org.team8592.lib.PIDProfile;
 import org.team8592.lib.Utils;
+import org.team8592.lib.hardware.motor.MotorConstants;
+import org.team8592.lib.hardware.motor.NewtonMotor;
 
 import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.controls.*;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import org.team8592.lib.hardware.motor.NewtonMotor;
-import org.team8592.lib.hardware.motor.MotorConstants;
 
 public abstract class TalonFXMotor extends NewtonMotor {
     protected TalonFX motor;
 
-    private TalonFXConfiguration configuration;
+    protected TalonFXConfiguration configuration;
 
-    private PositionVoltage positionOutput;
-    private VelocityVoltage velocityOutput;
+    protected PositionVoltage positionOutput = new PositionVoltage(0);
+    protected VelocityVoltage velocityOutput = new VelocityVoltage(0);
+    protected DutyCycleOut percentOutput = new DutyCycleOut(0);
+    protected MotionMagicVoltage motionMagicOutput = new MotionMagicVoltage(0);
+    protected VoltageOut voltageOutput = new VoltageOut(0);
 
     protected TalonFXMotor(int motorID, MotorConstants constants) {
         this(motorID, false, constants);
@@ -27,8 +35,6 @@ public abstract class TalonFXMotor extends NewtonMotor {
         super(motorID, inverted, constants);
         
         this.motor = new TalonFX(motorID);
-        this.motor.setInverted(inverted);
-
         this.configuration = new TalonFXConfiguration();
         this.configuration.MotorOutput.Inverted = inverted ? 
             InvertedValue.Clockwise_Positive :
@@ -36,14 +42,33 @@ public abstract class TalonFXMotor extends NewtonMotor {
 
         this.motor.getConfigurator().apply(configuration);
 
-        this.positionOutput = new PositionVoltage(0.0);
-        this.velocityOutput = new VelocityVoltage(0.0);
+        this.percentOutput.OverrideBrakeDurNeutral = true;
+        this.positionOutput.OverrideBrakeDurNeutral = true;
+        this.velocityOutput.OverrideBrakeDurNeutral = true;
+        this.motionMagicOutput.OverrideBrakeDurNeutral = true;
+        this.voltageOutput.OverrideBrakeDurNeutral = true;
+    }
+
+    @Override
+    public void configureMotionProfile(double maxAcceleration, double cruiseVelocity){
+        MotionMagicConfigs motionMagicConfig = configuration.MotionMagic;
+
+        motionMagicConfig.withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(maxAcceleration));
+        motionMagicConfig.withMotionMagicCruiseVelocity(RotationsPerSecond.of(cruiseVelocity));
+        motionMagicConfig.withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(maxAcceleration*100));
+        motor.getConfigurator().apply(configuration);
     }
 
     @Override
     public void setInverted(boolean inverted) {
-        this.motor.setInverted(inverted);
+        this.configuration.MotorOutput.Inverted = inverted ? 
+            InvertedValue.Clockwise_Positive :
+            InvertedValue.CounterClockwise_Positive;
+
+        this.motor.getConfigurator().apply(configuration);
     }
+
+    
 
     @Override
     public void withGains(PIDProfile gains) {
@@ -51,49 +76,45 @@ public abstract class TalonFXMotor extends NewtonMotor {
         
         switch (gains.pidSlot) {
             case 0:
-                Slot0Configs slot0Config = new Slot0Configs()
+                Slot0Configs slot0Config = configuration.Slot0
                     .withKP(gains.kP)
                     .withKI(gains.kI)
                     .withKD(gains.kD)
-                    .withKA(gains.feedForward.kA)
-                    .withKV(gains.feedForward.kV)
-                    .withKG(gains.feedForward.kG)
-                    .withKS(gains.feedForward.kS);
+                    .withKA(gains.kA)
+                    .withKV(gains.kV)
+                    .withKS(gains.kS);
 
                 this.motor.getConfigurator().apply(slot0Config);
             case 1:
-                Slot1Configs slot1Config = new Slot1Configs()
+                Slot1Configs slot1Config = configuration.Slot1
                     .withKP(gains.kP)
                     .withKI(gains.kI)
                     .withKD(gains.kD)
-                    .withKA(gains.feedForward.kA)
-                    .withKV(gains.feedForward.kV)
-                    .withKG(gains.feedForward.kG)
-                    .withKS(gains.feedForward.kS);
+                    .withKA(gains.kA)
+                    .withKV(gains.kV)
+                    .withKS(gains.kS);
 
                 this.motor.getConfigurator().apply(slot1Config);
                 break;
             case 2:
-                Slot2Configs slot2Config = new Slot2Configs()
+                Slot2Configs slot2Config = configuration.Slot2
                     .withKP(gains.kP)
                     .withKI(gains.kI)
                     .withKD(gains.kD)
-                    .withKA(gains.feedForward.kA)
-                    .withKV(gains.feedForward.kV)
-                    .withKG(gains.feedForward.kG)
-                    .withKS(gains.feedForward.kS);
+                    .withKA(gains.kA)
+                    .withKV(gains.kV)
+                    .withKS(gains.kS);
 
                 this.motor.getConfigurator().apply(slot2Config);
                 break;
             default:
-                SlotConfigs slotConfig = new SlotConfigs()
+                Slot0Configs slotConfig = configuration.Slot0
                     .withKP(gains.kP)
                     .withKI(gains.kI)
                     .withKD(gains.kD)
-                    .withKA(gains.feedForward.kA)
-                    .withKV(gains.feedForward.kV)
-                    .withKG(gains.feedForward.kG)
-                    .withKS(gains.feedForward.kS);
+                    .withKA(gains.kA)
+                    .withKV(gains.kV)
+                    .withKS(gains.kS);
 
                 this.motor.getConfigurator().apply(slotConfig);
                 break;
@@ -104,12 +125,18 @@ public abstract class TalonFXMotor extends NewtonMotor {
 
     @Override
     public void setPercentOutput(double percent) {
-        this.motor.set(percent);
+        this.motor.setControl(percentOutput.withOutput(percent));
     }
 
     @Override
     public void setVoltage(double voltage, int slot) {
         this.motor.setVoltage(voltage);
+        motor.getMotorVoltage();
+    }
+
+    @Override
+    public double getVoltage() {
+        return motor.getMotorVoltage().getValueAsDouble();
     }
 
     @Override
@@ -126,7 +153,7 @@ public abstract class TalonFXMotor extends NewtonMotor {
     }
 
     @Override
-    public void setPositionSmartMotion(double desiredRotations, int pidSlot) {
+    public void setPosition(double desiredRotations, int pidSlot) {
         if (motorPIDGains.get(pidSlot) != null) {
             Utils.clamp(
                 desiredRotations,
@@ -134,7 +161,7 @@ public abstract class TalonFXMotor extends NewtonMotor {
                 motorPIDGains.get(pidSlot).softLimitMax
             );
         }
-        this.motor.setControl(positionOutput.withSlot(pidSlot).withPosition(desiredRotations));
+        this.motor.setControl(motionMagicOutput.withSlot(pidSlot).withPosition(desiredRotations));
     }
 
     @Override
@@ -153,6 +180,22 @@ public abstract class TalonFXMotor extends NewtonMotor {
     }
 
     @Override
+    public void setSoftLimits(double min, double max) {
+
+        SoftwareLimitSwitchConfigs soft_limit_motor = new SoftwareLimitSwitchConfigs();
+        soft_limit_motor.ForwardSoftLimitEnable = true;
+        soft_limit_motor.ReverseSoftLimitEnable = true;
+
+        soft_limit_motor.ForwardSoftLimitThreshold = max;
+        soft_limit_motor.ReverseSoftLimitThreshold = min;
+
+        this.configuration.withSoftwareLimitSwitch(soft_limit_motor);
+
+        this.motor.getConfigurator().apply(this.configuration);
+
+    }
+
+    @Override
     public void setIdleMode(IdleMode idleMode) {
         NeutralModeValue neutralMode = NeutralModeValue.Brake;
         switch(idleMode) {
@@ -165,9 +208,10 @@ public abstract class TalonFXMotor extends NewtonMotor {
         this.motor.setNeutralMode(neutralMode);
     }
 
+
     @Override
     public double getVelocityRPM() {
-        return this.motor.getVelocity().getValueAsDouble();
+        return this.motor.getVelocity().getValueAsDouble() * 60d;
     }
 
     @Override

@@ -1,236 +1,84 @@
 package org.team8592.lib.hardware.swerve;
 
-import java.util.function.Supplier;
+import static edu.wpi.first.units.Units.*;
 
-import com.ctre.phoenix6.Utils;
-import com.ctre.phoenix6.swerve.*;
+import java.util.function.Consumer;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Notifier;
-import edu.wpi.first.wpilibj.RobotController;
+import org.team8592.frc.robot.subsystems.swerve.ctreswerve.CommandSwerveDrivetrain;
+import org.team8592.frc.robot.subsystems.swerve.ctreswerve.TunerConstants;
 
-public class CTRESwerve extends SwerveDrivetrain {
-    public static final class SpeedConstants {
-        public final double MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND;
-        public final double MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND;
+public class CTRESwerve {
+    private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
-        public SpeedConstants(double translate, double rotate) {
-            this.MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND = translate;
-            this.MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND = rotate;
-        }
-    }
-
-    private Notifier m_simNotifier = null;
-    private double m_lastSimTime;
-    private boolean hasAppliedOperatorPerspective = false;
-
-    private final SwerveRequest.FieldCentric fieldRelativeDrive;
-    private final SwerveRequest.RobotCentric robotRelativeDrive;
+    /* Setting up bindings for necessary control of the swerve drive platform */
+    private final SwerveRequest.FieldCentric fieldRelative = new SwerveRequest.FieldCentric()
+        .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+        .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
+    private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
+    private final SwerveRequest.RobotCentric robotRelative = new SwerveRequest.RobotCentric()
+        .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+       
+    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
-    private Supplier<Rotation2d> currentGyroOffset = () -> new Rotation2d();
-
-    private ChassisSpeeds appliedSpeeds = new ChassisSpeeds();
-
-    private Supplier<Boolean> robotIsSimulation = () -> true;
-
-    /**
-     * Creates a new CTRESwerve (a class dedicated to tucking away the complexity of Phoenix 6)
-     * @param driveTrainConstants the constants for the drivetrain as a whole
-     * @param commonModuleConstants the shared constants for all modules
-     * @param moduleConstants the module constants, generated from commonModuleConstants
-     */
-    public CTRESwerve(SwerveDrivetrainConstants driveTrainConstants, SpeedConstants speedConstants, SwerveModuleConstantsFactory commonModuleConstants, SwerveModuleConstants... moduleConstants) {
-        // super(driveTrainConstants, moduleConstants);
-        super(null, null, null, driveTrainConstants, moduleConstants);
-
-        // These two requests can be combined with a ChassisSpeeds (see getRequest() below) to drive the swerve
-        fieldRelativeDrive = (
-            new SwerveRequest.FieldCentric()
-            .withDeadband(commonModuleConstants.SpeedAt12Volts * 0.001)
-            .withRotationalDeadband(speedConstants.MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND * 0.001)
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
-        );
-        robotRelativeDrive = (
-            new SwerveRequest.RobotCentric()
-            .withDeadband(commonModuleConstants.SpeedAt12Volts * 0.001)
-            .withRotationalDeadband(speedConstants.MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND * 0.001)
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
-        );
-    }
-
-    /**
-     * Request a {@code ChassisSpeeds} of the swerve with control over whether
-     * the robot is field- or robot-relative
-     *
-     * @param speeds the {@code ChassisSpeeds} object to send to the drivetrain
-     * @param isFieldRelative whether to drive the robot field-relative. If this
-     * is {@code false}, the drivetrain will run robot-relative instead
-     */
-    public void drive(ChassisSpeeds speeds, boolean isFieldRelative) {
-        this.appliedSpeeds = speeds;
-
-        this.setControl(
-            isFieldRelative ? getRequest(speeds, fieldRelativeDrive) : getRequest(speeds, robotRelativeDrive)
-        );
-    }
-
-    /**
-     * Request a {@code ChassisSpeeds} of the drivetrain, field-relative
-     *
-     * @param speeds the {@code ChassisSpeeds} object to request
-     */
-    public void drive(ChassisSpeeds speeds){
-        drive(speeds, true);
-    }
-
-    /**
-     * Form the swerve's wheels in an X pattern to completely lock it from
-     * movement. This should be used sparingly.
-     */
-    public void brake(){
-        this.setControl(brake);
-    }
-
-    /**
-     * @return a {@code ChassisSpeeds} object representing what the robot is
-     * currently doing (this is obtained by measuring the encoder readings
-     * from the motors, then using kinematics to calculate what they mean)
-     */
-    public ChassisSpeeds getCurrentSpeeds(){
-        if (robotIsSimulation.get()) {
-            return appliedSpeeds;
+    public void drive(ChassisSpeeds speeds, boolean driveFieldRelative) {
+        if (driveFieldRelative) {
+            drivetrain.setControl(
+                fieldRelative.withVelocityX(speeds.vxMetersPerSecond) 
+                    .withVelocityY(speeds.vyMetersPerSecond) 
+                    .withRotationalRate(speeds.omegaRadiansPerSecond) 
+            );
         }
-        return getState().Speeds;
-    }
-
-    /**
-     * Define whatever direction the robot is facing as forward
-     */
-    public void resetHeading(Supplier<Rotation2d> headingOffset){
-        this.currentGyroOffset = headingOffset;
-        this.setGyroscopeYaw(headingOffset.get());
-        this.seedFieldCentric();
-    }
-
-    /**
-     * @return the current yaw as a {@code Rotation2d} (as measured
-     * by the gyroscope)
-     */
-    public Rotation2d getYaw(){
-        return Rotation2d.fromDegrees(
-            this.getPigeon2().getYaw().getValueAsDouble()
-        );
-    }
-
-    /**
-     * @return the current robot position, as determined by the odometry
-     */
-    public Pose2d getCurrentOdometryPosition(){
-        return getState().Pose;
-    }
-
-    /**
-     * Set the known gyroscope heading (for field-relative)
-     * @param yaw a {@code Rotation2d} containing the yaw to
-     * set the gyroscope to
-     */
-    public void setGyroscopeYaw(Rotation2d yaw){
-        this.getPigeon2().setYaw(yaw.getDegrees());
-    }
-
-    /**
-     * Set the odometry pose
-     * @param pose a {@code Pose2d} containing the desired known pose
-     */
-    public void setKnownOdometryPose(Pose2d pose){
-        this.resetPose(pose);
-    }
-
-    public void startSimThread(boolean isSimulation) {
-        if (!isSimulation) return; // Do not run on real robot
-        this.robotIsSimulation = () -> isSimulation;
-
-        m_lastSimTime = Utils.getCurrentTimeSeconds();
-
-        /* Run simulation at a faster rate so PID gains behave more reasonably */
-        m_simNotifier = new Notifier(() -> {
-            final double currentTime = Utils.getCurrentTimeSeconds();
-            double deltaTime = currentTime - m_lastSimTime;
-            m_lastSimTime = currentTime;
-
-            /* use the measured time delta, get battery voltage from WPILib */
-            updateSimState(deltaTime, RobotController.getBatteryVoltage());
-        });
-        m_simNotifier.startPeriodic(0.005);
-    }
-
-    public void periodic() {
-        // If we haven't flipped based on our alliance color or if the robot
-        // restarts in the middle of a match, check to make sure we've applied
-        // the alliance perspective.
-        if (!hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
-            DriverStation.getAlliance().ifPresent((allianceColor) -> {
-                this.setOperatorPerspectiveForward(currentGyroOffset.get());
-                hasAppliedOperatorPerspective = true;
-            });
+        else {
+        drivetrain.setControl(
+            robotRelative.withVelocityX(speeds.vxMetersPerSecond) // Drive forward with negative Y (forward)
+                .withVelocityY(speeds.vyMetersPerSecond) // Drive left with negative X (left)
+                .withRotationalRate(speeds.omegaRadiansPerSecond) // Drive counterclockwise with negative X (left)
+            );
         }
     }
 
-    /**
-     * Apply a {@code ChassisSpeeds}'s data to a field-relative SwerveRequest
-     *
-     * @param speeds the {@code ChassisSpeeds} to apply
-     * @param baseRequest the {@code SwerveRequest.FieldCentric} add the {@code ChassisSpeeds}'s data to
-     *
-     * @return the modified SwerveRequest, ready to be send to the drivetrain
-     */
-    private SwerveRequest getRequest(ChassisSpeeds speeds, SwerveRequest.FieldCentric baseRequest){
-        return (
-            baseRequest.withVelocityX(speeds.vxMetersPerSecond)
-            .withVelocityY(speeds.vyMetersPerSecond)
-            .withRotationalRate(speeds.omegaRadiansPerSecond)
-        );
+    public void resetHeading() {
+        drivetrain.seedFieldCentric();
     }
 
-    /**
-     * Apply a {@code ChassisSpeeds}'s data to a robot-relative SwerveRequest
-     *
-     * @param speeds the {@code ChassisSpeeds} to apply
-     * @param baseRequest the {@code SwerveRequest.RobotCentric} add the {@code ChassisSpeeds}'s data to
-     *
-     * @return the modified SwerveRequest, ready to be send to the drivetrain
-     */
-    private SwerveRequest getRequest(ChassisSpeeds speeds, SwerveRequest.RobotCentric baseRequest){
-        return (
-            baseRequest.withVelocityX(speeds.vxMetersPerSecond)
-            .withVelocityY(speeds.vyMetersPerSecond)
-            .withRotationalRate(speeds.omegaRadiansPerSecond)
-        );
+    public Rotation2d getYaw() {
+        return drivetrain.getState().Pose.getRotation();
+    };
+
+    public Pose2d getCurrentOdometryPosition() {
+        return drivetrain.getState().Pose;
     }
 
-    /**
-     * Quick interface for a three-input lambda
-     * with all inputs parameterized
-     */
-    public interface TriConsumer<T1, T2, T3> {
-        public void accept(T1 t1, T2 t2, T3 t3);
+    public void setKnownOdometryPose(Pose2d currentPose) {        
+        drivetrain.resetPose(currentPose);
     }
 
-    /**
-     * Modified {@code registerTelemetry()} function that gives more data to the lambda than the default
-     * one in CTRE's swerve library
-     *
-     * @param telemetryFunction a lambda that passes in a {@code SwerveDriveState} current state,
-     * {@code SwerveDriveKinematics} kinematics object configured for this swerve, and
-     * {@code SwerveModule[]} array of this swerve's modules
-     */
-    public void registerTelemetry(TriConsumer<SwerveDriveState, SwerveDriveKinematics, SwerveModule[]> telemetryFunction){
-        // registerTelemetry((swerveDriveState) -> telemetryFunction.accept(swerveDriveState, this.getKinematics(), this.getModules()));
+    public void periodic(){
+        drivetrain.periodic();
+    }
+
+    public void brake() {
+        drivetrain.setControl(brake);
+    }
+
+    public void pointAt(Rotation2d direction) {
+        drivetrain.setControl(point.withModuleDirection(direction));
+    }
+
+    public void registerTelemetry(Consumer<SwerveDriveState> driveState){
+        drivetrain.registerTelemetry(driveState);
+    }
+
+    public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
+        drivetrain.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds);
     }
 }

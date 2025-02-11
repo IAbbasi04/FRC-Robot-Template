@@ -1,10 +1,13 @@
 package org.team8592.frc.robot.commands.proxies;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WrapperCommand;
 import org.team8592.frc.robot.Robot;
 
-import edu.wpi.first.wpilibj2.command.*;
-
-public class SimulatedCommand extends WrapperCommand{
+public class TimingSimulatedCommand extends WrapperCommand{
     /**
      * If running in simulation, replaces the passed-in command with a
      * WaitCommand that waits for a length of your choosing.
@@ -18,9 +21,9 @@ public class SimulatedCommand extends WrapperCommand{
      * @apiNote This command wraps the passed-in command. If this command
      * is cancelled, the passed-in command will be cancelled too.
      */
-    public SimulatedCommand(Command command, double time){
+    public TimingSimulatedCommand(Command command, double time){
         super(
-            Robot.isReal() ? command : command.withTimeout(time)
+            Robot.isReal() ? command : new WaitCommand(time)
         );
         if(!this.getRequirements().equals(command.getRequirements())){
             this.addRequirements(command.getRequirements().toArray(new Subsystem[0]));
@@ -33,7 +36,7 @@ public class SimulatedCommand extends WrapperCommand{
      *
      * @param command the command to run if on a real robot
      */
-    public SimulatedCommand(Command command){
+    public TimingSimulatedCommand(Command command){
         super(
             Robot.isReal() ? command : Commands.none()
         );

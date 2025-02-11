@@ -1,13 +1,17 @@
 package org.team8592.frc.robot;
 
-import java.util.function.*;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
+import java.util.function.IntSupplier;
+import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
-import org.team8592.frc.robot.Constants.*;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import org.team8592.frc.robot.Constants.*;
+import org.team8592.frc.robot.subsystems.SubsystemManager;
 import edu.wpi.first.util.WPISerializable;
 
 /**
@@ -45,6 +49,11 @@ public final class Suppliers {
         public int getAsInt(){int d = supplier.getAsInt(); Logger.recordOutput(name, d); return d;}
     }
 
+    private static SubsystemManager manager;
+    public static void addSubsystems(SubsystemManager manager){
+        Suppliers.manager = manager;
+    }
+
     /**
      * {@code getAsBoolean()} returns {@code true} when the robot it running on the red side and
      * {@code false} when on the blue side. Defaults to {@code false} if the alliance color is
@@ -60,17 +69,11 @@ public final class Suppliers {
      * when the front of the robot is aimed away from the driver station.
      */
     public static final Supplier<Rotation2d> currentGyroscopeRotationOffset = new LoggedWPILibSupplier<Rotation2d>(
-        () -> robotRunningOnRed.getAsBoolean() ? SWERVE.RED_PERSPECTIVE_ROTATION : SWERVE.BLUE_PERSPECTIVE_ROTATION,
+        () -> robotRunningOnRed.getAsBoolean() && !DriverStation.isAutonomous() 
+        ? SWERVE.RED_PERSPECTIVE_ROTATION
+        : SWERVE.BLUE_PERSPECTIVE_ROTATION,
         "CurrentGyroscopeRotationOffset"
     );
 
-    /**
-     * Whether we are using a physical robot or simulating one
-     */
-    public static final BooleanSupplier robotIsReal = () -> Robot.isReal();
-
-    /**
-     * The period of time between robot cycles (typically around 0.02 seconds / 20 ms)
-     */
-    public static final DoubleSupplier robotDt = () -> Robot.CLOCK.dt();
+    //TODO: Add more useful suppliers here
 }
