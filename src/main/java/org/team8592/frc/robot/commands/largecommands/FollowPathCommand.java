@@ -48,8 +48,8 @@ public class FollowPathCommand extends LargeCommand {
      *
      * @param trajectory the trajectory to follow
      */
-    public FollowPathCommand(Trajectory trajectory, SwerveSubsystem swerve) {
-        this(trajectory, () -> true, swerve);
+    public FollowPathCommand(Trajectory trajectory) {
+        this(trajectory, () -> true);
     }
 
     /**
@@ -59,9 +59,9 @@ public class FollowPathCommand extends LargeCommand {
      * @param flip lambda that returns whether to mirror the path to the
      * red side of the field.
      */
-    public FollowPathCommand(Trajectory trajectory, BooleanSupplier flip, SwerveSubsystem swerve){
-        super(swerve);
-        this.swerve = swerve;
+    public FollowPathCommand(Trajectory trajectory, BooleanSupplier flip){
+        super(manager.swerveSubsystem);
+        this.swerve = manager.swerveSubsystem;
 
         this.trajectory = trajectory;
 
@@ -142,7 +142,7 @@ public class FollowPathCommand extends LargeCommand {
         BooleanSupplier useAlternateTranslation, Supplier<ChassisSpeeds> translationSupplier,
         SwerveSubsystem swerve
     ){
-        this(trajectory, flip, swerve);
+        this(trajectory, flip);
         this.useAlternateRotation = useAlternateRotation;
         this.alternateRotation = rotationSupplier;
         this.useAlternateRotation = useAlternateTranslation;

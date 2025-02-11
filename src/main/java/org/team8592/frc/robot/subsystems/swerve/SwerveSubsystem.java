@@ -17,7 +17,7 @@ import org.team8592.lib.MatchMode;
 import org.team8592.lib.SmoothingFilter;
 import org.team8592.lib.hardware.swerve.CTRESwerve;
 
-public class SwerveSubsystem extends NewtonSubsystem {
+public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
     /**
      * Small enum to control whether to drive robot- or field-
      * relative for {@link SwerveSubsystem#drive(ChassisSpeeds, DriveModes)}
@@ -43,7 +43,7 @@ public class SwerveSubsystem extends NewtonSubsystem {
     public static ChassisSpeeds speedZero = new ChassisSpeeds();
 
     public SwerveSubsystem(boolean logToShuffleboard) {
-        super(logToShuffleboard);
+        super(logToShuffleboard, new SwerveCommands(this));
 
         smoothingFilter = new SmoothingFilter(
             SWERVE.TRANSLATION_SMOOTHING_AMOUNT,

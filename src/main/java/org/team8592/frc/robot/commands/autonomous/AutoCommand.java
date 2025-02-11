@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.team8592.frc.robot.subsystems.SubsystemManager;
-import org.team8592.frc.robot.subsystems.swerve.SwerveSubsystem;
 
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -17,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.*;
  * Class to provide subsystems, convenient methods, and a constructor to autonomous commands
  */
 public class AutoCommand extends WrapperCommand{
-    private static SubsystemManager manager;
+    protected static SubsystemManager manager;
     public static void addSubsystems(SubsystemManager manager){
         AutoCommand.manager = manager;
     }
@@ -91,12 +90,12 @@ public class AutoCommand extends WrapperCommand{
     }
 
     /**
-     * Convert a PathPlanner path into a WPILib trajectory
+     * Convert a Chreo path into a WPILib trajectory
      *
-     * @param path the PathPlannerPath to convert
+     * @param path the Choreo to convert
      * @return the path converted to a WPILib trajectory
      */
-    private static Trajectory fromChoreoPath(choreo.trajectory.Trajectory<SwerveSample> path){
+    protected static Trajectory fromChoreoPath(choreo.trajectory.Trajectory<SwerveSample> path){
         List<SwerveSample> choreoSamples = path.samples();
         ArrayList<State> wpilibStates = new ArrayList<>();
 

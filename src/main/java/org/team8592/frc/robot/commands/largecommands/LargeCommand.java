@@ -7,7 +7,7 @@ import org.team8592.frc.robot.subsystems.SubsystemManager;
 // import org.team8592.frc.robot.subsystems.Intake;
 
 public abstract class LargeCommand extends Command {
-    private static SubsystemManager manager;
+    protected static SubsystemManager manager;
     public static void addSubsystems(SubsystemManager manager){
         LargeCommand.manager = manager;
     }

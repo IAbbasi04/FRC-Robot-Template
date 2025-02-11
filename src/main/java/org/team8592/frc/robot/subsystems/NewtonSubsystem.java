@@ -6,14 +6,17 @@ import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import org.team8592.lib.logging.SmartLogger;
 import org.team8592.lib.MatchMode;
 
-public abstract class NewtonSubsystem extends SubsystemBase {
+public abstract class NewtonSubsystem<C extends SubsystemCommands<?>> extends SubsystemBase {
     protected SmartLogger logger;
     private boolean logToShuffleboard = false;
     private boolean enabled = false;
 
-    protected NewtonSubsystem(boolean logToShuffleboard) {
+    public C commands;
+
+    protected NewtonSubsystem(boolean logToShuffleboard, C commands) {
         this.logToShuffleboard = logToShuffleboard;
         this.logger = new SmartLogger(getName(), logToShuffleboard);
+        this.commands = commands;
     }
 
     public void initializeLogger() {

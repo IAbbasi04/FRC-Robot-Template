@@ -11,7 +11,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import org.team8592.frc.robot.Constants.*;
-import org.team8592.frc.robot.subsystems.SubsystemManager;
 import edu.wpi.first.util.WPISerializable;
 
 /**
@@ -47,11 +46,6 @@ public final class Suppliers {
         private String name;
         public LoggedIntSupplier(IntSupplier supplier, String name){this.supplier = supplier; this.name = name;}
         public int getAsInt(){int d = supplier.getAsInt(); Logger.recordOutput(name, d); return d;}
-    }
-
-    private static SubsystemManager manager;
-    public static void addSubsystems(SubsystemManager manager){
-        Suppliers.manager = manager;
     }
 
     /**
