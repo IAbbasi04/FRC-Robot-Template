@@ -1,6 +1,6 @@
-package frc.robot.helpers.motor.talonfx;
+package org.team8592.lib.hardware.motor.talonfx;
 
-import frc.robot.helpers.motor.MotorConstants;
+import org.team8592.lib.hardware.motor.MotorConstants;
 
 public class KrakenX44Motor extends TalonFXMotor {
     public KrakenX44Motor(int motorID) {

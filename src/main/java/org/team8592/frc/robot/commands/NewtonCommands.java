@@ -9,6 +9,7 @@ import org.team8592.frc.robot.subsystems.SwerveSubsystem.DriveModes;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 
 public final class NewtonCommands {
     private static SubsystemManager manager;
@@ -29,19 +30,20 @@ public final class NewtonCommands {
      * @return the command
      */
     public static Command swerveSnapToCommand(Rotation2d angle, DoubleSupplier driveX, DoubleSupplier driveY){
-        return manager.getSwerve().run(() -> {
-            ChassisSpeeds processed = manager.getSwerve().processJoystickInputs(
-                driveX.getAsDouble(),
-                driveY.getAsDouble(),
-                0
-            );
-            processed.omegaRadiansPerSecond = 
-                manager.getSwerve().snapToAngle(
-                    Suppliers.currentGyroscopeRotationOffset.get()
-                    .plus(angle)
-                );
-            manager.getSwerve().drive(processed, DriveModes.AUTOMATIC);
-        });
+        // return manager.getSwerve().run(() -> {
+        //     ChassisSpeeds processed = manager.getSwerve().processJoystickInputs(
+        //         driveX.getAsDouble(),
+        //         driveY.getAsDouble(),
+        //         0
+        //     );
+        //     processed.omegaRadiansPerSecond = 
+        //         manager.getSwerve().snapToAngle(
+        //             Suppliers.currentGyroscopeRotationOffset.get()
+        //             .plus(angle)
+        //         );
+        //     manager.getSwerve().drive(processed, DriveModes.AUTOMATIC);
+        // });
+        return Commands.none();
     }
 
     /**

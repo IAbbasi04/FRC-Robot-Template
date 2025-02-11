@@ -1,6 +1,6 @@
-package frc.robot.helpers.motor.talonfx;
+package org.team8592.lib.hardware.motor.talonfx;
 
-import frc.robot.helpers.motor.MotorConstants;
+import org.team8592.lib.hardware.motor.MotorConstants;
 
 public class KrakenX60FOCMotor extends TalonFXMotor {
     public KrakenX60FOCMotor(int motorID) {
@@ -14,10 +14,5 @@ public class KrakenX60FOCMotor extends TalonFXMotor {
             9.37,
             484.8
         ));
-
-        super.positionOutput.withEnableFOC(true);
-        super.velocityOutput.withEnableFOC(true);
-        super.percentOutput.withEnableFOC(true);
-        super.motionMagicOutput.withEnableFOC(true);
     }
 }

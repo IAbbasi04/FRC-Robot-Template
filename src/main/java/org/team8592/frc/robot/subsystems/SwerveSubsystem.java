@@ -9,14 +9,12 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstantsFactory;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.ClosedLoopOutputType;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants.SteerFeedbackType;
+import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
+import com.ctre.phoenix6.swerve.SwerveModuleConstants;
+import com.ctre.phoenix6.swerve.SwerveModuleConstants.ClosedLoopOutputType;
+import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerFeedbackType;
+import com.ctre.phoenix6.swerve.SwerveModuleConstantsFactory;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
-import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -87,8 +85,9 @@ public class SwerveSubsystem extends NewtonSubsystem {
             new SwerveDrivetrainConstants()
             .withPigeon2Id(Ports.PIGEON_CAN_ID)
             .withPigeon2Configs(new Pigeon2Configuration())
-            .withCANbusName("*")
         );
+
+        drivetrainConstants.CANBusName = "*";
 
         // This configuration object will apply to all of the swerve's drive motors
         TalonFXConfiguration driveMotorsConfig = (
@@ -122,7 +121,7 @@ public class SwerveSubsystem extends NewtonSubsystem {
                 .withDriveMotorGains(driveGains)
                 .withDriveMotorClosedLoopOutput(ClosedLoopOutputType.Voltage)
                 .withSteerMotorClosedLoopOutput(ClosedLoopOutputType.Voltage)
-                .withSpeedAt12VoltsMps(SWERVE.MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND)
+                .withSpeedAt12Volts(SWERVE.MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND)
                 .withDriveInertia(SIMULATION.SIMULATED_DRIVE_INERTIA)
                 .withSteerInertia(SIMULATION.SIMULATED_STEER_INERTIA)
                 .withDriveFrictionVoltage(SWERVE.DRIVE_FRICTION_VOLTAGE)
@@ -130,8 +129,8 @@ public class SwerveSubsystem extends NewtonSubsystem {
                 .withFeedbackSource(SteerFeedbackType.RemoteCANcoder)
                 .withCouplingGearRatio(SWERVE.COUPLING_GEAR_RATIO)
                 .withDriveMotorInitialConfigs(driveMotorsConfig)
-                .withSteerMotorInitialConfigs(steerMotorsConfig)
-                .withCANcoderInitialConfigs(cancoderInitialConfigs);
+                .withSteerMotorInitialConfigs(steerMotorsConfig);
+                // .withCANcoderInitialConfigs(cancoderInitialConfigs);
 
         // Generate swerve-module constant objects by combing the common constants with module-specific ones
         SwerveModuleConstants frontLeft = commonSwerveConstants.createModuleConstants(
@@ -141,7 +140,9 @@ public class SwerveSubsystem extends NewtonSubsystem {
             SWERVE.BLACK_FRONT_LEFT_STEER_OFFSET,
             Units.inchesToMeters(SWERVE.BLACK_FRONT_LEFT_X_POSITION),
             Units.inchesToMeters(SWERVE.BLACK_FRONT_LEFT_Y_POSITION),
-            SWERVE.INVERT_LEFT_SIDE
+            SWERVE.INVERT_LEFT_SIDE,
+            true,
+            false
         ).withSteerMotorInverted(SWERVE.BLACK_FRONT_LEFT_STEER_INVERT);
         SwerveModuleConstants frontRight = commonSwerveConstants.createModuleConstants(
             Ports.SWERVE_ORANGE_FRONT_RIGHT_STEER_CAN_ID,
@@ -150,7 +151,9 @@ public class SwerveSubsystem extends NewtonSubsystem {
             SWERVE.ORANGE_FRONT_RIGHT_STEER_OFFSET,
             Units.inchesToMeters(SWERVE.ORANGE_FRONT_RIGHT_X_POSITION),
             Units.inchesToMeters(SWERVE.ORANGE_FRONT_RIGHT_Y_POSITION),
-            SWERVE.INVERT_RIGHT_SIDE
+            SWERVE.INVERT_RIGHT_SIDE,
+            true,
+            false
         ).withSteerMotorInverted(SWERVE.ORANGE_FRONT_RIGHT_STEER_INVERT);
         SwerveModuleConstants backLeft = commonSwerveConstants.createModuleConstants(
             Ports.SWERVE_TEAL_BACK_LEFT_STEER_CAN_ID,
@@ -159,7 +162,9 @@ public class SwerveSubsystem extends NewtonSubsystem {
             SWERVE.TEAL_BACK_LEFT_STEER_OFFSET,
             Units.inchesToMeters(SWERVE.TEAL_BACK_LEFT_X_POSITION),
             Units.inchesToMeters(SWERVE.TEAL_BACK_LEFT_Y_POSITION),
-            SWERVE.INVERT_LEFT_SIDE
+            SWERVE.INVERT_LEFT_SIDE,
+            true,
+            false
         ).withSteerMotorInverted(SWERVE.TEAL_BACK_LEFT_STEER_INVERT);
         SwerveModuleConstants backRight = commonSwerveConstants.createModuleConstants(
             Ports.SWERVE_WHITE_BACK_RIGHT_STEER_CAN_ID,
@@ -168,7 +173,9 @@ public class SwerveSubsystem extends NewtonSubsystem {
         SWERVE.WHITE_BACK_RIGHT_STEER_OFFSET,
             Units.inchesToMeters(SWERVE.WHITE_BACK_RIGHT_X_POSITION),
             Units.inchesToMeters(SWERVE.WHITE_BACK_RIGHT_Y_POSITION),
-            SWERVE.INVERT_RIGHT_SIDE
+            SWERVE.INVERT_RIGHT_SIDE,
+            true,
+            false
         ).withSteerMotorInverted(SWERVE.WHITE_BACK_RIGHT_STEER_INVERT);
 
         SpeedConstants speedConstants = new SpeedConstants(
@@ -217,22 +224,22 @@ public class SwerveSubsystem extends NewtonSubsystem {
     }
 
     public SwerveSubsystem initializeAutoBuilder() {
-        AutoBuilder.configureHolonomic(
-            swerve::getCurrentOdometryPosition, 
-            this::resetPose,
-            swerve::getCurrentSpeeds, 
-            this::drive,
-            new HolonomicPathFollowerConfig(
-                SWERVE.MAX_VELOCITY_METERS_PER_SECOND,
-                SWERVE.DRIVE_TRAIN_RADIUS,
-                new ReplanningConfig()
-            ),
-        () -> {
-            if (DriverStation.getAlliance().isPresent()) {
-                return DriverStation.getAlliance().get() == Alliance.Red;
-            }
-            return false; // Never flip if driver station does not display alliance color
-        }, this);
+        // AutoBuilder.configureHolonomic(
+        //     swerve::getCurrentOdometryPosition, 
+        //     this::resetPose,
+        //     swerve::getCurrentSpeeds, 
+        //     this::drive,
+        //     new HolonomicPathFollowerConfig(
+        //         SWERVE.MAX_VELOCITY_METERS_PER_SECOND,
+        //         SWERVE.DRIVE_TRAIN_RADIUS,
+        //         new ReplanningConfig()
+        //     ),
+        // () -> {
+        //     if (DriverStation.getAlliance().isPresent()) {
+        //         return DriverStation.getAlliance().get() == Alliance.Red;
+        //     }
+        //     return false; // Never flip if driver station does not display alliance color
+        // }, this);
 
         return this;
     }
@@ -517,7 +524,7 @@ public class SwerveSubsystem extends NewtonSubsystem {
 
     @Override
     public void periodicLogs() {
-        this.logger.log("Odometry Valid", this.swerve.odometryIsValid());
+        // this.logger.log("Odometry Valid", this.swerve.odometryIsValid());
         this.logger.log("Current Robot Pose", this.getCurrentPosition());
         this.logger.log("Reset Pose", this.resetPose);
         this.logger.log("Desired Chassis Speeds", this.desiredSpeeds);

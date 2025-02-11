@@ -1,5 +1,8 @@
 package org.team8592.lib.hardware.motor.spark;
 
+import org.team8592.lib.PIDProfile;
+import org.team8592.lib.Utils;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase;
@@ -7,8 +10,8 @@ import com.revrobotics.spark.SparkBase.*;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.config.SparkBaseConfig;
 
-import frc.robot.helpers.motor.MotorConstants;
-import frc.robot.helpers.motor.NewtonMotor;
+import org.team8592.lib.hardware.motor.NewtonMotor;
+import org.team8592.lib.hardware.motor.MotorConstants;
 
 public abstract class SparkBaseMotor<M extends SparkBase, C extends SparkBaseConfig> extends NewtonMotor {
     protected M motor;
@@ -16,26 +19,22 @@ public abstract class SparkBaseMotor<M extends SparkBase, C extends SparkBaseCon
     protected RelativeEncoder encoder;
     protected C config;
 
-    protected SparkBaseMotor(M motor, C config, boolean inverted, MotorConstants constants) {
+    protected SparkBaseMotor(M motor, boolean inverted, MotorConstants constants) {
         super(motor.getDeviceId(), inverted, constants);
         this.motor = motor;
         this.motorCtrl = motor.getClosedLoopController();
         this.encoder = motor.getEncoder();
         
-        this.config = config;
+        // this.config.closedLoop.apply();
+
         this.config.inverted(inverted);
-    }
 
-    @Override
-    public void configureMotionProfile(double maxVelocity, double maxAcceleration) {
-        this.config.closedLoop.maxMotion
-            .maxVelocity(maxVelocity, ClosedLoopSlot.kSlot0)
-            .maxAcceleration(maxAcceleration, ClosedLoopSlot.kSlot0)
-            .positionMode(com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode.kMAXMotionTrapezoidal, ClosedLoopSlot.kSlot0)
-            .allowedClosedLoopError(0, ClosedLoopSlot.kSlot0)
-        ;
-
-        this.motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        // super.simEncoder = EncoderSim.createForIndex(deviceID);
+        // super.simMotor = new DCMotorSim(
+        //     NewtonMotor.getDCMotor(this, 1),
+        //     deviceID, 
+        //     1d
+        // );
     }
 
     @Override
@@ -63,7 +62,7 @@ public abstract class SparkBaseMotor<M extends SparkBase, C extends SparkBaseCon
             .p(gains.kP, slot)
             .i(gains.kI, slot)
             .d(gains.kD, slot)
-            .velocityFF(gains.kV, slot)
+            .velocityFF(gains.feedForward.kV, slot)
             ;
 
         if (gains.softLimit) {
@@ -118,7 +117,7 @@ public abstract class SparkBaseMotor<M extends SparkBase, C extends SparkBaseCon
     }
 
     @Override
-    public void setPosition(double desiredRotations, int pidSlot) {
+    public void setPositionSmartMotion(double desiredRotations, int pidSlot) {
         if (motorPIDGains != null) {
             Utils.clamp(
                 desiredRotations, 
@@ -179,20 +178,6 @@ public abstract class SparkBaseMotor<M extends SparkBase, C extends SparkBaseCon
     @Override
     public void resetEncoderPosition(double rotations) {
         this.encoder.setPosition(rotations);
-    }
-
-    @Override
-    public double getVoltage() {
-        return motor.getAppliedOutput();
-    }
-
-    @Override
-    public void setSoftLimits(double min, double max) {
-        this.config.softLimit.forwardSoftLimitEnabled(true);
-        this.config.softLimit.forwardSoftLimit(max);
-
-        this.config.softLimit.reverseSoftLimitEnabled(true);
-        this.config.softLimit.reverseSoftLimit(min);
     }
 
     private ClosedLoopSlot getSlot(int slot) {

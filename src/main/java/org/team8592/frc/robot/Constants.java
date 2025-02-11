@@ -174,6 +174,22 @@ public final class Constants {
         ;
     }
 
+    public final class INTAKE {
+        public static final double AT_VELOCITY_THRESHOLD = 25d; // RPM
+
+        public static final PIDProfile OUTER_ROLLER_GAINS = new PIDProfile()
+            .setP(1E-3)
+            .setV(1.5)
+            .setMaxVelocity(5000)
+        ;
+
+        public static final PIDProfile INNER_ROLLER_GAINS = new PIDProfile()
+            .setP(1E-3)
+            .setV(1.5)
+            .setMaxVelocity(5000)
+        ;
+    }
+
     public final class ROBOT {
         public static final String LOG_PATH = SHARED.LOG_FOLDER + "/Robot/";
     }

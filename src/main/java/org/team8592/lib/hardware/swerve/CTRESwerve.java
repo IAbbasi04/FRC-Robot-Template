@@ -3,13 +3,8 @@ package org.team8592.lib.hardware.swerve;
 import java.util.function.Supplier;
 
 import com.ctre.phoenix6.Utils;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrain;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveDrivetrainConstants;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModule;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstants;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModuleConstantsFactory;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.*;
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -19,7 +14,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 
-public class CTRESwerve extends SwerveDrivetrain{
+public class CTRESwerve extends SwerveDrivetrain {
     public static final class SpeedConstants {
         public final double MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND;
         public final double MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND;
@@ -51,18 +46,19 @@ public class CTRESwerve extends SwerveDrivetrain{
      * @param moduleConstants the module constants, generated from commonModuleConstants
      */
     public CTRESwerve(SwerveDrivetrainConstants driveTrainConstants, SpeedConstants speedConstants, SwerveModuleConstantsFactory commonModuleConstants, SwerveModuleConstants... moduleConstants) {
-        super(driveTrainConstants, moduleConstants);
+        // super(driveTrainConstants, moduleConstants);
+        super(null, null, null, driveTrainConstants, moduleConstants);
 
         // These two requests can be combined with a ChassisSpeeds (see getRequest() below) to drive the swerve
         fieldRelativeDrive = (
             new SwerveRequest.FieldCentric()
-            .withDeadband(commonModuleConstants.SpeedAt12VoltsMps * 0.001)
+            .withDeadband(commonModuleConstants.SpeedAt12Volts * 0.001)
             .withRotationalDeadband(speedConstants.MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND * 0.001)
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
         );
         robotRelativeDrive = (
             new SwerveRequest.RobotCentric()
-            .withDeadband(commonModuleConstants.SpeedAt12VoltsMps * 0.001)
+            .withDeadband(commonModuleConstants.SpeedAt12Volts * 0.001)
             .withRotationalDeadband(speedConstants.MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND * 0.001)
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
         );
@@ -110,7 +106,7 @@ public class CTRESwerve extends SwerveDrivetrain{
         if (robotIsSimulation.get()) {
             return appliedSpeeds;
         }
-        return m_cachedState.speeds;
+        return getState().Speeds;
     }
 
     /**
@@ -119,7 +115,7 @@ public class CTRESwerve extends SwerveDrivetrain{
     public void resetHeading(Supplier<Rotation2d> headingOffset){
         this.currentGyroOffset = headingOffset;
         this.setGyroscopeYaw(headingOffset.get());
-        this.seedFieldRelative();
+        this.seedFieldCentric();
     }
 
     /**
@@ -136,7 +132,7 @@ public class CTRESwerve extends SwerveDrivetrain{
      * @return the current robot position, as determined by the odometry
      */
     public Pose2d getCurrentOdometryPosition(){
-        return m_cachedState.Pose;
+        return getState().Pose;
     }
 
     /**
@@ -153,7 +149,7 @@ public class CTRESwerve extends SwerveDrivetrain{
      * @param pose a {@code Pose2d} containing the desired known pose
      */
     public void setKnownOdometryPose(Pose2d pose){
-        this.seedFieldRelative(pose);
+        this.resetPose(pose);
     }
 
     public void startSimThread(boolean isSimulation) {
@@ -235,6 +231,6 @@ public class CTRESwerve extends SwerveDrivetrain{
      * {@code SwerveModule[]} array of this swerve's modules
      */
     public void registerTelemetry(TriConsumer<SwerveDriveState, SwerveDriveKinematics, SwerveModule[]> telemetryFunction){
-        registerTelemetry((swerveDriveState) -> telemetryFunction.accept(swerveDriveState, this.m_kinematics, this.Modules));
+        // registerTelemetry((swerveDriveState) -> telemetryFunction.accept(swerveDriveState, this.getKinematics(), this.getModules()));
     }
 }

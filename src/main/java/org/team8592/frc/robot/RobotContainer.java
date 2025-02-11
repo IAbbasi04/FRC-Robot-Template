@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj2.command.*;
 
 public class RobotContainer {
     private SubsystemManager activeSubsystemsManager;
-    private SwerveSubsystem swerve;
+    // private SwerveSubsystem swerve;
 
     private UnitTestScheduler testScheduler;
 
@@ -42,7 +42,7 @@ public class RobotContainer {
         Controls.initializeShuffleboardLogs(logToShuffleboard);
 
         // Add subsystems here
-        swerve = activeSubsystemsManager.getSwerve();
+        // swerve = activeSubsystemsManager.getSwerve();
 
         this.configureBindings(ControlSets.DUAL_DRIVER);
         this.configureDefaults();
@@ -64,17 +64,21 @@ public class RobotContainer {
      */
     public void configureDefaults(){
         // Set the swerve's default command to drive with joysticks
-        swerve.setDefaultCommand(swerve.run(() -> {
-            swerve.drive(swerve.processJoystickInputs(
-                Controls.driveTranslateX.getAsDouble(),
-                Controls.driveTranslateY.getAsDouble(),
-                Controls.driveRotate.getAsDouble()
-            ), DriveModes.AUTOMATIC);
+        // swerve.setDefaultCommand(swerve.run(() -> {
+        //     swerve.drive(swerve.processJoystickInputs(
+        //         Controls.driveTranslateX.getAsDouble(),
+        //         Controls.driveTranslateY.getAsDouble(),
+        //         Controls.driveRotate.getAsDouble()
+        //     ), DriveModes.AUTOMATIC);
+        // }));
+
+        activeSubsystemsManager.getIntake().setDefaultCommand(activeSubsystemsManager.getIntake().run(() -> {
+            activeSubsystemsManager.getIntake().setRollerVelocity(Controls.getDriver().getLeftY()*1000);
         }));
     }
 
     public void removeDefaults() {
-        swerve.removeDefaultCommand();
+        // swerve.removeDefaultCommand();
     }
 
     /**
@@ -86,23 +90,23 @@ public class RobotContainer {
         CommandScheduler.getInstance().getDefaultButtonLoop().clear();
         Controls.applyControlSet(controlSet);
 
-        Controls.slowMode.onTrue(
-            Commands.runOnce(() -> swerve.setSlowMode(true)).ignoringDisable(true)
-        ).onFalse(
-            Commands.runOnce(() -> swerve.setSlowMode(false)).ignoringDisable(true)
-        );
+        // Controls.slowMode.onTrue(
+        //     Commands.runOnce(() -> swerve.setSlowMode(true)).ignoringDisable(true)
+        // ).onFalse(
+        //     Commands.runOnce(() -> swerve.setSlowMode(false)).ignoringDisable(true)
+        // );
 
-        Controls.zeroGryoscope.onTrue(
-            // Similar comment on Commands.runOnce as slow mode above
-            Commands.runOnce(() -> swerve.resetHeading())
-        );
+        // Controls.zeroGryoscope.onTrue(
+        //     // Similar comment on Commands.runOnce as slow mode above
+        //     Commands.runOnce(() -> swerve.resetHeading())
+        // );
 
-        Controls.robotRelative.onTrue(
-            // Similar comment on Commands.runOnce and ignoringDisable as slow mode above
-            Commands.runOnce(() -> swerve.setRobotRelative(true)).ignoringDisable(true)
-        ).onFalse(
-            Commands.runOnce(() -> swerve.setRobotRelative(false)).ignoringDisable(true)
-        );
+        // Controls.robotRelative.onTrue(
+        //     // Similar comment on Commands.runOnce and ignoringDisable as slow mode above
+        //     Commands.runOnce(() -> swerve.setRobotRelative(true)).ignoringDisable(true)
+        // ).onFalse(
+        //     Commands.runOnce(() -> swerve.setRobotRelative(false)).ignoringDisable(true)
+        // );
 
         Controls.snapForward.whileTrue(
             NewtonCommands.swerveSnapToCommand(

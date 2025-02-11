@@ -55,7 +55,7 @@ public final class AutoManager {
      */
     public static Command getAutonomousCommand(){
         AutoCommand autoCommand = autoChooser.getSelected();
-        manager.getSwerve().resetPose(autoCommand.getStartPose());
+        // manager.getSwerve().resetPose(autoCommand.getStartPose());
         return manager.onAutonomousInitCommand().andThen(
             // If we don't keep this command from registering as composed,
             // the code will crash if we try to run an auto twice without

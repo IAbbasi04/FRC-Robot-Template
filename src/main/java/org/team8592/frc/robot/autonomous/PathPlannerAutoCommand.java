@@ -10,6 +10,7 @@ public abstract class PathPlannerAutoCommand extends AutoCommand {
 
     @Override
     public Pose2d getStartPose() {
-        return PathPlannerAuto.getStaringPoseFromAutoFile(getName());
+        // return PathPlannerAuto.getStaringPoseFromAutoFile(getName());
+        return new Pose2d();
     }
 }

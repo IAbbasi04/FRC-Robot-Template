@@ -1,6 +1,6 @@
-package frc.robot.helpers.motor.talonfx;
+package org.team8592.lib.hardware.motor.talonfx;
 
-import frc.robot.helpers.motor.MotorConstants;
+import org.team8592.lib.hardware.motor.MotorConstants;
 
 public class Falcon500FOCMotor extends TalonFXMotor {
     public Falcon500FOCMotor(int motorID) {

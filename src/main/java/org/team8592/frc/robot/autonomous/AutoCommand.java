@@ -77,14 +77,14 @@ public abstract class AutoCommand extends NewtonWrapperCommand {
      * Creates a PathPlanner-based auto from the indicated file path 
      * @param file path without the .auto extension (ex. "ExamplePreloadTwoGamePieceAuto")
      */
-    public static AutoCommand createAutoFromPathPlanner(String file) {
-        return new AutoCommand(file) {
-            @Override
-            public Pose2d getStartPose() {
-                return PathPlannerAuto.getStaringPoseFromAutoFile(file);
-            }
-        };
-    }
+    // public static AutoCommand createAutoFromPathPlanner(String file) {
+    //     return new AutoCommand(file) {
+    //         @Override
+    //         public Pose2d getStartPose() {
+    //             return PathPlannerAuto.getStaringPoseFromAutoFile(file);
+    //         }
+    //     };
+    // }
 
     public static AutoCommand getDefaultAuto() {
         return new AutoCommand() {
@@ -121,16 +121,16 @@ public abstract class AutoCommand extends NewtonWrapperCommand {
      * {@code FileNotFoundException} if the name doesn't represent a .traj file
      * located in the {@code choreo} folder in the {@code deploy} folder
      */
-    protected static final Trajectory getChoreoTrajectory(String name){
-        if(cachedChoreoTrajectories.containsKey(name)){
-            return cachedChoreoTrajectories.get(name);
-        }
-        else{
-            Trajectory wpilibTrajectory = fromPathPlannerPath(PathPlannerPath.fromChoreoTrajectory(name));
-            cachedChoreoTrajectories.put(name, wpilibTrajectory);
-            return wpilibTrajectory;
-        }
-    }
+    // protected static final Trajectory getChoreoTrajectory(String name){
+    //     if(cachedChoreoTrajectories.containsKey(name)){
+    //         return cachedChoreoTrajectories.get(name);
+    //     }
+    //     else{
+    //         Trajectory wpilibTrajectory = fromPathPlannerPath(PathPlannerPath.fromChoreoTrajectory(name));
+    //         cachedChoreoTrajectories.put(name, wpilibTrajectory);
+    //         return wpilibTrajectory;
+    //     }
+    // }
 
     /**
      * Get a PathPlanner path by name as a WPILib trajectory.
@@ -142,40 +142,40 @@ public abstract class AutoCommand extends NewtonWrapperCommand {
      * {@code FileNotFoundException} if the name doesn't represent a .path file
      * located in {@code /src/main/deploy/pathplanner/paths}
      */
-    protected static final Trajectory getPathPlannerTrajectory(String name){
-        if(cachedPathPlannerTrajectories.containsKey(name)){
-            return cachedPathPlannerTrajectories.get(name);
-        }
-        else{
-            Trajectory wpilibTrajectory = fromPathPlannerPath(PathPlannerPath.fromPathFile(name));
-            cachedPathPlannerTrajectories.put(name, wpilibTrajectory);
-            return wpilibTrajectory;
-        }
-    }
+    // protected static final Trajectory getPathPlannerTrajectory(String name){
+    //     if(cachedPathPlannerTrajectories.containsKey(name)){
+    //         return cachedPathPlannerTrajectories.get(name);
+    //     }
+    //     else{
+    //         Trajectory wpilibTrajectory = fromPathPlannerPath(PathPlannerPath.fromPathFile(name));
+    //         cachedPathPlannerTrajectories.put(name, wpilibTrajectory);
+    //         return wpilibTrajectory;
+    //     }
+    // }
 
     /**
      * Set the start pose of this auto to the first pose of a Choreo path.
      *
      * @param name the name of the Choreo path to get the start pose from
      */
-    protected AutoCommand setStartStateFromChoreoTrajectory(String name){
-        if(!cachedChoreoTrajectories.containsKey(name)){
-            getChoreoTrajectory(name); // Adds the path to the cached trajectory map
-        }
-        this.startPose = cachedChoreoTrajectories.get(name).getInitialPose();
+    // protected AutoCommand setStartStateFromChoreoTrajectory(String name){
+    //     if(!cachedChoreoTrajectories.containsKey(name)){
+    //         getChoreoTrajectory(name); // Adds the path to the cached trajectory map
+    //     }
+    //     this.startPose = cachedChoreoTrajectories.get(name).getInitialPose();
 
-        return this;
-    }
+    //     return this;
+    // }
 
     /**
      * Set the start pose of this auto to the first pose of a PathPlanner path.
      *
      * @param name the name of the PathPlanner path to get the start pose from
      */
-    protected AutoCommand setStartStateFromPathPlannerTrajectory(String name){
-        this.startPose = PathPlannerAuto.getStaringPoseFromAutoFile(name);
-        return this;
-    }
+    // protected AutoCommand setStartStateFromPathPlannerTrajectory(String name){
+    //     this.startPose = PathPlannerAuto.getStaringPoseFromAutoFile(name);
+    //     return this;
+    // }
 
     /**
      * Convert a PathPlanner path into a WPILib trajectory
@@ -183,28 +183,28 @@ public abstract class AutoCommand extends NewtonWrapperCommand {
      * @param path the PathPlannerPath to convert
      * @return the path converted to a WPILib trajectory
      */
-    private static Trajectory fromPathPlannerPath(PathPlannerPath path){
-        PathPlannerTrajectory pathPlannerTraj = (
-            path.getTrajectory(new ChassisSpeeds(), path.getPreviewStartingHolonomicPose().getRotation())
-        );
+    // private static Trajectory fromPathPlannerPath(PathPlannerPath path){
+    //     PathPlannerTrajectory pathPlannerTraj = (
+    //         path.getTrajectory(new ChassisSpeeds(), path.getPreviewStartingHolonomicPose().getRotation())
+    //     );
 
-        List<PathPlannerTrajectory.State> pathPlannerStates = pathPlannerTraj.getStates();
-        ArrayList<State> wpilibStates = new ArrayList<>();
+    //     List<PathPlannerTrajectory.State> pathPlannerStates = pathPlannerTraj.getStates();
+    //     ArrayList<State> wpilibStates = new ArrayList<>();
 
-        // Convert all the PathPlanner states to WPILib trajectory states and add
-        // them to the wpilibStates ArrayList
-        for (PathPlannerTrajectory.State pathPlannerState : pathPlannerStates) {
-            State wpilibState = new State(
-                pathPlannerState.timeSeconds,
-                pathPlannerState.velocityMps,
-                pathPlannerState.accelerationMpsSq,
-                pathPlannerState.getTargetHolonomicPose(),
-                pathPlannerState.curvatureRadPerMeter
-            );
-            wpilibStates.add(wpilibState);
-        }
-        return new Trajectory(wpilibStates);
-    }
+    //     // Convert all the PathPlanner states to WPILib trajectory states and add
+    //     // them to the wpilibStates ArrayList
+    //     for (PathPlannerTrajectory.State pathPlannerState : pathPlannerStates) {
+    //         State wpilibState = new State(
+    //             pathPlannerState.timeSeconds,
+    //             pathPlannerState.velocityMps,
+    //             pathPlannerState.accelerationMpsSq,
+    //             pathPlannerState.getTargetHolonomicPose(),
+    //             pathPlannerState.curvatureRadPerMeter
+    //         );
+    //         wpilibStates.add(wpilibState);
+    //     }
+    //     return new Trajectory(wpilibStates);
+    // }
 
     public Command getAutoAsCommand() {
         return this.autoCommand;
