@@ -13,9 +13,9 @@ import edu.wpi.first.wpilibj.Timer;
 
 import org.team8592.lib.logging.SmartLogger;
 import org.team8592.frc.robot.Robot;
+import org.team8592.frc.robot.subsystems.swerve.SwerveConstants;
 import org.team8592.frc.robot.subsystems.swerve.SwerveSubsystem;
 import org.team8592.frc.robot.Constants.MEASUREMENTS;
-import org.team8592.frc.robot.Constants.SWERVE;
 
 public class FollowPathCommand extends LargeCommand {
     // Pathing variables
@@ -66,37 +66,37 @@ public class FollowPathCommand extends LargeCommand {
         this.trajectory = trajectory;
 
         this.xController = new PIDController(
-            SWERVE.PATH_FOLLOW_TRANSLATE_kP,
-            SWERVE.PATH_FOLLOW_TRANSLATE_kI,
-            SWERVE.PATH_FOLLOW_TRANSLATE_kD
+            SwerveConstants.PATH_FOLLOW_TRANSLATE_kP,
+            SwerveConstants.PATH_FOLLOW_TRANSLATE_kI,
+            SwerveConstants.PATH_FOLLOW_TRANSLATE_kD
         );
         this.xController.setTolerance(
-            SWERVE.PATH_FOLLOW_POSITION_TOLERANCE,
-            SWERVE.PATH_FOLLOW_VELOCITY_TOLERANCE
+            SwerveConstants.PATH_FOLLOW_POSITION_TOLERANCE,
+            SwerveConstants.PATH_FOLLOW_VELOCITY_TOLERANCE
         );
 
         this.yController = new PIDController(
-            SWERVE.PATH_FOLLOW_TRANSLATE_kP,
-            SWERVE.PATH_FOLLOW_TRANSLATE_kI,
-            SWERVE.PATH_FOLLOW_TRANSLATE_kD
+            SwerveConstants.PATH_FOLLOW_TRANSLATE_kP,
+            SwerveConstants.PATH_FOLLOW_TRANSLATE_kI,
+            SwerveConstants.PATH_FOLLOW_TRANSLATE_kD
         );
         this.yController.setTolerance(
-            SWERVE.PATH_FOLLOW_POSITION_TOLERANCE,
-            SWERVE.PATH_FOLLOW_VELOCITY_TOLERANCE
+            SwerveConstants.PATH_FOLLOW_POSITION_TOLERANCE,
+            SwerveConstants.PATH_FOLLOW_VELOCITY_TOLERANCE
         );
 
         this.turnController = new ProfiledPIDController(
-            SWERVE.PATH_FOLLOW_ROTATE_kP,
-            SWERVE.PATH_FOLLOW_ROTATE_kI,
-            SWERVE.PATH_FOLLOW_ROTATE_kD,
+            SwerveConstants.PATH_FOLLOW_ROTATE_kP,
+            SwerveConstants.PATH_FOLLOW_ROTATE_kI,
+            SwerveConstants.PATH_FOLLOW_ROTATE_kD,
             new Constraints(
-                SWERVE.PATH_FOLLOW_ROTATE_MAX_VELOCITY,
-                SWERVE.PATH_FOLLOW_ROTATE_MAX_ACCELLERATION
+                SwerveConstants.PATH_FOLLOW_ROTATE_MAX_VELOCITY,
+                SwerveConstants.PATH_FOLLOW_ROTATE_MAX_ACCELLERATION
             )
         );
         this.turnController.setTolerance(
-            SWERVE.PATH_FOLLOW_POSITION_TOLERANCE,
-            SWERVE.PATH_FOLLOW_VELOCITY_TOLERANCE
+            SwerveConstants.PATH_FOLLOW_POSITION_TOLERANCE,
+            SwerveConstants.PATH_FOLLOW_VELOCITY_TOLERANCE
         );
         this.turnController.enableContinuousInput(-Math.PI, Math.PI);
 

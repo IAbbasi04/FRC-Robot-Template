@@ -1,65 +1,36 @@
 package org.team8592.frc.robot.commands;
 
+import java.util.Optional;
+
+import org.photonvision.EstimatedRobotPose;
+import org.team8592.frc.robot.Constants;
+import org.team8592.frc.robot.subsystems.swerve.SwerveSubsystem;
+import org.team8592.frc.robot.subsystems.vision.VisionSubsystem;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 public final class NewtonCommands {
-    public static Command primeL1Command(){
-        return Commands.none();
+    public static Command updateOdometryWithVision(SwerveSubsystem swerve, VisionSubsystem vision) {
+        return new InstantCommand(() -> {
+            Optional<EstimatedRobotPose> estimatedRobotPose = vision.getRobotPoseVision();
+            if (estimatedRobotPose.isPresent()) {
+                Pose2d robotPose = estimatedRobotPose.get().estimatedPose.toPose2d();
+                double ambiguity = vision.getPoseAmbiguityRatio();
+
+                if(Math.abs(ambiguity) < Constants.VISION.MAX_ACCEPTABLE_AMBIGUITY) {
+                    if (DriverStation.isDisabled()){
+                        swerve.resetPose(robotPose);        
+                    } else {
+                        swerve.addVisionMeasurement(robotPose);
+                    }
+                }
+            }
+        }, swerve, vision).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
     }
-
-    public static Command primeL2Command(){
-        return Commands.none();
-    }
-
-    public static Command primeL3Command(){
-        return Commands.none();
-    }
-
-    public static Command primeL4Command(){
-        return Commands.none();
-    }
-
-    public static Command groundIntakeCommand(){
-        return Commands.none();
-    }
-
-    public static Command stowCommand(){
-        return Commands.none();
-    }
-
-    public static Command primeL2AlgaeCommand(){
-        return Commands.none();
-    }
-
-    public static Command primeL3AlgaeCommand(){
-        return Commands.none();
-    }
-
-    public static Command goToPrimePositionCommand(){
-        return Commands.none();
-    }
-
-    public static Command primeProcessorCommand(){
-        return Commands.none();
-    }
-
-    public static Command primeNetCommand(){
-        return Commands.none();
-    }
-
-
-    /**
-     * Currently Commands.none(). Update this comment when the command is added.
-     *
-     * @param position
-     * @return Commands.none()
-     */
-
-    /**
-     * Command to stop the intake and stow the pivot to REST position
-     * @return the command
-     */
 }
 
 

@@ -11,6 +11,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import org.team8592.frc.robot.Constants.*;
+import org.team8592.frc.robot.subsystems.swerve.SwerveConstants;
+
 import edu.wpi.first.util.WPISerializable;
 
 /**
@@ -64,8 +66,8 @@ public final class Suppliers {
      */
     public static final Supplier<Rotation2d> currentGyroscopeRotationOffset = new LoggedWPILibSupplier<Rotation2d>(
         () -> robotRunningOnRed.getAsBoolean() && !DriverStation.isAutonomous() 
-        ? SWERVE.RED_PERSPECTIVE_ROTATION
-        : SWERVE.BLUE_PERSPECTIVE_ROTATION,
+        ? SwerveConstants.RED_PERSPECTIVE_ROTATION
+        : SwerveConstants.BLUE_PERSPECTIVE_ROTATION,
         "CurrentGyroscopeRotationOffset"
     );
 

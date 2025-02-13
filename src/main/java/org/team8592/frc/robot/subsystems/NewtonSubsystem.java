@@ -6,10 +6,12 @@ import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import org.team8592.lib.logging.SmartLogger;
 import org.team8592.lib.MatchMode;
 
-public abstract class NewtonSubsystem extends SubsystemBase {
+public abstract class NewtonSubsystem<C extends SubsystemCommands<?>> extends SubsystemBase {
     protected SmartLogger logger;
     private boolean logToShuffleboard = false;
     private boolean enabled = false;
+
+    public C commands;
 
     protected NewtonSubsystem(boolean logToShuffleboard) {
         this.logToShuffleboard = logToShuffleboard;
@@ -78,7 +80,7 @@ public abstract class NewtonSubsystem extends SubsystemBase {
 
     public void onRobotInit() {}
 
-    public abstract void onInit(MatchMode mode);
+    public abstract void onModeInit(MatchMode mode);
 
     public abstract void periodicTelemetry();
 

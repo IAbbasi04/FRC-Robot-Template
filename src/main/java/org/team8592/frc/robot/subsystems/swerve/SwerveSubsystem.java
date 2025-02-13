@@ -18,7 +18,7 @@ import org.team8592.lib.MatchMode;
 import org.team8592.lib.SmoothingFilter;
 import org.team8592.lib.hardware.swerve.CTRESwerve;
 
-public class SwerveSubsystem extends NewtonSubsystem {
+public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
     /**
      * Small enum to control whether to drive robot- or field-
      * relative for {@link SwerveSubsystem#drive(ChassisSpeeds, DriveModes)}
@@ -41,20 +41,18 @@ public class SwerveSubsystem extends NewtonSubsystem {
     
     private CTRESwerve swerve;
 
-    public static ChassisSpeeds speedZero = new ChassisSpeeds();
-
-    public SwerveCommands commands = new SwerveCommands(this);
-
     public SwerveSubsystem(boolean logToShuffleboard) {
         super(logToShuffleboard);
 
+        super.commands = new SwerveCommands(this);
+
         smoothingFilter = new SmoothingFilter(
-            SWERVE.TRANSLATION_SMOOTHING_AMOUNT,
-            SWERVE.TRANSLATION_SMOOTHING_AMOUNT,
-            SWERVE.ROTATION_SMOOTHING_AMOUNT
+            SwerveConstants.TRANSLATION_SMOOTHING_AMOUNT,
+            SwerveConstants.TRANSLATION_SMOOTHING_AMOUNT,
+            SwerveConstants.ROTATION_SMOOTHING_AMOUNT
         );
 
-        snapToController = new PIDController(SWERVE.SNAP_TO_kP, SWERVE.SNAP_TO_kI, SWERVE.SNAP_TO_kD);
+        snapToController = new PIDController(SwerveConstants.SNAP_TO_kP, SwerveConstants.SNAP_TO_kI, SwerveConstants.SNAP_TO_kD);
 
         // TODO: Any initialization code needed for the new swerve stuff
         swerve = new CTRESwerve();
@@ -154,7 +152,7 @@ public class SwerveSubsystem extends NewtonSubsystem {
         // TODO: implement something that allows the commented code to work
         swerve.setKnownOdometryPose(pose);
         Logger.recordOutput(
-            SWERVE.LOG_PATH+"Console", (
+            SwerveConstants.LOG_PATH+"Console", (
                 "Current pose reset to X: "+
                 pose.getX()+
                 "; Y: "+
@@ -219,40 +217,36 @@ public class SwerveSubsystem extends NewtonSubsystem {
     public ChassisSpeeds processJoystickInputs(double rawX, double rawY, double rawRot){
         double driveTranslateY = (
             rawY >= 0
-            ? (Math.pow(Math.abs(rawY), SWERVE.JOYSTICK_EXPONENT))
-            : -(Math.pow(Math.abs(rawY), SWERVE.JOYSTICK_EXPONENT))
+            ? (Math.pow(Math.abs(rawY), SwerveConstants.JOYSTICK_EXPONENT))
+            : -(Math.pow(Math.abs(rawY), SwerveConstants.JOYSTICK_EXPONENT))
         );
 
         double driveTranslateX = (
             rawX >= 0
-            ? (Math.pow(Math.abs(rawX), SWERVE.JOYSTICK_EXPONENT))
-            : -(Math.pow(Math.abs(rawX), SWERVE.JOYSTICK_EXPONENT))
+            ? (Math.pow(Math.abs(rawX), SwerveConstants.JOYSTICK_EXPONENT))
+            : -(Math.pow(Math.abs(rawX), SwerveConstants.JOYSTICK_EXPONENT))
         );
 
         double driveRotate = (
             rawRot >= 0
-            ? (Math.pow(Math.abs(rawRot), SWERVE.JOYSTICK_EXPONENT))
-            : -(Math.pow(Math.abs(rawRot), SWERVE.JOYSTICK_EXPONENT))
+            ? (Math.pow(Math.abs(rawRot), SwerveConstants.JOYSTICK_EXPONENT))
+            : -(Math.pow(Math.abs(rawRot), SwerveConstants.JOYSTICK_EXPONENT))
         );
-
-        Logger.recordOutput(SWERVE.LOG_PATH+"TranslateY", driveTranslateY);
-        Logger.recordOutput(SWERVE.LOG_PATH+"TranslateX", driveTranslateX);
-        Logger.recordOutput(SWERVE.LOG_PATH+"driveRotate", driveRotate);
 
         ChassisSpeeds currentSpeeds;
 
         if (isSlowMode) {
             currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
-                driveTranslateY * SWERVE.TRANSLATE_POWER_SLOW * SWERVE.MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
-                driveTranslateX * SWERVE.TRANSLATE_POWER_SLOW * SWERVE.MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
-                driveRotate * SWERVE.ROTATE_POWER_SLOW * SWERVE.MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND
+                driveTranslateY * SwerveConstants.TRANSLATE_POWER_SLOW * SwerveConstants.MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
+                driveTranslateX * SwerveConstants.TRANSLATE_POWER_SLOW * SwerveConstants.MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
+                driveRotate * SwerveConstants.ROTATE_POWER_SLOW * SwerveConstants.MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND
             ));
         }
         else {
             currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
-                driveTranslateY * SWERVE.TRANSLATE_POWER_FAST * SWERVE.MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
-                driveTranslateX * SWERVE.TRANSLATE_POWER_FAST * SWERVE.MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
-                driveRotate * SWERVE.ROTATE_POWER_FAST * SWERVE.MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND
+                driveTranslateY * SwerveConstants.TRANSLATE_POWER_FAST * SwerveConstants.MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
+                driveTranslateX * SwerveConstants.TRANSLATE_POWER_FAST * SwerveConstants.MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
+                driveRotate * SwerveConstants.ROTATE_POWER_FAST * SwerveConstants.MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND
             ));
         }
 
@@ -264,7 +258,7 @@ public class SwerveSubsystem extends NewtonSubsystem {
     }
 
     @Override
-    public void onInit(MatchMode mode) {
+    public void onModeInit(MatchMode mode) {
 
     }
 
@@ -280,7 +274,7 @@ public class SwerveSubsystem extends NewtonSubsystem {
 
     @Override
     public void periodicTelemetry() {
-        Logger.recordOutput(SWERVE.LOG_PATH+"Current Pose", getCurrentPosition());
+        logger.log("Current Pose", getCurrentPosition());
         swerve.periodic();
     }
 

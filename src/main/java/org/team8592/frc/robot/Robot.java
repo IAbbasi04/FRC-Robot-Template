@@ -13,8 +13,8 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import org.team8592.lib.MatchMode;
 
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -36,8 +36,7 @@ public class Robot extends LoggedRobot {
     private RobotContainer robotContainer;
 
     public static Field2d FIELD = new Field2d();
-
-    public GenericHID coralController = new GenericHID(0);
+    public static MatchMode MODE = MatchMode.DISABLED;
 
     /**
      * This function is run when the robot is first started up and should be used
@@ -80,6 +79,7 @@ public class Robot extends LoggedRobot {
         Logger.start();
 
         robotContainer = new RobotContainer(Robot.isSimulation() || true); // TODO - Fix to only work when NOT in actual match
+        CommandScheduler.getInstance().schedule(robotContainer.onRobotInit());
     }
 
     /**
@@ -107,6 +107,7 @@ public class Robot extends LoggedRobot {
     /** This function is called once each time the robot enters Disabled mode. */
     @Override
     public void disabledInit() {
+        updateMode(MatchMode.DISABLED);
     }
 
     @Override
@@ -120,6 +121,8 @@ public class Robot extends LoggedRobot {
     @Override
     public void autonomousInit() {
         autonomousCommand = robotContainer.getAutonomousCommand();
+
+        updateMode(MatchMode.AUTONOMOUS);
 
         if (autonomousCommand != null) {
             autonomousCommand.schedule();
@@ -140,6 +143,8 @@ public class Robot extends LoggedRobot {
         if (autonomousCommand != null) {
             autonomousCommand.cancel();
         }
+
+        updateMode(MatchMode.TELEOP);
     }
 
     /** This function is called periodically during operator control. */
@@ -152,6 +157,8 @@ public class Robot extends LoggedRobot {
     public void testInit() {
         // Cancels all running commands at the start of test mode.
         CommandScheduler.getInstance().cancelAll();
+
+        updateMode(MatchMode.TEST);
     }
 
     /** This function is called periodically during test mode. */
@@ -170,5 +177,10 @@ public class Robot extends LoggedRobot {
         //drivetrain.simulationPeriodic();
 
         //vision.simulationPeriodic(drivetrain.getSimPose());
+    }
+
+    private void updateMode(MatchMode mode) {
+        MODE = mode;
+        CommandScheduler.getInstance().schedule(robotContainer.onModeInit(MODE));
     }
 }

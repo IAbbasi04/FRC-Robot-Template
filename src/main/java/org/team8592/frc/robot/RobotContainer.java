@@ -4,18 +4,15 @@
 
 package org.team8592.frc.robot;
 
-import java.util.Optional;
-
-import org.photonvision.EstimatedRobotPose;
+import org.team8592.frc.robot.commands.NewtonCommands;
 import org.team8592.frc.robot.commands.autonomous.*;
 import org.team8592.frc.robot.commands.largecommands.LargeCommand;
 import org.team8592.frc.robot.subsystems.SubsystemManager;
 import org.team8592.frc.robot.subsystems.swerve.SwerveSubsystem;
 import org.team8592.frc.robot.subsystems.vision.VisionSubsystem;
+import org.team8592.lib.MatchMode;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 
@@ -64,23 +61,7 @@ public class RobotContainer {
             )
         );
 
-        vision.setDefaultCommand(
-            new InstantCommand(() -> {
-                Optional<EstimatedRobotPose> estimatedRobotPose = vision.getRobotPoseVision();
-                if (estimatedRobotPose.isPresent()) {
-                    Pose2d robotPose = estimatedRobotPose.get().estimatedPose.toPose2d();
-                    double ambiguity = vision.getPoseAmbiguityRatio();
-
-                    if(Math.abs(ambiguity) < Constants.NAVIGATION.MAX_ACCEPTABLE_AMBIGUITY) {
-                        if (DriverStation.isDisabled()){
-                            swerve.resetPose(robotPose);        
-                        } else {
-                            swerve.addVisionMeasurement(robotPose);
-                        }
-                    }
-                }
-            }).withInterruptBehavior(InterruptionBehavior.kCancelSelf)
-        );
+        vision.setDefaultCommand(NewtonCommands.updateOdometryWithVision(swerve, vision));
     }
 
 
@@ -150,7 +131,13 @@ public class RobotContainer {
         );
     };
 
+    public Command onRobotInit() {
+        return manager.onRobotInitCommand();
+    }
 
+    public Command onModeInit(MatchMode mode) {
+        return manager.onModeInitCommand(mode);
+    }
 
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.

@@ -15,7 +15,7 @@ import org.team8592.lib.MatchMode;
 import org.team8592.lib.hardware.NewtonPhotonCamera;
 import org.team8592.frc.robot.Robot;
 
-public class VisionSubsystem extends NewtonSubsystem {
+public class VisionSubsystem extends NewtonSubsystem<VisionCommands> {
     private NewtonPhotonCamera camera;
  
     private PIDController xController = new PIDController(VISION.X_KP, VISION.X_KI, VISION.X_KD);
@@ -27,6 +27,8 @@ public class VisionSubsystem extends NewtonSubsystem {
 
     public VisionSubsystem(boolean logToShuffleboard){
         super(logToShuffleboard);
+
+        super.commands = new VisionCommands(this);
 
         this.camera = new NewtonPhotonCamera(
             VISION.CAM_NAME, 
@@ -67,7 +69,7 @@ public class VisionSubsystem extends NewtonSubsystem {
     }
 
     @Override
-    public void onInit(MatchMode mode) {
+    public void onModeInit(MatchMode mode) {
         // So far does nothing
     }
 

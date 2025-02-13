@@ -13,7 +13,7 @@ public class SubsystemManager extends SubsystemBase {
     public SwerveSubsystem swerve;
     public VisionSubsystem vision;
 
-    private List<NewtonSubsystem> activeSubystems = new ArrayList<>();
+    private List<NewtonSubsystem<?>> activeSubystems = new ArrayList<>();
 
     public SubsystemManager(boolean logToShuffleboard) {
         this.swerve = new SwerveSubsystem(logToShuffleboard);
@@ -31,33 +31,56 @@ public class SubsystemManager extends SubsystemBase {
         });
     }
 
-    public Command onAutonomousInitCommand() {
-        NewtonSubsystem[] subs = new NewtonSubsystem[activeSubystems.size()];
+    public void onModeInit(MatchMode mode) {
+        NewtonSubsystem<?>[] subs = new NewtonSubsystem<?>[activeSubystems.size()];
         for (int i = 0; i < activeSubystems.size(); i++) {
             subs[i] = activeSubystems.get(i);
         }
 
-        return Commands.runOnce(() -> {
-            activeSubystems.forEach(s -> s.onInit(MatchMode.AUTONOMOUS));
-        }, subs);
-    }
-
-    public void onInit(MatchMode mode) {
-        NewtonSubsystem[] subs = new NewtonSubsystem[activeSubystems.size()];
-        for (int i = 0; i < activeSubystems.size(); i++) {
-            subs[i] = activeSubystems.get(i);
-        }
-
-        activeSubystems.forEach(s -> s.onInit(mode));
+        activeSubystems.forEach(s -> s.onModeInit(mode));
     }
 
     public void onRobotInit() {
-        NewtonSubsystem[] subs = new NewtonSubsystem[activeSubystems.size()];
+        NewtonSubsystem<?>[] subs = new NewtonSubsystem<?>[activeSubystems.size()];
         for (int i = 0; i < activeSubystems.size(); i++) {
             subs[i] = activeSubystems.get(i);
         }
 
         activeSubystems.forEach(s -> s.onRobotInit());
+    }
+
+    public Command onModeInitCommand(MatchMode mode) {
+        NewtonSubsystem<?>[] subs = new NewtonSubsystem<?>[activeSubystems.size()];
+        for (int i = 0; i < activeSubystems.size(); i++) {
+            subs[i] = activeSubystems.get(i);
+        }
+
+        return Commands.runOnce(() -> {
+            activeSubystems.forEach(s -> s.onModeInit(mode));
+        }, subs);
+    }
+
+    public Command onRobotInitCommand() {
+        NewtonSubsystem<?>[] subs = new NewtonSubsystem<?>[activeSubystems.size()];
+        for (int i = 0; i < activeSubystems.size(); i++) {
+            subs[i] = activeSubystems.get(i);
+        }
+
+        return Commands.runOnce(() -> {
+            activeSubystems.forEach(s -> s.onRobotInit());
+        }, subs);
+    }
+
+    public List<NewtonSubsystem<?>> getAllSubsystemsAsList() {
+        return activeSubystems;
+    }
+
+    public NewtonSubsystem<?>[] getAllSubsystemsAsArray() {
+        NewtonSubsystem<?>[] subsystems = new NewtonSubsystem<?>[activeSubystems.size()];
+        for (int i = 0; i < activeSubystems.size(); i++) {
+            subsystems[i] = activeSubystems.get(i);
+        }
+        return subsystems;
     }
 
     @Override
@@ -79,21 +102,5 @@ public class SubsystemManager extends SubsystemBase {
                 }
             );
         });
-    }
-
-    // ==================================== \\
-    // Add all getSubsystem() methods below \\
-    // ==================================== \\
-
-    public List<NewtonSubsystem> getAllSubsystemsAsList() {
-        return activeSubystems;
-    }
-
-    public NewtonSubsystem[] getAllSubsystemsAsArray() {
-        NewtonSubsystem[] subsystems = new NewtonSubsystem[activeSubystems.size()];
-        for (int i = 0; i < activeSubystems.size(); i++) {
-            subsystems[i] = activeSubystems.get(i);
-        }
-        return subsystems;
     }
 }
