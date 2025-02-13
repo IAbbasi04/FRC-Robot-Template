@@ -74,7 +74,7 @@ public final class AutoManager {
         }
         else{ // If we do have a starting pose, reset the odometry to that first
             return getAutonomousInitCommand().andThen(
-                manager.swerveSubsystem.runOnce(() -> manager.swerveSubsystem.resetPose(
+                manager.swerve.runOnce(() -> manager.swerve.resetPose(
                     autoCommand.startPose, Suppliers.robotRunningOnRed.getAsBoolean()
                 ))
             ).andThen(
@@ -90,9 +90,9 @@ public final class AutoManager {
      */
     private static Command getAutonomousInitCommand(){
         return new ParallelCommandGroup(
-            manager.swerveSubsystem.runOnce(() -> {
-                manager.swerveSubsystem.stop();
-                manager.swerveSubsystem.resetHeading();
+            manager.swerve.runOnce(() -> {
+                manager.swerve.stop();
+                manager.swerve.resetHeading();
             })
             // TODO: Add any other commands that need to be run on autonomous init here
         );

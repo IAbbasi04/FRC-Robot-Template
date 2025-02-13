@@ -63,7 +63,9 @@ public final class Constants {
         public static final int SWERVE_STEER_CURRENT_LIMIT = 40;
     }
 
-    public final class CORAL_ALIGN {
+    public final class VISION {
+        public static final String CAM_NAME = "Arducam_OV9782_E";
+
         public static final double X_KP = 1; // Used to be 1. Currently testing x_KP of 0
         public static final double X_KI = 0;
         public static final double X_KD = 0.01;
@@ -85,7 +87,10 @@ public final class Constants {
 
         public static final int MAX_LOCK_LOSS_TICKS = 20;
 
-        public static final Transform3d CAMERA_OFFSETS = new Transform3d(new Translation3d(0.60, -0.05, 0.245), new Rotation3d(0, Math.toRadians(-12), 0));
+        // Our camera is mounted 0.6 meters forward and 0.05 meters up from the robot pose,
+        // (Robot pose is considered the center of rotation at the floor level, or Z = 0)
+        // and pitched 15 degrees up.
+        public static final Transform3d CAMERA_OFFSET = new Transform3d(new Translation3d(0.60, -0.05, 0.245), new Rotation3d(0, Math.toRadians(-12), 0));
 
         public static final Pose3d SOUTH_BLUE_POSE = AprilTagFields.k2025Reefscape.loadAprilTagLayoutField().getTagPose(18).get();
         public static final Pose3d SOUTH_WEST_BLUE_POSE = AprilTagFields.k2025Reefscape.loadAprilTagLayoutField().getTagPose(19).get();
@@ -106,19 +111,16 @@ public final class Constants {
 
         public static final int[] BLUE_HPLAYER_TAGS = {12, 13};
         public static final int[] RED_HPLAYER_TAGS = {1, 2};
-
     }
+
     public final class NAVIGATION {
         public static final double MAX_ACCEPTABLE_AMBIGUITY = 0.2;
     }
    
-    
     public final class INTAKE {
         public static final String LOG_PATH = SHARED.LOG_FOLDER+"/Intake/";
         public static final int INTAKE_BEAM_BREAK_DIGITAL_ID = 0; // TODO: Set the ID
-
     }
-
     
     public final class SWERVE {
         public static final String LOG_PATH = SHARED.LOG_FOLDER+"/Swerve/";

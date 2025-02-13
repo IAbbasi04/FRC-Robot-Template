@@ -60,8 +60,8 @@ public class FollowPathCommand extends LargeCommand {
      * red side of the field.
      */
     public FollowPathCommand(Trajectory trajectory, BooleanSupplier flip){
-        super(manager.swerveSubsystem);
-        this.swerve = manager.swerveSubsystem;
+        super(manager.swerve);
+        this.swerve = manager.swerve;
 
         this.trajectory = trajectory;
 

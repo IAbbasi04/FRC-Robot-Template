@@ -1,25 +1,28 @@
 package org.team8592.frc.robot.subsystems;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import org.team8592.frc.robot.subsystems.swerve.SwerveSubsystem;
+import org.team8592.frc.robot.subsystems.vision.VisionSubsystem;
 import org.team8592.lib.MatchMode;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.*;
 
 public class SubsystemManager extends SubsystemBase {
-    public SwerveSubsystem swerveSubsystem;
+    public SwerveSubsystem swerve;
+    public VisionSubsystem vision;
 
     private List<NewtonSubsystem> activeSubystems = new ArrayList<>();
 
     public SubsystemManager(boolean logToShuffleboard) {
-        this.swerveSubsystem = new SwerveSubsystem(logToShuffleboard);
+        this.swerve = new SwerveSubsystem(logToShuffleboard);
+        this.vision = new VisionSubsystem(logToShuffleboard);
 
         this.activeSubystems = List.of(
             // Add all active subsystems here
-            swerveSubsystem
+            swerve,
+            vision
         );
 
         this.activeSubystems.forEach(s -> {
@@ -60,7 +63,7 @@ public class SubsystemManager extends SubsystemBase {
     @Override
     public void periodic() {
         this.activeSubystems.forEach(s -> {
-            s.periodicLogs();
+            s.periodicTelemetry();
             s.periodicOutputs();
         });
     }

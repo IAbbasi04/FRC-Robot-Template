@@ -162,20 +162,80 @@ public class SmartLogger {
         this.shuffleboardTab.add(sendable).withPosition(constants.column, constants.row);
     }
 
-    // TODO - Try to fix this sometime
-    // public <T> void logValue(String key, T value) {
-    //     if (value.getClass().equals(Pose2d.class)) { // Pose 2d
-    //         Logger.recordOutput(tableName + "/" + key, (Pose2d)value);
-    //     } else if (value.getClass().equals(ChassisSpeeds.class)) { // Chassis Speeds
-    //         Logger.recordOutput(tableName + "/" + key, (ChassisSpeeds)value);
-    //     } else if (value.getClass().equals(Double.class)) { // double
-    //         Logger.recordOutput(tableName + "/" + key, (Double)value);
-    //     } else if (value.getClass().equals(Boolean.class)) { // boolean
-    //         Logger.recordOutput(tableName + "/" + key, (Boolean)value);
-    //     } else if (value.getClass().equals(String.class)) { // String
-    //         Logger.recordOutput(tableName + "/" + key, (String)value);
-    //     } else { // Enum or anything not mentioned
-    //         Logger.recordOutput(tableName + "/" + key, value.toString());
-    //     }
-    // }
+    public void logIf(String key, double valueIfTrue, double valueIfFalse, boolean condition) {
+        double loggedValue = valueIfFalse;
+        if (condition) {
+            loggedValue = valueIfTrue;
+        }
+        Logger.recordOutput(tableName + key, loggedValue); // Record to AdvantageKit logs
+        if (!this.logToShuffleboard) return; // Do not proceed if we do not want to log to shuffleboard
+        if (!initialized()) initialize(); // Initialize the shuffleboard tab if not already initialized
+        if (!dictionary.contains(key)) { // Card doesn't exist yet
+            dictionary.addEntry(key, new LoggerEntry(key, shuffleboardTab.add(key, loggedValue).getEntry()));
+        } else { // Card already exists
+            dictionary.getGenericEntry(key).setDouble(loggedValue);
+        }
+    }
+
+    public void logIf(String key, String valueIfTrue, String valueIfFalse, boolean condition) {
+        String loggedValue = valueIfFalse;
+        if (condition) {
+            loggedValue = valueIfTrue;
+        }
+        Logger.recordOutput(tableName + key, loggedValue); // Record to AdvantageKit logs
+        if (!this.logToShuffleboard) return; // Do not proceed if we do not want to log to shuffleboard
+        if (!initialized()) initialize(); // Initialize the shuffleboard tab if not already initialized
+        if (!dictionary.contains(key)) { // Card doesn't exist yet
+            dictionary.addEntry(key, new LoggerEntry(key, shuffleboardTab.add(key, loggedValue).getEntry()));
+        } else { // Card already exists
+            dictionary.getGenericEntry(key).setString(loggedValue);
+        }
+    }
+
+    public void logIf(String key, boolean valueIfTrue, boolean valueIfFalse, boolean condition) {
+        boolean loggedValue = valueIfFalse;
+        if (condition) {
+            loggedValue = valueIfTrue;
+        }
+        Logger.recordOutput(tableName + key, loggedValue); // Record to AdvantageKit logs
+        if (!this.logToShuffleboard) return; // Do not proceed if we do not want to log to shuffleboard
+        if (!initialized()) initialize(); // Initialize the shuffleboard tab if not already initialized
+        if (!dictionary.contains(key)) { // Card doesn't exist yet
+            dictionary.addEntry(key, new LoggerEntry(key, shuffleboardTab.add(key, loggedValue).getEntry()));
+        } else { // Card already exists
+            dictionary.getGenericEntry(key).setBoolean(loggedValue);
+        }
+    }
+
+    public <E extends Enum<E>> void logIf(String key, E valueIfTrue, E valueIfFalse, boolean condition) {
+        E loggedValue = valueIfFalse;
+        if (condition) {
+            loggedValue = valueIfTrue;
+        }
+
+        Logger.recordOutput(tableName + key, loggedValue.name()); // Record to AdvantageKit logs
+        if (!this.logToShuffleboard) return; // Do not proceed if we do not want to log to shuffleboard
+        if (!initialized()) initialize(); // Initialize the shuffleboard tab if not already initialized
+        if (!dictionary.contains(key)) { // Card doesn't exist yet
+            dictionary.addEntry(key, new LoggerEntry(key, shuffleboardTab.add(key, loggedValue.name()).getEntry()));
+        } else { // Card already exists
+            dictionary.getGenericEntry(key).setString(loggedValue.name());
+        }
+    }
+
+    public void logIf(String key, StructSerializable valueIfTrue, StructSerializable valueIfFalse, boolean condition) {
+        StructSerializable loggedValue = valueIfFalse;
+        if (condition) {
+            loggedValue = valueIfTrue;
+        }
+
+        Logger.recordOutput(tableName + key, loggedValue); // Record to AdvantageKit logs
+        if (!this.logToShuffleboard) return; // Do not proceed if we do not want to log to shuffleboard
+        if (!initialized()) initialize(); // Initialize the shuffleboard tab if not already initialized
+        if (!dictionary.contains(key)) { // Card doesn't exist yet
+            dictionary.addEntry(key, new LoggerEntry(key, shuffleboardTab.add(key, loggedValue).getEntry()));
+        } else { // Card already exists
+            dictionary.getGenericEntry(key).setString(loggedValue.toString());
+        }
+    }
 }

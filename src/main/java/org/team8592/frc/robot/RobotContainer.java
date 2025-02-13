@@ -4,12 +4,18 @@
 
 package org.team8592.frc.robot;
 
-import static org.team8592.frc.robot.commands.NewtonCommands.*;
+import java.util.Optional;
 
+import org.photonvision.EstimatedRobotPose;
 import org.team8592.frc.robot.commands.autonomous.*;
 import org.team8592.frc.robot.commands.largecommands.LargeCommand;
 import org.team8592.frc.robot.subsystems.SubsystemManager;
+import org.team8592.frc.robot.subsystems.swerve.SwerveSubsystem;
+import org.team8592.frc.robot.subsystems.vision.VisionSubsystem;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 
@@ -17,13 +23,17 @@ import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 public class RobotContainer {
     // The robot's subsystems
     private final SubsystemManager manager;
+    private final SwerveSubsystem swerve;
+    private final VisionSubsystem vision;
 
     /**
      * Create the robot container. This creates and configures subsystems, sets
      * up button bindings, and prepares for autonomous.
      */
     public RobotContainer(boolean logToShuffleboard) {
-        manager = new SubsystemManager(logToShuffleboard);
+        this.manager = new SubsystemManager(logToShuffleboard);
+        this.swerve = manager.swerve;
+        this.vision = manager.vision;
 
         passSubsystems();
         configureDefaults();
@@ -46,12 +56,30 @@ public class RobotContainer {
      */
     private void configureDefaults(){
         // Set the swerve's default command to drive with joysticks
-        manager.swerveSubsystem.setDefaultCommand(
-            manager.swerveSubsystem.commands.joystickDriveCommand(
-                Controls.driveTranslateX.getAsDouble(),
-                Controls.driveTranslateY.getAsDouble(),
-                Controls.driveRotate.getAsDouble()
+        swerve.setDefaultCommand(
+            manager.swerve.commands.joystickDriveCommand(
+                Controls.driveTranslateX,
+                Controls.driveTranslateY,
+                Controls.driveRotate
             )
+        );
+
+        vision.setDefaultCommand(
+            new InstantCommand(() -> {
+                Optional<EstimatedRobotPose> estimatedRobotPose = vision.getRobotPoseVision();
+                if (estimatedRobotPose.isPresent()) {
+                    Pose2d robotPose = estimatedRobotPose.get().estimatedPose.toPose2d();
+                    double ambiguity = vision.getPoseAmbiguityRatio();
+
+                    if(Math.abs(ambiguity) < Constants.NAVIGATION.MAX_ACCEPTABLE_AMBIGUITY) {
+                        if (DriverStation.isDisabled()){
+                            swerve.resetPose(robotPose);        
+                        } else {
+                            swerve.addVisionMeasurement(robotPose);
+                        }
+                    }
+                }
+            }).withInterruptBehavior(InterruptionBehavior.kCancelSelf)
         );
     }
 
@@ -72,52 +100,52 @@ public class RobotContainer {
 
             // The .ignoringDisable makes sure slow mode won't get stuck on or off if
             // the robot is disabled.
-            Commands.runOnce(() -> manager.swerveSubsystem.setSlowMode(true)).ignoringDisable(true)
+            Commands.runOnce(() -> manager.swerve.setSlowMode(true)).ignoringDisable(true)
         ).onFalse(
-            Commands.runOnce(() -> manager.swerveSubsystem.setSlowMode(false)).ignoringDisable(true)
+            Commands.runOnce(() -> manager.swerve.setSlowMode(false)).ignoringDisable(true)
         );
 
         Controls.zeroGryoscope.onTrue(
             // Similar comment on Commands.runOnce as slow mode above
-            Commands.runOnce(() -> manager.swerveSubsystem.resetHeading())
+            Commands.runOnce(() -> manager.swerve.resetHeading())
         );
 
         Controls.robotRelative.onTrue(
             // Similar comment on Commands.runOnce and ignoringDisable as slow mode above
-            Commands.runOnce(() -> manager.swerveSubsystem.setRobotRelative(true)).ignoringDisable(true)
+            Commands.runOnce(() -> manager.swerve.setRobotRelative(true)).ignoringDisable(true)
         ).onFalse(
-            Commands.runOnce(() -> manager.swerveSubsystem.setRobotRelative(false)).ignoringDisable(true)
+            Commands.runOnce(() -> manager.swerve.setRobotRelative(false)).ignoringDisable(true)
         );
 
         Controls.snapNorth.whileTrue(
-            swerveSnapToCommand(
+            swerve.commands.snapToAngleCommand(
                 Rotation2d.fromDegrees(0),
-                () -> Controls.driveTranslateX.getAsDouble(),
-                () -> Controls.driveTranslateY.getAsDouble()
-            )
+                Controls.driveTranslateX,
+                Controls.driveTranslateY
+            ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
         Controls.snapSouth.whileTrue(
-            swerveSnapToCommand(
+            swerve.commands.snapToAngleCommand(
                 Rotation2d.fromDegrees(180),
-                () -> Controls.driveTranslateX.getAsDouble(),
-                () -> Controls.driveTranslateY.getAsDouble()
-            )
+                Controls.driveTranslateX,
+                Controls.driveTranslateY
+            ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
         Controls.snapEast.whileTrue(
-            swerveSnapToCommand(
+            swerve.commands.snapToAngleCommand(
                 Rotation2d.fromDegrees(270),
-                () -> Controls.driveTranslateX.getAsDouble(),
-                () -> Controls.driveTranslateY.getAsDouble()
-            )
+                Controls.driveTranslateX,
+                Controls.driveTranslateY
+            ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
         Controls.snapWest.whileTrue(
-            swerveSnapToCommand(
+            swerve.commands.snapToAngleCommand(
                 Rotation2d.fromDegrees(90),
-                () -> Controls.driveTranslateX.getAsDouble(),
-                () -> Controls.driveTranslateY.getAsDouble()
+                Controls.driveTranslateX,
+                Controls.driveTranslateY
             ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
     };

@@ -7,6 +7,7 @@ package org.team8592.frc.robot.subsystems.swerve;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.Timer;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -17,7 +18,7 @@ import org.team8592.lib.MatchMode;
 import org.team8592.lib.SmoothingFilter;
 import org.team8592.lib.hardware.swerve.CTRESwerve;
 
-public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
+public class SwerveSubsystem extends NewtonSubsystem {
     /**
      * Small enum to control whether to drive robot- or field-
      * relative for {@link SwerveSubsystem#drive(ChassisSpeeds, DriveModes)}
@@ -42,8 +43,10 @@ public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
 
     public static ChassisSpeeds speedZero = new ChassisSpeeds();
 
+    public SwerveCommands commands = new SwerveCommands(this);
+
     public SwerveSubsystem(boolean logToShuffleboard) {
-        super(logToShuffleboard, new SwerveCommands(this));
+        super(logToShuffleboard);
 
         smoothingFilter = new SmoothingFilter(
             SWERVE.TRANSLATION_SMOOTHING_AMOUNT,
@@ -256,8 +259,8 @@ public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
         return currentSpeeds;
     }
 
-    public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
-        swerve.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds);
+    public void addVisionMeasurement(Pose2d visionRobotPoseMeters) {
+        swerve.addVisionMeasurement(visionRobotPoseMeters, Timer.getFPGATimestamp());
     }
 
     @Override
@@ -276,7 +279,7 @@ public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
     }
 
     @Override
-    public void periodicLogs() {
+    public void periodicTelemetry() {
         Logger.recordOutput(SWERVE.LOG_PATH+"Current Pose", getCurrentPosition());
         swerve.periodic();
     }
