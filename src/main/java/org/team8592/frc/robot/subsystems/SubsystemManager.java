@@ -3,6 +3,7 @@ package org.team8592.frc.robot.subsystems;
 import java.util.*;
 
 import org.team8592.frc.robot.RobotConstants;
+import org.team8592.frc.robot.subsystems.intake.*;
 import org.team8592.frc.robot.subsystems.logger.*;
 import org.team8592.frc.robot.subsystems.power.*;
 import org.team8592.frc.robot.subsystems.swerve.*;
@@ -17,6 +18,7 @@ public class SubsystemManager extends SubsystemBase {
     public VisionSubsystem vision;
     public LoggerSubsystem logger;
     public PowerSubsystem power;
+    public IntakeSubsystem intake;
 
     private List<NewtonSubsystem<?>> activeSubystems = new ArrayList<>();
 
@@ -31,11 +33,16 @@ public class SubsystemManager extends SubsystemBase {
                     logToShuffleboard
                 );
 
-                this.vision = 
-                    new VisionSubsystem(new CameraIOArducam(
+                this.vision = new VisionSubsystem(
+                    new CameraIOArducam(
                         getName(),
                         VisionConstants.CAMERA_OFFSET
                     ), logToShuffleboard
+                );
+
+                this.intake = new IntakeSubsystem(
+                    new IntakeIOKrakenX60(100, false), 
+                    logToShuffleboard
                 );
                 break;
             case SIM_BOT:
@@ -44,11 +51,16 @@ public class SubsystemManager extends SubsystemBase {
                     logToShuffleboard
                 );
 
-                this.vision = 
-                    new VisionSubsystem(new CameraIOSim(
+                this.vision = new VisionSubsystem(
+                    new CameraIOSim(
                         getName(), 
                         VisionConstants.CAMERA_OFFSET
                     ), logToShuffleboard
+                );
+
+                this.intake = new IntakeSubsystem(
+                    new IntakeIOSim(100, false), 
+                    logToShuffleboard
                 );
                 break;
             case COMP_BOT: // Fall through intentional
@@ -58,11 +70,16 @@ public class SubsystemManager extends SubsystemBase {
                     logToShuffleboard
                 );
 
-                this.vision = 
-                    new VisionSubsystem(new CameraIOArducam(
+                this.vision = new VisionSubsystem(
+                    new CameraIOArducam(
                         getName(), 
                         VisionConstants.CAMERA_OFFSET
                     ), logToShuffleboard
+                );
+
+                this.intake = new IntakeSubsystem(
+                    new IntakeIOKrakenX60(100, false), 
+                    logToShuffleboard
                 );
                 break;
         }
@@ -70,9 +87,10 @@ public class SubsystemManager extends SubsystemBase {
         this.activeSubystems = List.of(
             // Add all active subsystems here
             swerve,
-            vision,
+            // vision,
             logger,
-            power
+            power,
+            intake
         );
 
         this.activeSubystems.forEach(s -> {

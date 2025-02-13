@@ -39,9 +39,9 @@ public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
 
     private SmoothingFilter smoothingFilter;
     
-    private SwerveIO swerve;
+    private SwerveIO swerveIO;
 
-    public SwerveSubsystem(SwerveIO swerve, boolean logToShuffleboard) {
+    public SwerveSubsystem(SwerveIO swerveIO, boolean logToShuffleboard) {
         super(logToShuffleboard);
 
         super.commands = new SwerveCommands(this);
@@ -54,7 +54,7 @@ public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
 
         snapToController = SNAP_TO_GAINS.toPIDController();
 
-        this.swerve = swerve;
+        this.swerveIO = swerveIO;
     }
 
     /**
@@ -64,7 +64,7 @@ public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
      */
     public void drive(ChassisSpeeds speeds){
         // TODO: implement something that allows the commented code to work
-        swerve.drive(speeds, false);
+        swerveIO.drive(speeds, false);
     }
 
     /**
@@ -75,7 +75,7 @@ public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
     private int heartbeat = 0;
     public void drive(ChassisSpeeds speeds, DriveModes mode){
         // TODO: implement something that allows the commented code to work'
-        swerve.drive(
+        swerveIO.drive(
             speeds,
             switch(mode){
                 case FIELD_RELATIVE:
@@ -114,7 +114,7 @@ public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
      */
     public void resetHeading(){
         // TODO: implement something that allows the commented code to work
-        swerve.resetHeading();
+        swerveIO.resetHeading();
     }
 
     /**
@@ -122,7 +122,7 @@ public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
      */
     public Rotation2d getYaw() {
         // TODO: implement something that allows the commented code to work
-        return swerve.getYaw();
+        return swerveIO.getYaw();
     }
 
     /**
@@ -133,7 +133,7 @@ public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
         // if (Robot.isSimulation()){
         //    return Robot.FIELD.getRobotPose();
         // }
-        return swerve.getCurrentOdometryPosition();
+        return swerveIO.getCurrentOdometryPosition();
     }
 
    
@@ -145,7 +145,7 @@ public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
      */
     public void resetPose(Pose2d pose) {
         // TODO: implement something that allows the commented code to work
-        swerve.setKnownOdometryPose(pose);
+        swerveIO.setKnownOdometryPose(pose);
         logger.log("Reset Pose", pose);
     }
     
@@ -158,10 +158,10 @@ public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
                 ),
                 Rotation2d.fromDegrees(180).minus(pose.getRotation())
             );
-            swerve.setKnownOdometryPose(flipped);
+            swerveIO.setKnownOdometryPose(flipped);
             return;
         }
-        swerve.setKnownOdometryPose(pose);
+        swerveIO.setKnownOdometryPose(pose);
     }
 
     /**
@@ -238,7 +238,7 @@ public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
     }
 
     public void addVisionMeasurement(Pose2d visionRobotPoseMeters) {
-        swerve.addVisionMeasurement(visionRobotPoseMeters, Timer.getFPGATimestamp());
+        swerveIO.addVisionMeasurement(visionRobotPoseMeters, Timer.getFPGATimestamp());
     }
 
     @Override
@@ -259,7 +259,7 @@ public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
     @Override
     public void periodicTelemetry() {
         logger.log("Current Pose", getCurrentPosition());
-        swerve.periodic();
+        swerveIO.periodic();
     }
 
     /**

@@ -52,6 +52,7 @@ public abstract class CameraIO {
     }
 
     public Optional<EstimatedRobotPose> getVisionEstimatedPose() {
+        if (results.size() <= 0) return Optional.empty();
         return this.estimator.update(results.get(results.size() - 1));
     }
     

@@ -17,7 +17,7 @@ public class RobotConstants {
     public static boolean invalidRobotAlertSent = false;
 
     public static RobotType getRobot() {
-        if (!disableHAL && !RobotBase.isReal()) {
+        if (!disableHAL && RobotBase.isReal()) {
             if (robot == RobotType.SIM_BOT) { // Invalid robot selected
                 if (!invalidRobotAlertSent) {
                     new Alert("Invalid robot selected, using competition robot as default.", AlertType.ERROR)
