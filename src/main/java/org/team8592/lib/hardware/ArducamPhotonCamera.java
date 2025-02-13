@@ -16,7 +16,7 @@ import edu.wpi.first.math.geometry.*;
 
 import org.team8592.lib.field.FieldLayout;
 
-public class NewtonPhotonCamera {
+public class ArducamPhotonCamera {
     private PhotonCamera camera;
     private PhotonCameraSim simCamera;
     private VisionSystemSim simVisionSystem;
@@ -30,7 +30,7 @@ public class NewtonPhotonCamera {
 
     private Transform3d cameraPoseToRobotPose = new Transform3d();
 
-    public NewtonPhotonCamera(String name, Transform3d robotPoseToCameraPose, AprilTagFieldLayout fieldLayout, boolean isSimulation) {
+    public ArducamPhotonCamera(String name, Transform3d robotPoseToCameraPose, AprilTagFieldLayout fieldLayout, boolean isSimulation) {
         this.camera = new PhotonCamera(name);
         this.cameraPoseToRobotPose = robotPoseToCameraPose;
 
@@ -69,7 +69,7 @@ public class NewtonPhotonCamera {
 
     public PhotonTrackedTarget getClosestTag() {
         if (isAnyTargetVisible()) {
-            List<PhotonTrackedTarget> targets = getTargets();
+            List<PhotonTrackedTarget> targets = getAllTargets();
             List<Double> distances = new ArrayList<Double>();
 
             targets.forEach(
@@ -111,7 +111,7 @@ public class NewtonPhotonCamera {
     /**
      * Grabs all visible targets
      */
-    public List<PhotonTrackedTarget> getTargets() {
+    public List<PhotonTrackedTarget> getAllTargets() {
         results = this.camera.getAllUnreadResults();
         if (this.camera.getAllUnreadResults().size() == 0) return new ArrayList<>();
         return this.camera.getAllUnreadResults().get(results.size() - 1).targets;
@@ -121,9 +121,9 @@ public class NewtonPhotonCamera {
      * Grabs the target most matching the current pipeline
      */
     public PhotonTrackedTarget getBestTarget() {
-        if (getTargets().size() == 0) return null;
+        if (getAllTargets().size() == 0) return null;
 
-        return getTargets().get(0);
+        return getAllTargets().get(0);
     }
 
     /**
@@ -144,7 +144,7 @@ public class NewtonPhotonCamera {
      * Whether a particular AprilTag is visible in the camera
      */
     public boolean isAprilTagVisible(int id) {
-        for (PhotonTrackedTarget target : getTargets()) {
+        for (PhotonTrackedTarget target : getAllTargets()) {
             if (target.getFiducialId() == id) return true;
         }
         return false;
@@ -170,7 +170,7 @@ public class NewtonPhotonCamera {
      * Gets the yaw offset from the best visible target
      */
     public Rotation2d getYawToAprilTag(int id) {
-        for (PhotonTrackedTarget target : getTargets()) {
+        for (PhotonTrackedTarget target : getAllTargets()) {
             if (target.getFiducialId() == id) return Rotation2d.fromDegrees(target.getYaw());
         }
         return null; // Return null if the particular april tag is not seen by the camera

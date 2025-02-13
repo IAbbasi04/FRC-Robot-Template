@@ -2,10 +2,11 @@ package org.team8592.frc.robot.subsystems;
 
 import java.util.*;
 
-import org.team8592.frc.robot.subsystems.logger.LoggerSubsystem;
-import org.team8592.frc.robot.subsystems.power.PowerSubsystem;
-import org.team8592.frc.robot.subsystems.swerve.SwerveSubsystem;
-import org.team8592.frc.robot.subsystems.vision.VisionSubsystem;
+import org.team8592.frc.robot.RobotConstants;
+import org.team8592.frc.robot.subsystems.logger.*;
+import org.team8592.frc.robot.subsystems.power.*;
+import org.team8592.frc.robot.subsystems.swerve.*;
+import org.team8592.frc.robot.subsystems.vision.*;
 import org.team8592.lib.MatchMode;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -20,10 +21,51 @@ public class SubsystemManager extends SubsystemBase {
     private List<NewtonSubsystem<?>> activeSubystems = new ArrayList<>();
 
     public SubsystemManager(boolean logToShuffleboard) {
-        this.swerve = new SwerveSubsystem(logToShuffleboard);
-        this.vision = new VisionSubsystem(logToShuffleboard);
         this.logger = new LoggerSubsystem(logToShuffleboard);
         this.power = new PowerSubsystem(logToShuffleboard);
+        
+        switch(RobotConstants.getRobot()) {
+            case PRAC_BOT:
+                this.swerve = new SwerveSubsystem(
+                    new SwerveIOCTRE(), 
+                    logToShuffleboard
+                );
+
+                this.vision = 
+                    new VisionSubsystem(new CameraIOArducam(
+                        getName(),
+                        VisionConstants.CAMERA_OFFSET
+                    ), logToShuffleboard
+                );
+                break;
+            case SIM_BOT:
+                this.swerve = new SwerveSubsystem(
+                    new SwerveIOSim(), 
+                    logToShuffleboard
+                );
+
+                this.vision = 
+                    new VisionSubsystem(new CameraIOSim(
+                        getName(), 
+                        VisionConstants.CAMERA_OFFSET
+                    ), logToShuffleboard
+                );
+                break;
+            case COMP_BOT: // Fall through intentional
+            default:
+                this.swerve = new SwerveSubsystem(
+                    new SwerveIOCTRE(), 
+                    logToShuffleboard
+                );
+
+                this.vision = 
+                    new VisionSubsystem(new CameraIOArducam(
+                        getName(), 
+                        VisionConstants.CAMERA_OFFSET
+                    ), logToShuffleboard
+                );
+                break;
+        }
 
         this.activeSubystems = List.of(
             // Add all active subsystems here

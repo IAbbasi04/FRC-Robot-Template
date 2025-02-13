@@ -8,6 +8,7 @@ import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import org.team8592.frc.robot.Robot;
+import org.team8592.frc.robot.RobotConstants;
 import org.team8592.frc.robot.subsystems.NewtonSubsystem;
 import org.team8592.frc.robot.subsystems.SubsystemCommands;
 import org.team8592.lib.MatchMode;
@@ -32,6 +33,8 @@ public class LoggerSubsystem extends NewtonSubsystem<SubsystemCommands<?>> {
         
         Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
         Logger.start();
+
+        Logger.recordOutput("Testing I Guess", RobotConstants.getRobot());
     }
 
     @Override

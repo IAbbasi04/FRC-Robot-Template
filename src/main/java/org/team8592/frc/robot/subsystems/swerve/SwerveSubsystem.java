@@ -15,7 +15,6 @@ import org.team8592.frc.robot.*;
 import org.team8592.frc.robot.subsystems.NewtonSubsystem;
 import org.team8592.lib.MatchMode;
 import org.team8592.lib.SmoothingFilter;
-import org.team8592.lib.hardware.swerve.CTRESwerve;
 
 import static org.team8592.frc.robot.subsystems.swerve.SwerveConstants.*;
 
@@ -40,9 +39,9 @@ public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
 
     private SmoothingFilter smoothingFilter;
     
-    private CTRESwerve swerve;
+    private SwerveIO swerve;
 
-    public SwerveSubsystem(boolean logToShuffleboard) {
+    public SwerveSubsystem(SwerveIO swerve, boolean logToShuffleboard) {
         super(logToShuffleboard);
 
         super.commands = new SwerveCommands(this);
@@ -55,12 +54,7 @@ public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
 
         snapToController = SNAP_TO_GAINS.toPIDController();
 
-        // TODO: Any initialization code needed for the new swerve stuff
-        swerve = new CTRESwerve();
-
-        swerve.registerTelemetry((drivetrainState) -> {
-            // Register any swerve logs here
-        });
+        this.swerve = swerve;
     }
 
     /**
