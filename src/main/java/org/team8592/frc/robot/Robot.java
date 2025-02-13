@@ -14,10 +14,11 @@ import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import org.team8592.lib.MatchMode;
+import org.team8592.lib.RobotClock;
+import org.team8592.lib.field.FieldLayout;
+import org.team8592.lib.logging.LogUtils;
 
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -35,8 +36,9 @@ public class Robot extends LoggedRobot {
 
     private RobotContainer robotContainer;
 
-    public static Field2d FIELD = new Field2d();
     public static MatchMode MODE = MatchMode.DISABLED;
+    public static RobotClock CLOCK = new RobotClock();
+    public static FieldLayout FIELD = FieldLayout.none();
 
     /**
      * This function is run when the robot is first started up and should be used
@@ -71,12 +73,21 @@ public class Robot extends LoggedRobot {
             }
             LoggedPowerDistribution.getInstance(1, ModuleType.kRev);// Enables power distribution logging
         }
-        else { // If simulated
-            SmartDashboard.putData(FIELD);
-        }
-
+        
         Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
         Logger.start();
+
+        LogUtils.initialize(
+            new LogUtils.LogConstants(
+                null,
+                null,
+                null,
+                null
+            ), 
+            isReal()
+        );
+
+        FIELD.logToShuffleboard(Robot.isSimulation());
 
         robotContainer = new RobotContainer(Robot.isSimulation() || true); // TODO - Fix to only work when NOT in actual match
         CommandScheduler.getInstance().schedule(robotContainer.onRobotInit());
@@ -102,6 +113,7 @@ public class Robot extends LoggedRobot {
         // robot's periodic
         // block in order for anything in the Command-based framework to work.
         CommandScheduler.getInstance().run(); 
+        CLOCK.update();
     }
 
     /** This function is called once each time the robot enters Disabled mode. */

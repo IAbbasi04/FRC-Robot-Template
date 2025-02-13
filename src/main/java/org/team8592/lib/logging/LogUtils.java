@@ -44,20 +44,21 @@ public class LogUtils {
         }
     }
     
-    public static void initialize(LogConstants constants, boolean isSimulation) {
+    public static void initialize(LogConstants constants, boolean isReal) {
         Logger.recordMetadata("Game", constants.game);
         Logger.recordMetadata("Year", constants.year);
         Logger.recordMetadata("Robot", constants.robot);
         Logger.recordMetadata("Team", constants.team);
 
-        if (isSimulation) { // If running on a real robot
+        if (isReal) { // If running on a real robot
             String time = DateTimeFormatter.ofPattern("yy-MM-dd_HH-mm-ss").format(LocalDateTime.now());
             String path = "/U/"+time+".wpilog";
             Logger.addDataReceiver(new WPILOGWriter(path)); // Log to a USB stick
-            Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
             LoggedPowerDistribution.getInstance(1, ModuleType.kRev); // Enables power distribution logging
-            Logger.start();
         }
+        
+        Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+        Logger.start();
     }
 
     public static void logToSmartDashboard(String key, double value) {

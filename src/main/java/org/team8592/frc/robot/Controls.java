@@ -7,16 +7,10 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import org.team8592.lib.logging.SmartLogger;
-import org.team8592.frc.robot.Constants.CONTROLLERS;
 
 public final class Controls {
-    private static final CommandXboxController driverController = new CommandXboxController(
-        CONTROLLERS.DRIVER_PORT
-    );
-
-    private static final CommandXboxController operatorController = new CommandXboxController(
-        CONTROLLERS.OPERATOR_PORT
-    );
+    private static final CommandXboxController driverController = new CommandXboxController(0);
+    private static final CommandXboxController operatorController = new CommandXboxController(1);
 
     /**
      * Enum for the different sets of controls (different drivers,

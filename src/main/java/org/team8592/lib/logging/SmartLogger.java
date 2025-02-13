@@ -167,6 +167,7 @@ public class SmartLogger {
         if (condition) {
             loggedValue = valueIfTrue;
         }
+        
         Logger.recordOutput(tableName + key, loggedValue); // Record to AdvantageKit logs
         if (!this.logToShuffleboard) return; // Do not proceed if we do not want to log to shuffleboard
         if (!initialized()) initialize(); // Initialize the shuffleboard tab if not already initialized

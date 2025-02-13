@@ -21,8 +21,8 @@ public abstract class FieldLayout {
         this.aprilTagLayout = layout;
     }
 
-    public FieldLayout(List<AprilTag> tags) {
-        this.aprilTagLayout = new AprilTagLayout(tags);
+    public FieldLayout(List<AprilTag> tags, double fieldLength, double fieldWidth) {
+        this.aprilTagLayout = new AprilTagLayout(tags, fieldLength, fieldWidth);
     }
 
     public AprilTagFieldLayout getAprilTagLayout() {
@@ -41,12 +41,20 @@ public abstract class FieldLayout {
         return this.field;
     }
 
+    public double getFieldLength() {
+        return this.aprilTagLayout.getFieldLength();
+    }
+
+    public double getFieldWidth() {
+        return this.aprilTagLayout.getFieldWidth();
+    }
+
     public void logToShuffleboard(boolean log) {
         if (log) LogUtils.addSendable(field);
     }
 
     public static FieldLayout none() {
-        return new FieldLayout(new AprilTagLayout(List.of())) {};
+        return new FieldLayout(new AprilTagLayout(List.of(), 0d, 0d)) {};
     }
 
     public static AprilTagFieldLayout createLayout(String path) {

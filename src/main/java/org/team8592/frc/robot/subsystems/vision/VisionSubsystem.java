@@ -9,7 +9,6 @@ import edu.wpi.first.apriltag.*;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import org.team8592.frc.robot.Constants.VISION;
 import org.team8592.frc.robot.subsystems.NewtonSubsystem;
 import org.team8592.lib.MatchMode;
 import org.team8592.lib.hardware.NewtonPhotonCamera;
@@ -18,9 +17,9 @@ import org.team8592.frc.robot.Robot;
 public class VisionSubsystem extends NewtonSubsystem<VisionCommands> {
     private NewtonPhotonCamera camera;
  
-    private PIDController xController = new PIDController(VISION.X_KP, VISION.X_KI, VISION.X_KD);
-    private PIDController yController = new PIDController(VISION.Y_KP, VISION.Y_KI, VISION.Y_KD);
-    private PIDController rotController = new PIDController(VISION.ROT_KP, VISION.ROT_KI, VISION.ROT_KD);
+    private PIDController xController = new PIDController(VisionConstants.X_KP, VisionConstants.X_KI, VisionConstants.X_KD);
+    private PIDController yController = new PIDController(VisionConstants.Y_KP, VisionConstants.Y_KI, VisionConstants.Y_KD);
+    private PIDController rotController = new PIDController(VisionConstants.ROT_KP, VisionConstants.ROT_KI, VisionConstants.ROT_KD);
 
     private List<PhotonTrackedTarget> allVisibleTags = new ArrayList<>();
     private PhotonTrackedTarget bestTarget = new PhotonTrackedTarget();
@@ -31,8 +30,8 @@ public class VisionSubsystem extends NewtonSubsystem<VisionCommands> {
         super.commands = new VisionCommands(this);
 
         this.camera = new NewtonPhotonCamera(
-            VISION.CAM_NAME, 
-            VISION.CAMERA_OFFSET, 
+            VisionConstants.CAM_NAME, 
+            VisionConstants.CAMERA_OFFSET, 
             AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape),
             Robot.isSimulation()
         );
@@ -75,7 +74,7 @@ public class VisionSubsystem extends NewtonSubsystem<VisionCommands> {
 
     @Override
     public void simulationPeriodic() {
-        camera.updateSim(new Pose3d(Robot.FIELD.getRobotPose()));
+        camera.updateSim(new Pose3d(Robot.FIELD.getField().getRobotPose()));
     }
 
     @Override

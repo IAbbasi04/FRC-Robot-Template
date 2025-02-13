@@ -15,7 +15,7 @@ public abstract class NewtonSubsystem<C extends SubsystemCommands<?>> extends Su
 
     protected NewtonSubsystem(boolean logToShuffleboard) {
         this.logToShuffleboard = logToShuffleboard;
-        this.logger = new SmartLogger(getName(), logToShuffleboard);
+        this.logger = new SmartLogger("SubsystemLogs/" + getName(), logToShuffleboard);
     }
 
     public void initializeLogger() {

@@ -12,11 +12,12 @@ import edu.wpi.first.wpilibj.Timer;
 import org.littletonrobotics.junction.Logger;
 
 import org.team8592.frc.robot.*;
-import org.team8592.frc.robot.Constants.*;
 import org.team8592.frc.robot.subsystems.NewtonSubsystem;
 import org.team8592.lib.MatchMode;
 import org.team8592.lib.SmoothingFilter;
 import org.team8592.lib.hardware.swerve.CTRESwerve;
+
+import static org.team8592.frc.robot.subsystems.swerve.SwerveConstants.*;
 
 public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
     /**
@@ -47,12 +48,12 @@ public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
         super.commands = new SwerveCommands(this);
 
         smoothingFilter = new SmoothingFilter(
-            SwerveConstants.TRANSLATION_SMOOTHING_AMOUNT,
-            SwerveConstants.TRANSLATION_SMOOTHING_AMOUNT,
-            SwerveConstants.ROTATION_SMOOTHING_AMOUNT
+            TRANSLATION_SMOOTHING_AMOUNT,
+            TRANSLATION_SMOOTHING_AMOUNT,
+            ROTATION_SMOOTHING_AMOUNT
         );
 
-        snapToController = new PIDController(SwerveConstants.SNAP_TO_kP, SwerveConstants.SNAP_TO_kI, SwerveConstants.SNAP_TO_kD);
+        snapToController = SNAP_TO_GAINS.toPIDController();
 
         // TODO: Any initialization code needed for the new swerve stuff
         swerve = new CTRESwerve();
@@ -151,25 +152,14 @@ public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
     public void resetPose(Pose2d pose) {
         // TODO: implement something that allows the commented code to work
         swerve.setKnownOdometryPose(pose);
-        Logger.recordOutput(
-            SwerveConstants.LOG_PATH+"Console", (
-                "Current pose reset to X: "+
-                pose.getX()+
-                "; Y: "+
-                pose.getY()+
-                "; Rotation: "+
-                pose.getRotation().getDegrees()+
-                "°."
-            )
-        );
+        logger.log("Reset Pose", pose);
     }
     
     public void resetPose(Pose2d pose, boolean flip) {
-        // TODO: implement something that allows the commented code to work
         if(flip){
             Pose2d flipped = new Pose2d(
                 new Translation2d(
-                    MEASUREMENTS.FIELD_LENGTH_METERS-pose.getX(),
+                    Robot.FIELD.getFieldLength()-pose.getX(),
                     pose.getY()
                 ),
                 Rotation2d.fromDegrees(180).minus(pose.getRotation())
@@ -217,36 +207,36 @@ public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
     public ChassisSpeeds processJoystickInputs(double rawX, double rawY, double rawRot){
         double driveTranslateY = (
             rawY >= 0
-            ? (Math.pow(Math.abs(rawY), SwerveConstants.JOYSTICK_EXPONENT))
-            : -(Math.pow(Math.abs(rawY), SwerveConstants.JOYSTICK_EXPONENT))
+            ? (Math.pow(Math.abs(rawY), JOYSTICK_EXPONENT))
+            : -(Math.pow(Math.abs(rawY), JOYSTICK_EXPONENT))
         );
 
         double driveTranslateX = (
             rawX >= 0
-            ? (Math.pow(Math.abs(rawX), SwerveConstants.JOYSTICK_EXPONENT))
-            : -(Math.pow(Math.abs(rawX), SwerveConstants.JOYSTICK_EXPONENT))
+            ? (Math.pow(Math.abs(rawX), JOYSTICK_EXPONENT))
+            : -(Math.pow(Math.abs(rawX), JOYSTICK_EXPONENT))
         );
 
         double driveRotate = (
             rawRot >= 0
-            ? (Math.pow(Math.abs(rawRot), SwerveConstants.JOYSTICK_EXPONENT))
-            : -(Math.pow(Math.abs(rawRot), SwerveConstants.JOYSTICK_EXPONENT))
+            ? (Math.pow(Math.abs(rawRot), JOYSTICK_EXPONENT))
+            : -(Math.pow(Math.abs(rawRot), JOYSTICK_EXPONENT))
         );
 
         ChassisSpeeds currentSpeeds;
 
         if (isSlowMode) {
             currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
-                driveTranslateY * SwerveConstants.TRANSLATE_POWER_SLOW * SwerveConstants.MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
-                driveTranslateX * SwerveConstants.TRANSLATE_POWER_SLOW * SwerveConstants.MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
-                driveRotate * SwerveConstants.ROTATE_POWER_SLOW * SwerveConstants.MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND
+                driveTranslateY * TRANSLATE_POWER_SLOW * MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
+                driveTranslateX * TRANSLATE_POWER_SLOW * MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
+                driveRotate * ROTATE_POWER_SLOW * MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND
             ));
         }
         else {
             currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
-                driveTranslateY * SwerveConstants.TRANSLATE_POWER_FAST * SwerveConstants.MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
-                driveTranslateX * SwerveConstants.TRANSLATE_POWER_FAST * SwerveConstants.MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
-                driveRotate * SwerveConstants.ROTATE_POWER_FAST * SwerveConstants.MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND
+                driveTranslateY * TRANSLATE_POWER_FAST * MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
+                driveTranslateX * TRANSLATE_POWER_FAST * MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
+                driveRotate * ROTATE_POWER_FAST * MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND
             ));
         }
 
@@ -269,7 +259,7 @@ public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
             getCurrentPosition().getRotation()
         );
 
-        Robot.FIELD.setRobotPose(pose==null?new Pose2d():pose);
+        Robot.FIELD.getField().setRobotPose(pose==null?new Pose2d():pose);
     }
 
     @Override

@@ -8,14 +8,12 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.Trajectory.State;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.Timer;
 
 import org.team8592.lib.logging.SmartLogger;
 import org.team8592.frc.robot.Robot;
 import org.team8592.frc.robot.subsystems.swerve.SwerveConstants;
 import org.team8592.frc.robot.subsystems.swerve.SwerveSubsystem;
-import org.team8592.frc.robot.Constants.MEASUREMENTS;
 
 public class FollowPathCommand extends LargeCommand {
     // Pathing variables
@@ -65,40 +63,9 @@ public class FollowPathCommand extends LargeCommand {
 
         this.trajectory = trajectory;
 
-        this.xController = new PIDController(
-            SwerveConstants.PATH_FOLLOW_TRANSLATE_kP,
-            SwerveConstants.PATH_FOLLOW_TRANSLATE_kI,
-            SwerveConstants.PATH_FOLLOW_TRANSLATE_kD
-        );
-        this.xController.setTolerance(
-            SwerveConstants.PATH_FOLLOW_POSITION_TOLERANCE,
-            SwerveConstants.PATH_FOLLOW_VELOCITY_TOLERANCE
-        );
-
-        this.yController = new PIDController(
-            SwerveConstants.PATH_FOLLOW_TRANSLATE_kP,
-            SwerveConstants.PATH_FOLLOW_TRANSLATE_kI,
-            SwerveConstants.PATH_FOLLOW_TRANSLATE_kD
-        );
-        this.yController.setTolerance(
-            SwerveConstants.PATH_FOLLOW_POSITION_TOLERANCE,
-            SwerveConstants.PATH_FOLLOW_VELOCITY_TOLERANCE
-        );
-
-        this.turnController = new ProfiledPIDController(
-            SwerveConstants.PATH_FOLLOW_ROTATE_kP,
-            SwerveConstants.PATH_FOLLOW_ROTATE_kI,
-            SwerveConstants.PATH_FOLLOW_ROTATE_kD,
-            new Constraints(
-                SwerveConstants.PATH_FOLLOW_ROTATE_MAX_VELOCITY,
-                SwerveConstants.PATH_FOLLOW_ROTATE_MAX_ACCELLERATION
-            )
-        );
-        this.turnController.setTolerance(
-            SwerveConstants.PATH_FOLLOW_POSITION_TOLERANCE,
-            SwerveConstants.PATH_FOLLOW_VELOCITY_TOLERANCE
-        );
-        this.turnController.enableContinuousInput(-Math.PI, Math.PI);
+        this.xController = SwerveConstants.PATH_FOLLOW_TRANSLATE_GAINS.toPIDController();
+        this.yController = SwerveConstants.PATH_FOLLOW_TRANSLATE_GAINS.toPIDController();
+        this.turnController = SwerveConstants.PATH_FOLLOW_ROTATE_GAINS.toProfiledPIDController();
 
         this.drivePID = new HolonomicDriveController(xController, yController, turnController);
         this.drivePID.setTolerance(
@@ -217,7 +184,7 @@ public class FollowPathCommand extends LargeCommand {
             state.velocityMetersPerSecond,
             state.accelerationMetersPerSecondSq,
             new Pose2d(
-                MEASUREMENTS.FIELD_LENGTH_METERS - state.poseMeters.getX(),
+                Robot.FIELD.getFieldLength() - state.poseMeters.getX(),
                 state.poseMeters.getY(),
                 Rotation2d.fromRadians(Math.PI).minus(state.poseMeters.getRotation())
             ),
