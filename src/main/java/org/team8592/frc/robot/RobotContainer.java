@@ -131,10 +131,6 @@ public class RobotContainer {
         );
     };
 
-    public Command onRobotInit() {
-        return manager.onRobotInitCommand();
-    }
-
     public Command onModeInit(MatchMode mode) {
         return manager.onModeInitCommand(mode);
     }

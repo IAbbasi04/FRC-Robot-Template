@@ -78,8 +78,6 @@ public abstract class NewtonSubsystem<C extends SubsystemCommands<?>> extends Su
     
     public void periodicOutputs() {}
 
-    public void onRobotInit() {}
-
     public abstract void onModeInit(MatchMode mode);
 
     public abstract void periodicTelemetry();

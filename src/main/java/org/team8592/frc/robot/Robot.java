@@ -4,23 +4,15 @@
 
 package org.team8592.frc.robot;
 
-import java.io.File;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
-import org.littletonrobotics.junction.LoggedRobot;
-import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
-import org.littletonrobotics.junction.networktables.NT4Publisher;
-import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import org.team8592.lib.MatchMode;
 import org.team8592.lib.RobotClock;
 import org.team8592.lib.field.FieldLayout;
-import org.team8592.lib.logging.LogUtils;
 
-import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import org.littletonrobotics.junction.LoggedRobot;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -32,7 +24,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * project.
  */
 public class Robot extends LoggedRobot {
-    private Command autonomousCommand;
+    private Command autonomousCommand = Commands.none();
 
     private RobotContainer robotContainer;
 
@@ -47,50 +39,9 @@ public class Robot extends LoggedRobot {
      */
     @Override
     public void robotInit() {
-        Logger.recordMetadata("Game", "Crescendo");
-        Logger.recordMetadata("Year", "2024");
-        Logger.recordMetadata("Robot", "Zenith");
-        Logger.recordMetadata("Team", "8592");
+        Robot.FIELD.logToShuffleboard(Robot.isSimulation());
 
-        Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-        if (isReal()) { // If running on a real robot
-            String time = DateTimeFormatter.ofPattern("yy-MM-dd_HH-mm-ss").format(LocalDateTime.now());
-
-            File sda1 = new File("/media/sda1/logs");
-            if(sda1.exists()){
-                String path = "/media/sda1/"+time+".wpilog";
-                Logger.addDataReceiver(new WPILOGWriter(path));
-            }
-            else{
-                File sdb1 = new File("/media/sdb1/logs");
-                if(sdb1.exists()){
-                    String path = "/media/sdb2/"+time+".wpilog";
-                    Logger.addDataReceiver(new WPILOGWriter(path));
-                }
-                else{
-                    System.err.println("UNABLE TO LOG TO A USB STICK!");
-                }
-            }
-            LoggedPowerDistribution.getInstance(1, ModuleType.kRev);// Enables power distribution logging
-        }
-        
-        Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
-        Logger.start();
-
-        LogUtils.initialize(
-            new LogUtils.LogConstants(
-                null,
-                null,
-                null,
-                null
-            ), 
-            isReal()
-        );
-
-        FIELD.logToShuffleboard(Robot.isSimulation());
-
-        robotContainer = new RobotContainer(Robot.isSimulation() || true); // TODO - Fix to only work when NOT in actual match
-        CommandScheduler.getInstance().schedule(robotContainer.onRobotInit());
+        this.robotContainer = new RobotContainer(Robot.isSimulation() || true); // TODO - Fix to only work when NOT in actual match
     }
 
     /**
@@ -113,18 +64,17 @@ public class Robot extends LoggedRobot {
         // robot's periodic
         // block in order for anything in the Command-based framework to work.
         CommandScheduler.getInstance().run(); 
-        CLOCK.update();
+        Robot.CLOCK.update();
     }
 
     /** This function is called once each time the robot enters Disabled mode. */
     @Override
     public void disabledInit() {
-        updateMode(MatchMode.DISABLED);
+        this.updateMode(MatchMode.DISABLED);
     }
 
     @Override
-    public void disabledPeriodic() {
-    }
+    public void disabledPeriodic() {}
 
     /**
      * This autonomous runs the autonomous command selected by your
@@ -132,19 +82,18 @@ public class Robot extends LoggedRobot {
      */
     @Override
     public void autonomousInit() {
-        autonomousCommand = robotContainer.getAutonomousCommand();
+        this.autonomousCommand = robotContainer.getAutonomousCommand();
 
-        updateMode(MatchMode.AUTONOMOUS);
+        this.updateMode(MatchMode.AUTONOMOUS);
 
         if (autonomousCommand != null) {
-            autonomousCommand.schedule();
+            this.autonomousCommand.schedule();
         }
     }
 
     /** This function is called periodically during autonomous. */
     @Override
-    public void autonomousPeriodic() {
-    }
+    public void autonomousPeriodic() {}
 
     @Override
     public void teleopInit() {
@@ -153,46 +102,37 @@ public class Robot extends LoggedRobot {
         // continue until interrupted by another command, remove
         // this line or comment it out.
         if (autonomousCommand != null) {
-            autonomousCommand.cancel();
+            this.autonomousCommand.cancel();
         }
 
-        updateMode(MatchMode.TELEOP);
+        this.updateMode(MatchMode.TELEOP);
     }
 
     /** This function is called periodically during operator control. */
     @Override
-    public void teleopPeriodic() {
-
-    }
+    public void teleopPeriodic() {}
 
     @Override
     public void testInit() {
         // Cancels all running commands at the start of test mode.
         CommandScheduler.getInstance().cancelAll();
-
-        updateMode(MatchMode.TEST);
+        this.updateMode(MatchMode.TEST);
     }
 
     /** This function is called periodically during test mode. */
     @Override
-    public void testPeriodic() {
-    }
+    public void testPeriodic() {}
 
     /** This function is called once when the robot is first started up. */
     @Override
-    public void simulationInit() {
-    }
+    public void simulationInit() {}
 
     /** This function is called periodically whilst in simulation. */
     @Override
-    public void simulationPeriodic() {
-        //drivetrain.simulationPeriodic();
-
-        //vision.simulationPeriodic(drivetrain.getSimPose());
-    }
+    public void simulationPeriodic() {}
 
     private void updateMode(MatchMode mode) {
-        MODE = mode;
-        CommandScheduler.getInstance().schedule(robotContainer.onModeInit(MODE));
+        Robot.MODE = mode;
+        this.robotContainer.onModeInit(MODE).schedule();
     }
 }
