@@ -4,6 +4,7 @@
 
 package org.team8592.frc.robot;
 
+import org.team8592.frc.robot.Controls.ControlSets;
 import org.team8592.frc.robot.commands.NewtonCommands;
 import org.team8592.frc.robot.commands.autonomous.*;
 import org.team8592.frc.robot.commands.largecommands.LargeCommand;
@@ -32,11 +33,14 @@ public class RobotContainer {
         this.swerve = manager.swerve;
         this.vision = manager.vision;
 
+        Controls.applyControlSet(ControlSets.DUAL_DRIVER);
+
         passSubsystems();
         configureDefaults();
         configureBindings();
 
         AutoManager.prepare();
+
     }
 
     /**
