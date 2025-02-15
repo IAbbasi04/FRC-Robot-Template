@@ -136,13 +136,8 @@ public class RobotContainer {
             ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
-        Controls.getDriver().leftTrigger().whileTrue(manager.intake.run(() -> {
-            manager.intake.setPower(0.5);
-        }));
-
-        Controls.getDriver().rightTrigger().whileTrue(manager.intake.run(() -> {
-            manager.intake.setPower(-0.5);
-        }));
+        Controls.getDriver().leftTrigger().whileTrue(manager.intake.commands.setIntakeVelocityCommand(4000));
+        Controls.getDriver().rightTrigger().whileTrue(manager.intake.commands.setIntakeVelocityCommand(-4000));
     };
 
     public Command onModeInit(MatchMode mode) {

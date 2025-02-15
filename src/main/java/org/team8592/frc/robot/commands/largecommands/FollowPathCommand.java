@@ -12,8 +12,8 @@ import edu.wpi.first.wpilibj.Timer;
 
 import org.team8592.lib.logging.SmartLogger;
 import org.team8592.frc.robot.Robot;
-import org.team8592.frc.robot.subsystems.swerve.SwerveConstants;
 import org.team8592.frc.robot.subsystems.swerve.SwerveSubsystem;
+import org.team8592.frc.robot.Constants;
 
 public class FollowPathCommand extends LargeCommand {
     // Pathing variables
@@ -63,9 +63,9 @@ public class FollowPathCommand extends LargeCommand {
 
         this.trajectory = trajectory;
 
-        this.xController = SwerveConstants.PATH_FOLLOW_TRANSLATE_GAINS.toPIDController();
-        this.yController = SwerveConstants.PATH_FOLLOW_TRANSLATE_GAINS.toPIDController();
-        this.turnController = SwerveConstants.PATH_FOLLOW_ROTATE_GAINS.toProfiledPIDController();
+        this.xController = Constants.SWERVE.PATH_FOLLOW_TRANSLATE_GAINS.toPIDController();
+        this.yController = Constants.SWERVE.PATH_FOLLOW_TRANSLATE_GAINS.toPIDController();
+        this.turnController = Constants.SWERVE.PATH_FOLLOW_ROTATE_GAINS.toProfiledPIDController();
 
         this.drivePID = new HolonomicDriveController(xController, yController, turnController);
         this.drivePID.setTolerance(

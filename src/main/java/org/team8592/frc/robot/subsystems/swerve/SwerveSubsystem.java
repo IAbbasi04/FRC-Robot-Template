@@ -16,9 +16,9 @@ import org.team8592.frc.robot.subsystems.NewtonSubsystem;
 import org.team8592.lib.MatchMode;
 import org.team8592.lib.SmoothingFilter;
 
-import static org.team8592.frc.robot.subsystems.swerve.SwerveConstants.*;
+import static org.team8592.frc.robot.Constants.SWERVE.*;
 
-public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
+public class SwerveSubsystem extends NewtonSubsystem {
     /**
      * Small enum to control whether to drive robot- or field-
      * relative for {@link SwerveSubsystem#drive(ChassisSpeeds, DriveModes)}
@@ -39,12 +39,14 @@ public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
 
     private SmoothingFilter smoothingFilter;
     
-    private SwerveIO swerveIO;
+    private SwerveIO io;
 
-    public SwerveSubsystem(SwerveIO swerveIO, boolean logToShuffleboard) {
+    public SwerveCommands commands;
+
+    public SwerveSubsystem(SwerveIO io, boolean logToShuffleboard) {
         super(logToShuffleboard);
 
-        super.commands = new SwerveCommands(this);
+        this.commands = new SwerveCommands(this);
 
         smoothingFilter = new SmoothingFilter(
             TRANSLATION_SMOOTHING_AMOUNT,
@@ -54,7 +56,7 @@ public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
 
         snapToController = SNAP_TO_GAINS.toPIDController();
 
-        this.swerveIO = swerveIO;
+        this.io = io;
     }
 
     /**
@@ -64,7 +66,7 @@ public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
      */
     public void drive(ChassisSpeeds speeds){
         // TODO: implement something that allows the commented code to work
-        swerveIO.drive(speeds, false);
+        io.drive(speeds, false);
     }
 
     /**
@@ -75,7 +77,7 @@ public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
     private int heartbeat = 0;
     public void drive(ChassisSpeeds speeds, DriveModes mode){
         // TODO: implement something that allows the commented code to work'
-        swerveIO.drive(
+        io.drive(
             speeds,
             switch(mode){
                 case FIELD_RELATIVE:
@@ -114,7 +116,7 @@ public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
      */
     public void resetHeading(){
         // TODO: implement something that allows the commented code to work
-        swerveIO.resetHeading();
+        io.resetHeading();
     }
 
     /**
@@ -122,7 +124,7 @@ public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
      */
     public Rotation2d getYaw() {
         // TODO: implement something that allows the commented code to work
-        return swerveIO.getYaw();
+        return io.getYaw();
     }
 
     /**
@@ -133,7 +135,7 @@ public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
         // if (Robot.isSimulation()){
         //    return Robot.FIELD.getRobotPose();
         // }
-        return swerveIO.getCurrentOdometryPosition();
+        return io.getCurrentOdometryPosition();
     }
 
    
@@ -145,7 +147,7 @@ public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
      */
     public void resetPose(Pose2d pose) {
         // TODO: implement something that allows the commented code to work
-        swerveIO.setKnownOdometryPose(pose);
+        io.setKnownOdometryPose(pose);
         logger.log("Reset Pose", pose);
     }
     
@@ -158,10 +160,10 @@ public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
                 ),
                 Rotation2d.fromDegrees(180).minus(pose.getRotation())
             );
-            swerveIO.setKnownOdometryPose(flipped);
+            io.setKnownOdometryPose(flipped);
             return;
         }
-        swerveIO.setKnownOdometryPose(pose);
+        io.setKnownOdometryPose(pose);
     }
 
     /**
@@ -238,7 +240,7 @@ public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
     }
 
     public void addVisionMeasurement(Pose2d visionRobotPoseMeters) {
-        swerveIO.addVisionMeasurement(visionRobotPoseMeters, Timer.getFPGATimestamp());
+        io.addVisionMeasurement(visionRobotPoseMeters, Timer.getFPGATimestamp());
     }
 
     @Override
@@ -259,7 +261,7 @@ public class SwerveSubsystem extends NewtonSubsystem<SwerveCommands> {
     @Override
     public void periodicTelemetry() {
         logger.log("Current Pose", getCurrentPosition());
-        swerveIO.periodic();
+        io.periodic();
     }
 
     /**

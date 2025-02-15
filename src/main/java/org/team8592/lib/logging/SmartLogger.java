@@ -74,6 +74,11 @@ public class SmartLogger {
         return this;
     }
 
+    public SmartLogger addSendable(String key, Sendable sendable) {
+        this.shuffleboardTab.add(key, sendable);
+        return this;
+    }
+
     public GenericEntry getEntry(String key) {
         return this.dictionary.getGenericEntry(key);
     }

@@ -1,6 +1,8 @@
 package org.team8592.frc.robot.subsystems.intake;
 
-public abstract class IntakeIO {
+import org.team8592.frc.robot.subsystems.SubsystemIO;
+
+public abstract class IntakeIO implements SubsystemIO {
     protected int id;
     protected boolean reversed;
 
@@ -16,6 +18,4 @@ public abstract class IntakeIO {
     public abstract void setSpeedPercentOutput(double percent);
     
     public abstract double getAppliedVoltage();
-
-    public abstract double getDesiredPercent();
 }

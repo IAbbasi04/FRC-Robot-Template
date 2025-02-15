@@ -2,10 +2,10 @@ package org.team8592.frc.robot.subsystems;
 
 import java.util.*;
 
+import org.team8592.frc.robot.Constants;
 import org.team8592.frc.robot.RobotConstants;
 import org.team8592.frc.robot.subsystems.intake.*;
 import org.team8592.frc.robot.subsystems.logger.*;
-import org.team8592.frc.robot.subsystems.power.*;
 import org.team8592.frc.robot.subsystems.swerve.*;
 import org.team8592.frc.robot.subsystems.vision.*;
 import org.team8592.lib.MatchMode;
@@ -17,14 +17,14 @@ public class SubsystemManager extends SubsystemBase {
     public SwerveSubsystem swerve;
     public VisionSubsystem vision;
     public LoggerSubsystem logger;
-    public PowerSubsystem power;
     public IntakeSubsystem intake;
 
-    private List<NewtonSubsystem<?>> activeSubystems = new ArrayList<>();
+    public IntakeCommands cIntake;
+
+    private List<NewtonSubsystem> activeSubystems = new ArrayList<>();
 
     public SubsystemManager(boolean logToShuffleboard) {
         this.logger = new LoggerSubsystem(logToShuffleboard);
-        this.power = new PowerSubsystem(logToShuffleboard);
         
         switch(RobotConstants.getRobot()) {
             case PRAC_BOT:
@@ -36,7 +36,7 @@ public class SubsystemManager extends SubsystemBase {
                 this.vision = new VisionSubsystem(
                     new CameraIOArducam(
                         getName(),
-                        VisionConstants.CAMERA_OFFSET
+                        Constants.VISION.CAMERA_OFFSET
                     ), logToShuffleboard
                 );
 
@@ -54,7 +54,7 @@ public class SubsystemManager extends SubsystemBase {
                 this.vision = new VisionSubsystem(
                     new CameraIOSim(
                         getName(), 
-                        VisionConstants.CAMERA_OFFSET
+                        Constants.VISION.CAMERA_OFFSET
                     ), logToShuffleboard
                 );
 
@@ -73,7 +73,7 @@ public class SubsystemManager extends SubsystemBase {
                 this.vision = new VisionSubsystem(
                     new CameraIOArducam(
                         getName(), 
-                        VisionConstants.CAMERA_OFFSET
+                        Constants.VISION.CAMERA_OFFSET
                     ), logToShuffleboard
                 );
 
@@ -89,7 +89,6 @@ public class SubsystemManager extends SubsystemBase {
             swerve,
             // vision,
             logger,
-            power,
             intake
         );
 
@@ -100,7 +99,7 @@ public class SubsystemManager extends SubsystemBase {
     }
 
     public Command onModeInitCommand(MatchMode mode) {
-        NewtonSubsystem<?>[] subs = new NewtonSubsystem<?>[activeSubystems.size()];
+        NewtonSubsystem[] subs = new NewtonSubsystem[activeSubystems.size()];
         for (int i = 0; i < activeSubystems.size(); i++) {
             subs[i] = activeSubystems.get(i);
         }
@@ -110,12 +109,12 @@ public class SubsystemManager extends SubsystemBase {
         }, subs);
     }
 
-    public List<NewtonSubsystem<?>> getAllSubsystemsAsList() {
+    public List<NewtonSubsystem> getAllSubsystemsAsList() {
         return activeSubystems;
     }
 
-    public NewtonSubsystem<?>[] getAllSubsystemsAsArray() {
-        NewtonSubsystem<?>[] subsystems = new NewtonSubsystem<?>[activeSubystems.size()];
+    public NewtonSubsystem[] getAllSubsystemsAsArray() {
+        NewtonSubsystem[] subsystems = new NewtonSubsystem[activeSubystems.size()];
         for (int i = 0; i < activeSubystems.size(); i++) {
             subsystems[i] = activeSubystems.get(i);
         }

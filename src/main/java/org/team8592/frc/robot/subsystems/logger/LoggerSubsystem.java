@@ -10,12 +10,11 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import org.team8592.frc.robot.Robot;
 import org.team8592.frc.robot.RobotConstants;
 import org.team8592.frc.robot.subsystems.NewtonSubsystem;
-import org.team8592.frc.robot.subsystems.SubsystemCommands;
 import org.team8592.lib.MatchMode;
 
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 
-public class LoggerSubsystem extends NewtonSubsystem<SubsystemCommands<?>> {
+public class LoggerSubsystem extends NewtonSubsystem {
     public LoggerSubsystem(boolean logToShuffleboard) {
         super(logToShuffleboard);
 
