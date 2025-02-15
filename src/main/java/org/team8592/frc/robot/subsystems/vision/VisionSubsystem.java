@@ -10,31 +10,32 @@ import org.team8592.frc.robot.subsystems.NewtonSubsystem;
 import org.team8592.lib.MatchMode;
 import org.team8592.frc.robot.Robot;
 
-public class VisionSubsystem extends NewtonSubsystem<VisionCommands> {
-    private CameraIO camera;
+public class VisionSubsystem extends NewtonSubsystem {
+    private CameraIO io;
 
     private List<PhotonTrackedTarget> allVisibleTags = new ArrayList<>();
     private PhotonTrackedTarget bestTarget = new PhotonTrackedTarget();
 
-    public VisionSubsystem(CameraIO camera, boolean logToShuffleboard){
+
+    public VisionSubsystem(CameraIO io, boolean logToShuffleboard){
         super(logToShuffleboard);
-        super.commands = new VisionCommands(this);
+        this.io = io;
     }
 
     public boolean isAnyTargetVisible() {
-        return camera.isAnyTargetVisible();
+        return io.isAnyTargetVisible();
     }
 
     public List<PhotonTrackedTarget> getTargets() {
-        return camera.getAllTargets();
+        return io.getAllTargets();
     }
 
     public Optional<EstimatedRobotPose> getRobotPoseVision() {
-        return camera.getVisionEstimatedPose();
+        return io.getVisionEstimatedPose();
     }
 
     public double getPoseAmbiguityRatio() {
-        return camera.getPoseAmbiguityRatio();
+        return io.getPoseAmbiguityRatio();
     }
 
     @Override
@@ -49,18 +50,18 @@ public class VisionSubsystem extends NewtonSubsystem<VisionCommands> {
 
     @Override
     public void periodicTelemetry() {
-        camera.updateInputs(new Pose3d(Robot.FIELD.getField().getRobotPose()));
+        io.updateInputs(new Pose3d(Robot.FIELD.getField().getRobotPose()));
 
-        this.logger.log("Target Visible", camera.isAnyTargetVisible());
+        this.logger.log("Target Visible", io.isAnyTargetVisible());
 
         // Reset both every robot cycle
         this.allVisibleTags = new ArrayList<>();
         this.bestTarget = null;
 
-        if (!camera.isAnyTargetVisible()) return; // Do not log if we do not have any visible tag
+        if (!io.isAnyTargetVisible()) return; // Do not log if we do not have any visible tag
 
-        this.bestTarget = camera.getBestTarget();
-        for (PhotonTrackedTarget target : camera.getAllTargets()) { // Grab all visible tags
+        this.bestTarget = io.getBestTarget();
+        for (PhotonTrackedTarget target : io.getAllTargets()) { // Grab all visible tags
             allVisibleTags.add(target);
         }
         
@@ -73,7 +74,7 @@ public class VisionSubsystem extends NewtonSubsystem<VisionCommands> {
         this.logger.logIf("Best Target Y", bestTarget.getBestCameraToTarget().getY(), -1d, isAnyTargetVisible());
         this.logger.logIf("Best Target Z", bestTarget.getBestCameraToTarget().getZ(), -1d, isAnyTargetVisible());
 
-        this.logger.logIf("Closest Tag ID", camera.getClosestTagID(), -1, isAnyTargetVisible());
+        this.logger.logIf("Closest Tag ID", io.getClosestTagID(), -1, isAnyTargetVisible());
 
         this.logger.logIf(
             "Estimated Pose", 

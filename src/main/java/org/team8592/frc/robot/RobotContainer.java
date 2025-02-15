@@ -66,6 +66,8 @@ public class RobotContainer {
         );
 
         vision.setDefaultCommand(NewtonCommands.updateOdometryWithVision(swerve, vision));
+
+        manager.intake.setStopAsDefaultCommand();
     }
 
 
@@ -133,6 +135,9 @@ public class RobotContainer {
                 Controls.driveTranslateY
             ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
+
+        Controls.getDriver().leftTrigger().whileTrue(manager.intake.commands.setIntakeVelocityCommand(4000));
+        Controls.getDriver().rightTrigger().whileTrue(manager.intake.commands.setIntakeVelocityCommand(-4000));
     };
 
     public Command onModeInit(MatchMode mode) {

@@ -3,8 +3,8 @@ package org.team8592.frc.robot.commands;
 import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
+import org.team8592.frc.robot.Constants;
 import org.team8592.frc.robot.subsystems.swerve.SwerveSubsystem;
-import org.team8592.frc.robot.subsystems.vision.VisionConstants;
 import org.team8592.frc.robot.subsystems.vision.VisionSubsystem;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -21,7 +21,7 @@ public final class NewtonCommands {
                 Pose2d robotPose = estimatedRobotPose.get().estimatedPose.toPose2d();
                 double ambiguity = vision.getPoseAmbiguityRatio();
 
-                if(Math.abs(ambiguity) < VisionConstants.MAX_ACCEPTABLE_AMBIGUITY) {
+                if(Math.abs(ambiguity) < Constants.VISION.MAX_ACCEPTABLE_AMBIGUITY) {
                     if (DriverStation.isDisabled()){
                         swerve.resetPose(robotPose);        
                     } else {

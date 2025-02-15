@@ -2,16 +2,16 @@ package org.team8592.frc.robot.subsystems.swerve;
 
 import java.util.function.DoubleSupplier;
 
-import org.team8592.frc.robot.subsystems.SubsystemCommands;
 import org.team8592.frc.robot.subsystems.swerve.SwerveSubsystem.DriveModes;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 
-public class SwerveCommands extends SubsystemCommands<SwerveSubsystem> {
+public class SwerveCommands {
+    private SwerveSubsystem swerve;
     public SwerveCommands(SwerveSubsystem swerve) {
-        super(swerve);
+        this.swerve = swerve;
     }
 
     /**
@@ -24,8 +24,8 @@ public class SwerveCommands extends SubsystemCommands<SwerveSubsystem> {
      * @return the command
      */
     public Command joystickDriveCommand(DoubleSupplier translateX, DoubleSupplier translateY, DoubleSupplier rotate) {
-        return subsystem.run(() -> {
-            subsystem.drive(subsystem.processJoystickInputs(
+        return swerve.run(() -> {
+            swerve.drive(swerve.processJoystickInputs(
                 translateX.getAsDouble(),
                 translateY.getAsDouble(),
                 rotate.getAsDouble()
@@ -45,12 +45,12 @@ public class SwerveCommands extends SubsystemCommands<SwerveSubsystem> {
      * @return the command
      */
     public Command snapToAngleCommand(Rotation2d angle, DoubleSupplier translateX, DoubleSupplier translateY) {
-        return subsystem.run(() -> {
-            subsystem.drive(
-                subsystem.processJoystickInputs(
+        return swerve.run(() -> {
+            swerve.drive(
+                swerve.processJoystickInputs(
                 translateX.getAsDouble(),
                 translateY.getAsDouble(),
-                subsystem.snapToAngle(angle)
+                swerve.snapToAngle(angle)
             ), DriveModes.AUTOMATIC);
         });
     }
