@@ -7,13 +7,11 @@ import org.team8592.lib.logging.NewtonLogger;
 import org.team8592.lib.MatchMode;
 
 public abstract class NewtonSubsystem extends SubsystemBase {
-    private boolean logToShuffleboard = false;
-    private boolean enabled = false;
+    private boolean enabled = false; // TODO - Get Working
 
     protected NewtonLogger logger;
 
-    protected NewtonSubsystem(boolean logToShuffleboard) {
-        this.logToShuffleboard = logToShuffleboard;
+    protected NewtonSubsystem() {
         this.logger = new NewtonLogger(getName());
     }
 
@@ -27,10 +25,6 @@ public abstract class NewtonSubsystem extends SubsystemBase {
 
     public boolean isEnabled() {
         return enabled;
-    }
-
-    public boolean logToShuffleboard() {
-        return this.logToShuffleboard;
     }
 
     /**

@@ -22,10 +22,7 @@ public final class Controls {
         DUAL_DRIVER
     }
 
-    private static NewtonLogger logger;
-
-    private static boolean logToShuffleboard = false;
-    private static boolean loggingEnabled = false;
+    private static NewtonLogger logger = new NewtonLogger("Controls");
 
     protected static DoubleSupplier driveTranslateX = () -> -driverController.getLeftX();
     protected static DoubleSupplier driveTranslateY = () -> -driverController.getLeftY();
@@ -63,21 +60,11 @@ public final class Controls {
         
     }
 
-    public static void initializeShuffleboardLogs(boolean logToShuffleboard) {
-        Controls.logToShuffleboard = logToShuffleboard;
-        if (!logToShuffleboard) return;
-        
-        Controls.loggingEnabled = true;
+    public static void initializeLogs() {
         Controls.logger = new NewtonLogger("Controls");
     }
 
-    public static void logControlsToShuffleboard() {
-        if (!Controls.logToShuffleboard) return; // Don't log if we don't want to log
-        
-        if (!Controls.loggingEnabled) { // If not already enabled, enable it
-            initializeShuffleboardLogs(true);
-        }
-
+    public static void logControls() {
         for (Field field : Controls.class.getDeclaredFields()) {
             try {
                 logger.log(field.getName(), ((Trigger)field.get(null)).getAsBoolean());

@@ -33,6 +33,52 @@ public class NewtonLogger {
         Logger.recordOutput(logFolder + key, value);
     }
 
+    public void logIf(String key, double valueIfTrue, double valueIfFalse, boolean condition) {
+        double loggedValue = valueIfFalse;
+        if (condition) {
+            loggedValue = valueIfTrue;
+        }
+        
+        Logger.recordOutput(logFolder + key, loggedValue); // Record to AdvantageKit logs
+    }
+
+    public void logIf(String key, boolean valueIfTrue, boolean valueIfFalse, boolean condition) {
+        boolean loggedValue = valueIfFalse;
+        if (condition) {
+            loggedValue = valueIfTrue;
+        }
+        
+        Logger.recordOutput(logFolder + key, loggedValue); // Record to AdvantageKit logs
+    }
+
+    public void logIf(String key, String valueIfTrue, String valueIfFalse, boolean condition) {
+        String loggedValue = valueIfFalse;
+        if (condition) {
+            loggedValue = valueIfTrue;
+        }
+        
+        Logger.recordOutput(logFolder + key, loggedValue); // Record to AdvantageKit logs
+    }
+
+    public void logIf(String key, StructSerializable valueIfTrue, StructSerializable valueIfFalse, boolean condition) {
+        StructSerializable loggedValue = valueIfFalse;
+        if (condition) {
+            loggedValue = valueIfTrue;
+        }
+        
+        Logger.recordOutput(logFolder + key, loggedValue); // Record to AdvantageKit logs
+    }
+
+    public <E extends Enum<E>> void logIf(String key, E valueIfTrue, E valueIfFalse, boolean condition) {
+        E loggedValue = valueIfFalse;
+        if (condition) {
+            loggedValue = valueIfTrue;
+        }
+        
+        Logger.recordOutput(logFolder + key, loggedValue); // Record to AdvantageKit logs
+    }
+
+
     public static void addSendable(Sendable sendable) {
         SmartDashboard.putData(sendable);
     }

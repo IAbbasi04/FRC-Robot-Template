@@ -54,6 +54,7 @@ public final class AutoManager {
                 ), c
             );
         }
+        
         Shuffleboard.getTab("Autonomous Config").add(autoChooser);
     }
 

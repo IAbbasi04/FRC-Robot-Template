@@ -10,9 +10,7 @@ import org.team8592.lib.field.FieldLayout;
 
 import org.littletonrobotics.junction.LoggedRobot;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.*;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -29,8 +27,9 @@ public class Robot extends LoggedRobot {
     private RobotContainer robotContainer;
 
     public static MatchMode MODE = MatchMode.DISABLED;
-    public static RobotClock CLOCK = new RobotClock();
-    public static FieldLayout FIELD = FieldLayout.none();
+    
+    public static final RobotClock CLOCK = new RobotClock();
+    public static final FieldLayout FIELD = FieldLayout.none();
 
     /**
      * This function is run when the robot is first started up and should be used
@@ -40,8 +39,8 @@ public class Robot extends LoggedRobot {
     @Override
     public void robotInit() {
         Robot.FIELD.logToShuffleboard(Robot.isSimulation());
-        Controls.initializeShuffleboardLogs(Robot.isSimulation() || true); // TODO - Fix to only work when NOT in actual match
-        this.robotContainer = new RobotContainer(Robot.isSimulation() || true); // TODO - Fix to only work when NOT in actual match
+        Controls.initializeLogs();
+        this.robotContainer = new RobotContainer();
     }
 
     /**
@@ -64,7 +63,7 @@ public class Robot extends LoggedRobot {
         // robot's periodic
         // block in order for anything in the Command-based framework to work.
         CommandScheduler.getInstance().run(); 
-        Controls.logControlsToShuffleboard();
+        Controls.logControls();
         Robot.CLOCK.update();
     }
 

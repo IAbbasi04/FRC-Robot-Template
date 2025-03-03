@@ -13,14 +13,14 @@ import org.team8592.lib.MatchMode;
 
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 
-public class LoggerSubsystem extends NewtonSubsystem {
-    public LoggerSubsystem(boolean logToShuffleboard) {
-        super(logToShuffleboard);
+import org.team8592.frc.robot.Constants.*;
 
-        Logger.recordMetadata("Game", LoggerConstants.GAME);
-        Logger.recordMetadata("Year", LoggerConstants.YEAR);
-        Logger.recordMetadata("Robot", LoggerConstants.ROBOT);
-        Logger.recordMetadata("Team", LoggerConstants.TEAM);
+public class LoggerSubsystem extends NewtonSubsystem {
+    public LoggerSubsystem() {
+        Logger.recordMetadata("Game", CONFIG.GAME);
+        Logger.recordMetadata("Year", CONFIG.YEAR);
+        Logger.recordMetadata("Robot", CONFIG.ROBOT);
+        Logger.recordMetadata("Team", CONFIG.TEAM);
 
         if (Robot.isReal()) { // If running on a real robot
             String time = DateTimeFormatter.ofPattern("yy-MM-dd_HH-mm-ss").format(LocalDateTime.now());
@@ -30,12 +30,8 @@ public class LoggerSubsystem extends NewtonSubsystem {
         }
         
         Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+
         Logger.start();
-    }
-
-    @Override
-    public void periodic() {
-
     }
 
     @Override

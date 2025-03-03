@@ -17,8 +17,7 @@ public class VisionSubsystem extends NewtonSubsystem {
     private PhotonTrackedTarget bestTarget = new PhotonTrackedTarget();
 
 
-    public VisionSubsystem(CameraIO io, boolean logToShuffleboard){
-        super(logToShuffleboard);
+    public VisionSubsystem(CameraIO io){
         this.io = io;
     }
 

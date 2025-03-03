@@ -29,8 +29,9 @@ public class RobotContainer {
      * Create the robot container. This creates and configures subsystems, sets
      * up button bindings, and prepares for autonomous.
      */
-    public RobotContainer(boolean logToShuffleboard) {
-        this.manager = new SubsystemManager(logToShuffleboard);
+    public RobotContainer() {
+        this.manager = new SubsystemManager();
+
         this.swerve = manager.swerve;
         this.vision = manager.vision;
 
@@ -41,7 +42,6 @@ public class RobotContainer {
         configureBindings();
 
         AutoManager.prepare();
-
     }
 
     /**

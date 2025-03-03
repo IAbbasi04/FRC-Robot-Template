@@ -46,9 +46,7 @@ public class SwerveSubsystem extends NewtonSubsystem {
 
     private ChassisSpeeds desiredSpeeds = new ChassisSpeeds();
 
-    public SwerveSubsystem(SwerveIO io, boolean logToShuffleboard) {
-        super(logToShuffleboard);
-
+    public SwerveSubsystem(SwerveIO io) {
         this.commands = new SwerveCommands(this);
 
         smoothingFilter = new SmoothingFilter(
