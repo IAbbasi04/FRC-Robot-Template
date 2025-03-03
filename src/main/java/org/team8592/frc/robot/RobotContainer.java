@@ -10,11 +10,11 @@ import org.team8592.frc.robot.commands.autonomous.*;
 import org.team8592.frc.robot.commands.largecommands.LargeCommand;
 import org.team8592.frc.robot.subsystems.SubsystemManager;
 import org.team8592.frc.robot.subsystems.swerve.SwerveSubsystem;
-import org.team8592.frc.robot.subsystems.swerve.SwerveSubsystem.DriveModes;
 import org.team8592.frc.robot.subsystems.vision.VisionSubsystem;
 import org.team8592.lib.MatchMode;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 
@@ -35,11 +35,13 @@ public class RobotContainer {
         this.swerve = manager.swerve;
         this.vision = manager.vision;
 
+        // this.swerve = new SwerveSubsystem(new SwerveIOCTRE());
+
         Controls.applyControlSet(ControlSets.DUAL_DRIVER);
 
         passSubsystems();
-        configureDefaults();
         configureBindings();
+        configureDefaults();
 
         AutoManager.prepare();
     }
@@ -57,20 +59,44 @@ public class RobotContainer {
      * Configure default commands for the subsystems
      */
     private void configureDefaults(){
+        // swerve.setDefaultCommand(
+        //     // () -> {
+        //     // swerve.drive(swerve.processJoystickInputs(
+        //     //     1,
+        //     //     0,
+        //     //     0
+        //     //     // Controls.driveTranslateX.getAsDouble(),
+        //     //     // Controls.driveTranslateY.getAsDouble(),
+        //     //     // Controls.driveRotate.getAsDouble()
+        //     // ), DriveModes.AUTOMATIC);
+        //     // }
+        //     () -> {
+        //         SmartDashboard.putNumber("CLOCK AALLS", Robot.CLOCK.get());
+        //     }
+        // );
+
+        // swerve.setDefaultCommand(swerve.commands.joystickDriveCommand(
+        //     1, 
+        //     0, 
+        //     0
+        // ));
+
         swerve.setDefaultCommand(swerve.run(() -> {
-            swerve.drive(swerve.processJoystickInputs(
-                Controls.driveTranslateX.getAsDouble(),
-                Controls.driveTranslateY.getAsDouble(),
-                Controls.driveRotate.getAsDouble()
-            ), DriveModes.AUTOMATIC);
-            }).withInterruptBehavior(InterruptionBehavior.kCancelSelf)
-        );
+            SmartDashboard.putNumber("AAMMCCVVAAASDJKL", 155);
+        }));
+
+        // swerve.drive(new ChassisSpeeds(1, 0, 0));
+
+        // swerve.setDefaultCommand(
+        //     new DeferredCommand(() -> swerve.commands.joystickDriveCommand(
+        //         Controls.driveTranslateX.getAsDouble(), 
+        //         Controls.driveTranslateY.getAsDouble(), 
+        //         Controls.driveRotate.getAsDouble()
+        //     ), Set.of(swerve))
+        // );
 
         vision.setDefaultCommand(NewtonCommands.updateOdometryWithVision(swerve, vision));
     }
-
-
-    //Any commands that are reused a lot but can't go in a separate class go here
 
     /**
      * Configure all button bindings

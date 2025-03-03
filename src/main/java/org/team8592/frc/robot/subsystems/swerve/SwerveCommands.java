@@ -1,12 +1,16 @@
 package org.team8592.frc.robot.subsystems.swerve;
 
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import org.team8592.frc.robot.subsystems.swerve.SwerveSubsystem.DriveModes;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
 
 public class SwerveCommands {
@@ -34,6 +38,18 @@ public class SwerveCommands {
         }), Set.of(swerve));
     }
 
+    public Command joystickDriveCommand(double translateX, double translateY, double rotate) {
+        return swerve.run(() -> {
+            SmartDashboard.putNumber("AAJKLJKLDSA", translateX);
+
+            swerve.drive(swerve.processJoystickInputs(
+                translateX, 
+                translateY, 
+                rotate
+            ));
+        });
+    }
+
     /**
      * Command to drive the swerve with translation processed for human input and
      * rotation controlled by the snap-to PID controller (snapping to the passed-in)
@@ -54,5 +70,9 @@ public class SwerveCommands {
                 swerve.snapToAngle(angle)
             ), DriveModes.AUTOMATIC);
         });
+    }
+
+    public Command followPathCommand(Trajectory trajectory, BooleanSupplier flipForRed) {
+        return Commands.none(); // TODO - Add this later
     }
 }

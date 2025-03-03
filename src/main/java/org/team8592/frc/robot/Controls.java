@@ -7,7 +7,7 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
-import org.team8592.lib.logging.NewtonLogger;
+import org.team8592.lib.logging.SmartLogger;
 
 public final class Controls {
     private static final CommandXboxController driverController = new CommandXboxController(0);
@@ -22,7 +22,7 @@ public final class Controls {
         DUAL_DRIVER
     }
 
-    private static NewtonLogger logger = new NewtonLogger("Controls");
+    private static SmartLogger logger = new SmartLogger("Controls");
 
     protected static DoubleSupplier driveTranslateX = () -> -driverController.getLeftX();
     protected static DoubleSupplier driveTranslateY = () -> -driverController.getLeftY();
@@ -61,7 +61,7 @@ public final class Controls {
     }
 
     public static void initializeLogs() {
-        Controls.logger = new NewtonLogger("Controls");
+        Controls.logger = new SmartLogger("Controls");
     }
 
     public static void logControls() {

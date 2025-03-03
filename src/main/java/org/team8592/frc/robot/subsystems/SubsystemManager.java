@@ -12,13 +12,14 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.*;
 
 public class SubsystemManager extends SubsystemBase {
-    public SwerveSubsystem swerve;
+    // public SwerveSubsystem swerve;
     public VisionSubsystem vision;
+
+    public SwerveSubsystem swerve;
 
     private List<NewtonSubsystem> activeSubystems = new ArrayList<>();
 
     public SubsystemManager() {
-
         switch(RobotSelector.getRobot()) {
             case SIM_BOT: // Robot for simulation
                 this.swerve = new SwerveSubsystem(

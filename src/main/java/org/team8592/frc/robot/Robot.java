@@ -8,7 +8,7 @@ import org.team8592.frc.robot.Constants.CONFIG;
 import org.team8592.lib.MatchMode;
 import org.team8592.lib.RobotClock;
 import org.team8592.lib.field.FieldLayout;
-import org.team8592.lib.logging.NewtonLogger;
+import org.team8592.lib.logging.SmartLogger;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -33,7 +33,7 @@ import edu.wpi.first.wpilibj2.command.*;
  */
 public class Robot extends LoggedRobot {
     private Command autonomousCommand = Commands.none();
-    private NewtonLogger logger = new NewtonLogger("Config");
+    private SmartLogger logger = new SmartLogger("Config");
 
     private RobotContainer robotContainer;
 

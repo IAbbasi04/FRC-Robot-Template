@@ -8,7 +8,6 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.team8592.frc.robot.*;
 import org.team8592.frc.robot.subsystems.NewtonSubsystem;
@@ -37,8 +36,6 @@ public class SwerveSubsystem extends NewtonSubsystem {
     private boolean robotRelative;
 
     private SmoothingFilter smoothingFilter;
-    
-    // private SwerveIO io;
 
     private SwerveIO io;
 
@@ -57,10 +54,8 @@ public class SwerveSubsystem extends NewtonSubsystem {
 
         snapToController = SNAP_TO_GAINS.toPIDController();
 
-        // this.io = io;
-        this.io = new SwerveIOCTRE();
+        this.io = io;
         this.io.registerTelemetry((state) -> {});
-
     }
 
     /**
@@ -82,7 +77,6 @@ public class SwerveSubsystem extends NewtonSubsystem {
     public void drive(ChassisSpeeds speeds, DriveModes mode){
         this.desiredSpeeds = speeds;
         // TODO: implement something that allows the commented code to work'
-        SmartDashboard.putNumber("QWQWEOPQIEIOPQ", 11);
         io.drive(
             speeds,
             switch(mode){

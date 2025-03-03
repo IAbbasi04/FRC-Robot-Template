@@ -3,16 +3,16 @@ package org.team8592.frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 
-import org.team8592.lib.logging.NewtonLogger;
+import org.team8592.lib.logging.SmartLogger;
 import org.team8592.lib.MatchMode;
 
 public abstract class NewtonSubsystem extends SubsystemBase {
     private boolean enabled = false; // TODO - Get Working
 
-    protected NewtonLogger logger;
+    protected SmartLogger logger;
 
     protected NewtonSubsystem() {
-        this.logger = new NewtonLogger(getName());
+        this.logger = new SmartLogger(getName());
     }
 
     public boolean currentlyCommanded(){
@@ -52,7 +52,7 @@ public abstract class NewtonSubsystem extends SubsystemBase {
     }
 
     public void setDefaultCommand(Runnable runnable) {
-        super.setDefaultCommand(this.run(runnable));
+        this.setDefaultCommand(run(runnable));
     }
 
     public void removeDefaultCommand() {
