@@ -1,6 +1,7 @@
 package org.team8592.frc.robot;
 
 import java.util.Map;
+import java.util.Scanner;
 
 import org.team6328.lib.Alert;
 import org.team6328.lib.Alert.AlertType;
@@ -16,22 +17,27 @@ public class RobotConstants {
 
     public static boolean invalidRobotAlertSent = false;
 
+    private static Scanner scanner = new Scanner(System.in);
+
+    private static RobotType type = RobotType.COMP_BOT;
+
     public static RobotType getRobot() {
-        if (!disableHAL && RobotBase.isReal()) {
-            if (robot == RobotType.SIM_BOT) { // Invalid robot selected
-                if (!invalidRobotAlertSent) {
-                    new Alert("Invalid robot selected, using competition robot as default.", AlertType.ERROR)
-                        .set(true);
-                    invalidRobotAlertSent = true;
-                }
-                return RobotType.COMP_BOT;
-            } else {
-                return robot;
-            }
-        } else {
-            if (RobotBase.isSimulation()) return RobotType.SIM_BOT;
-            return robot;
-        }
+        // if (!disableHAL && RobotBase.isReal()) {
+        //     if (robot == RobotType.SIM_BOT) { // Invalid robot selected
+        //         if (!invalidRobotAlertSent) {
+        //             new Alert("Invalid robot selected, using competition robot as default.", AlertType.ERROR)
+        //                 .set(true);
+        //             invalidRobotAlertSent = true;
+        //         }
+        //         return RobotType.COMP_BOT;
+        //     } else {
+        //         return robot;
+        //     }
+        // } else {
+        //     if (RobotBase.isSimulation()) return RobotType.SIM_BOT;
+        //     return robot;
+        // }
+        return type;
     }
 
     public static Mode getMode() {
@@ -72,9 +78,22 @@ public class RobotConstants {
 
     /** Checks whether the robot the correct robot is selected when deploying. */
     public static void main(String... args) {
-        if (robot == RobotType.SIM_BOT) {
-            System.err.println("Cannot deploy, invalid robot selected: " + robot.toString());
-            System.exit(1);
+        if (Robot.isSimulation()) {
+            type = RobotType.SIM_BOT;
+        } else {
+            System.out.println("Which robot are you running? (0 for COMP, 1 for DEV)");
+            String ans = scanner.next();
+            try {
+                int robot = Integer.parseInt(ans);
+                type = (robot == 1) ? RobotType.PRAC_BOT : RobotType.COMP_BOT;
+            } catch (Exception e) {
+                System.err.println("Cannot deploy, invalid answer: " + ans);
+            }
         }
+
+        // if (robot == RobotType.SIM_BOT) {
+        //     System.err.println("Cannot deploy, invalid robot selected: " + robot.toString());
+        //     System.exit(1);
+        // }
     }
 }

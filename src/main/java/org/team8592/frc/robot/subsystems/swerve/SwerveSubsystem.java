@@ -8,8 +8,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
-
-import org.littletonrobotics.junction.Logger;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.team8592.frc.robot.*;
 import org.team8592.frc.robot.subsystems.NewtonSubsystem;
@@ -39,9 +38,13 @@ public class SwerveSubsystem extends NewtonSubsystem {
 
     private SmoothingFilter smoothingFilter;
     
+    // private SwerveIO io;
+
     private SwerveIO io;
 
     public SwerveCommands commands;
+
+    private ChassisSpeeds desiredSpeeds = new ChassisSpeeds();
 
     public SwerveSubsystem(SwerveIO io, boolean logToShuffleboard) {
         super(logToShuffleboard);
@@ -56,7 +59,10 @@ public class SwerveSubsystem extends NewtonSubsystem {
 
         snapToController = SNAP_TO_GAINS.toPIDController();
 
-        this.io = io;
+        // this.io = io;
+        this.io = new SwerveIOCTRE();
+        this.io.registerTelemetry((state) -> {});
+
     }
 
     /**
@@ -66,6 +72,7 @@ public class SwerveSubsystem extends NewtonSubsystem {
      */
     public void drive(ChassisSpeeds speeds){
         // TODO: implement something that allows the commented code to work
+        this.desiredSpeeds = speeds;
         io.drive(speeds, false);
     }
 
@@ -74,9 +81,10 @@ public class SwerveSubsystem extends NewtonSubsystem {
      *
      * @param speeds the speeds to run the drivetrain at
      */
-    private int heartbeat = 0;
     public void drive(ChassisSpeeds speeds, DriveModes mode){
+        this.desiredSpeeds = speeds;
         // TODO: implement something that allows the commented code to work'
+        SmartDashboard.putNumber("QWQWEOPQIEIOPQ", 11);
         io.drive(
             speeds,
             switch(mode){
@@ -88,8 +96,6 @@ public class SwerveSubsystem extends NewtonSubsystem {
                     yield false;
             }
         );
-        heartbeat++;     
-        Logger.recordOutput("CustomLogs/Swerve/HeartBeat", heartbeat);
     }
 
     /**
@@ -131,10 +137,6 @@ public class SwerveSubsystem extends NewtonSubsystem {
      * Get the current position of the swerve as judged by odometry.
      */
     public Pose2d getCurrentPosition() {
-        // TODO: implement something that allows the commented code to work
-        // if (Robot.isSimulation()){
-        //    return Robot.FIELD.getRobotPose();
-        // }
         return io.getCurrentOdometryPosition();
     }
 
@@ -261,7 +263,8 @@ public class SwerveSubsystem extends NewtonSubsystem {
     @Override
     public void periodicTelemetry() {
         logger.log("Current Pose", getCurrentPosition());
-        io.periodic();
+        logger.log("Desired Speeds", desiredSpeeds);
+        io.updateInputs();
     }
 
     /**

@@ -4,7 +4,6 @@ import java.util.*;
 
 import org.team8592.frc.robot.Constants;
 import org.team8592.frc.robot.RobotConstants;
-import org.team8592.frc.robot.subsystems.intake.*;
 import org.team8592.frc.robot.subsystems.logger.*;
 import org.team8592.frc.robot.subsystems.swerve.*;
 import org.team8592.frc.robot.subsystems.vision.*;
@@ -17,9 +16,6 @@ public class SubsystemManager extends SubsystemBase {
     public SwerveSubsystem swerve;
     public VisionSubsystem vision;
     public LoggerSubsystem logger;
-    public IntakeSubsystem intake;
-
-    public IntakeCommands cIntake;
 
     private List<NewtonSubsystem> activeSubystems = new ArrayList<>();
 
@@ -39,15 +35,10 @@ public class SubsystemManager extends SubsystemBase {
                         Constants.VISION.CAMERA_OFFSET
                     ), logToShuffleboard
                 );
-
-                this.intake = new IntakeSubsystem(
-                    new IntakeIOKrakenX60(100, false), 
-                    logToShuffleboard
-                );
                 break;
             case SIM_BOT:
                 this.swerve = new SwerveSubsystem(
-                    new SwerveIOSim(), 
+                    new SwerveIOCTRE(), 
                     logToShuffleboard
                 );
 
@@ -56,11 +47,6 @@ public class SubsystemManager extends SubsystemBase {
                         getName(), 
                         Constants.VISION.CAMERA_OFFSET
                     ), logToShuffleboard
-                );
-
-                this.intake = new IntakeSubsystem(
-                    new IntakeIOSim(100, false), 
-                    logToShuffleboard
                 );
                 break;
             case COMP_BOT: // Fall through intentional
@@ -76,25 +62,20 @@ public class SubsystemManager extends SubsystemBase {
                         Constants.VISION.CAMERA_OFFSET
                     ), logToShuffleboard
                 );
-
-                this.intake = new IntakeSubsystem(
-                    new IntakeIOKrakenX60(100, false), 
-                    logToShuffleboard
-                );
                 break;
         }
 
         this.activeSubystems = List.of(
             // Add all active subsystems here
-            swerve,
-            // vision,
             logger,
-            intake
+            swerve
+            // ,
+            // vision
         );
 
         this.activeSubystems.forEach(s -> {
             s.enableSubsystem(true);
-            s.initializeLogger();
+            // s.initializeLogger();
         });
     }
 

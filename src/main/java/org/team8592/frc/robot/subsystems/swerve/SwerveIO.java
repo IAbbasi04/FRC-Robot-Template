@@ -2,13 +2,15 @@ package org.team8592.frc.robot.subsystems.swerve;
 
 import java.util.function.Consumer;
 
+import org.team8592.frc.robot.subsystems.SubsystemIO;
+
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
-public abstract class SwerveIO {
+public abstract class SwerveIO implements SubsystemIO {
     public abstract void drive(ChassisSpeeds speeds, boolean driveFieldRelative);
 
     public abstract void resetHeading();
@@ -19,7 +21,7 @@ public abstract class SwerveIO {
 
     public abstract void setKnownOdometryPose(Pose2d currentPose);
 
-    public abstract void periodic();
+    public abstract void updateInputs();
 
     public abstract void brake();
 

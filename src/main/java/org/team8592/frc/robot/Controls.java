@@ -6,7 +6,8 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import org.team8592.lib.logging.SmartLogger;
+
+import org.team8592.lib.logging.NewtonLogger;
 
 public final class Controls {
     private static final CommandXboxController driverController = new CommandXboxController(0);
@@ -21,41 +22,23 @@ public final class Controls {
         DUAL_DRIVER
     }
 
-    private static SmartLogger logger;
+    private static NewtonLogger logger;
 
     private static boolean logToShuffleboard = false;
     private static boolean loggingEnabled = false;
 
-    protected static DoubleSupplier driveTranslateX = () -> 0;
-    protected static DoubleSupplier driveTranslateY = () -> 0;
-    protected static DoubleSupplier driveRotate = () -> 0;
+    protected static DoubleSupplier driveTranslateX = () -> -driverController.getLeftX();
+    protected static DoubleSupplier driveTranslateY = () -> -driverController.getLeftY();
+    protected static DoubleSupplier driveRotate = () -> -driverController.getRightX();
 
-    protected static Trigger slowMode = new Trigger(() -> false);
-    protected static Trigger robotRelative = new Trigger(() -> false);
-    protected static Trigger zeroGryoscope = new Trigger(() -> false);
+    protected static Trigger slowMode = driverController.rightBumper();
+    protected static Trigger robotRelative = driverController.leftBumper();
+    protected static Trigger zeroGryoscope = driverController.back();
 
-    protected static Trigger snapNorth = new Trigger(() -> false);
-    protected static Trigger snapSouth = new Trigger(() -> false);
-    protected static Trigger snapWest = new Trigger(() -> false);
-    protected static Trigger snapEast = new Trigger(() -> false);
-
-    /**
-     * Sets the controls for the drivebase movement
-     */
-    private static void applyDrivetrainControls() {
-        driveTranslateX = () -> -driverController.getLeftX();
-        driveTranslateY = () -> -driverController.getLeftY();
-        driveRotate = () -> -driverController.getRightX();
-
-        slowMode = driverController.rightBumper();
-        robotRelative = driverController.leftBumper();
-        zeroGryoscope = driverController.back();
-
-        snapNorth = driverController.pov(0);
-        snapSouth = driverController.pov(180);
-        snapWest = driverController.pov(270);
-        snapEast = driverController.pov(90);
-    }
+    protected static Trigger snapNorth = driverController.pov(0);
+    protected static Trigger snapSouth = driverController.pov(180);
+    protected static Trigger snapWest = driverController.pov(270);
+    protected static Trigger snapEast = driverController.pov(90);
 
     /**
      * Change the variables in the Controls class to match the specified
@@ -64,8 +47,6 @@ public final class Controls {
      * @param set the control set to apply
      */
     protected static void applyControlSet(ControlSets set){
-        Controls.applyDrivetrainControls();
-
         // Add controls that do not rely on control set below
 
         // Use the controls set if we have differentiating inputs for a certain control
@@ -87,8 +68,7 @@ public final class Controls {
         if (!logToShuffleboard) return;
         
         Controls.loggingEnabled = true;
-        Controls.logger = new SmartLogger("Controls");
-        Controls.logger.enable();
+        Controls.logger = new NewtonLogger("Controls");
     }
 
     public static void logControlsToShuffleboard() {

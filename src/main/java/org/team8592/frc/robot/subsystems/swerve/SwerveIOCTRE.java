@@ -43,7 +43,7 @@ public class SwerveIOCTRE extends SwerveIO {
     }
 
     @Override
-    public void periodic() {
+    public void updateInputs() {
         drivetrain.periodic();
     }
 

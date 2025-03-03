@@ -3,22 +3,18 @@ package org.team8592.frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 
-import org.team8592.lib.logging.SmartLogger;
+import org.team8592.lib.logging.NewtonLogger;
 import org.team8592.lib.MatchMode;
 
 public abstract class NewtonSubsystem extends SubsystemBase {
-    protected SmartLogger logger;
     private boolean logToShuffleboard = false;
     private boolean enabled = false;
 
+    protected NewtonLogger logger;
 
     protected NewtonSubsystem(boolean logToShuffleboard) {
         this.logToShuffleboard = logToShuffleboard;
-        this.logger = new SmartLogger("SubsystemLogs/" + getName(), logToShuffleboard);
-    }
-
-    public void initializeLogger() {
-        this.logger.initialize();
+        this.logger = new NewtonLogger(getName());
     }
 
     public boolean currentlyCommanded(){
@@ -53,15 +49,16 @@ public abstract class NewtonSubsystem extends SubsystemBase {
     
     /**
      * Set the default command of a subsystem (what to run if no other command requiring it is running).
-     * <p> NOTE: all subsystems also have a setDefaultCommand method; this version includes a check for
-     * default commands that cancel incoming commands that require the subsystem. Unless you're sure
-     * of what you're doing, you should use this one.
      *
      * @param command to command to set as default
      */
     @Override
     public void setDefaultCommand(Command command) {
         super.setDefaultCommand(command.withInterruptBehavior(InterruptionBehavior.kCancelSelf));
+    }
+
+    public void setDefaultCommand(Runnable runnable) {
+        super.setDefaultCommand(this.run(runnable));
     }
 
     public void removeDefaultCommand() {

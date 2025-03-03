@@ -40,7 +40,7 @@ public class Robot extends LoggedRobot {
     @Override
     public void robotInit() {
         Robot.FIELD.logToShuffleboard(Robot.isSimulation());
-
+        Controls.initializeShuffleboardLogs(Robot.isSimulation() || true); // TODO - Fix to only work when NOT in actual match
         this.robotContainer = new RobotContainer(Robot.isSimulation() || true); // TODO - Fix to only work when NOT in actual match
     }
 
@@ -64,6 +64,7 @@ public class Robot extends LoggedRobot {
         // robot's periodic
         // block in order for anything in the Command-based framework to work.
         CommandScheduler.getInstance().run(); 
+        Controls.logControlsToShuffleboard();
         Robot.CLOCK.update();
     }
 

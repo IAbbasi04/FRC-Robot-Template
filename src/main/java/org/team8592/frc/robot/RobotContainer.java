@@ -10,6 +10,7 @@ import org.team8592.frc.robot.commands.autonomous.*;
 import org.team8592.frc.robot.commands.largecommands.LargeCommand;
 import org.team8592.frc.robot.subsystems.SubsystemManager;
 import org.team8592.frc.robot.subsystems.swerve.SwerveSubsystem;
+import org.team8592.frc.robot.subsystems.swerve.SwerveSubsystem.DriveModes;
 import org.team8592.frc.robot.subsystems.vision.VisionSubsystem;
 import org.team8592.lib.MatchMode;
 
@@ -56,18 +57,16 @@ public class RobotContainer {
      * Configure default commands for the subsystems
      */
     private void configureDefaults(){
-        // Set the swerve's default command to drive with joysticks
-        swerve.setDefaultCommand(
-            manager.swerve.commands.joystickDriveCommand(
-                Controls.driveTranslateX,
-                Controls.driveTranslateY,
-                Controls.driveRotate
-            )
+        swerve.setDefaultCommand(swerve.run(() -> {
+            swerve.drive(swerve.processJoystickInputs(
+                Controls.driveTranslateX.getAsDouble(),
+                Controls.driveTranslateY.getAsDouble(),
+                Controls.driveRotate.getAsDouble()
+            ), DriveModes.AUTOMATIC);
+            }).withInterruptBehavior(InterruptionBehavior.kCancelSelf)
         );
 
         vision.setDefaultCommand(NewtonCommands.updateOdometryWithVision(swerve, vision));
-
-        manager.intake.setStopAsDefaultCommand();
     }
 
 
@@ -135,9 +134,6 @@ public class RobotContainer {
                 Controls.driveTranslateY
             ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
-
-        Controls.getDriver().leftTrigger().whileTrue(manager.intake.commands.setIntakeVelocityCommand(4000));
-        Controls.getDriver().rightTrigger().whileTrue(manager.intake.commands.setIntakeVelocityCommand(-4000));
     };
 
     public Command onModeInit(MatchMode mode) {

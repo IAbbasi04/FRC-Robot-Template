@@ -16,9 +16,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 public class SmartLogger {
     private String tableName = "";
     private ShuffleboardTab shuffleboardTab;
-    // private Dictionary<String, GenericEntry> cards;
-
-    // private ArrayList<LoggerEntry> _cards = new ArrayList<>();
 
     private LoggerDictionary dictionary = new LoggerDictionary();
 
