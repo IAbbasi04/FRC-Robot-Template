@@ -4,12 +4,22 @@
 
 package org.team8592.frc.robot;
 
+import org.team8592.frc.robot.Constants.CONFIG;
 import org.team8592.lib.MatchMode;
 import org.team8592.lib.RobotClock;
 import org.team8592.lib.field.FieldLayout;
+import org.team8592.lib.logging.NewtonLogger;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.*;
 
 /**
@@ -23,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.*;
  */
 public class Robot extends LoggedRobot {
     private Command autonomousCommand = Commands.none();
+    private NewtonLogger logger = new NewtonLogger("Config");
 
     private RobotContainer robotContainer;
 
@@ -38,6 +49,21 @@ public class Robot extends LoggedRobot {
      */
     @Override
     public void robotInit() {
+        Logger.recordMetadata("Game", CONFIG.GAME);
+        Logger.recordMetadata("Year", CONFIG.YEAR);
+        Logger.recordMetadata("Robot", CONFIG.ROBOT);
+        Logger.recordMetadata("Team", CONFIG.TEAM);
+
+        if (Robot.isReal()) { // If running on a real robot
+            String time = DateTimeFormatter.ofPattern("yy-MM-dd_HH-mm-ss").format(LocalDateTime.now());
+            String path = "/U/"+time+".wpilog";
+            Logger.addDataReceiver(new WPILOGWriter(path)); // Log to a USB stick
+            LoggedPowerDistribution.getInstance(1, ModuleType.kRev); // Enables power distribution logging
+        }
+        
+        Logger.addDataReceiver(new NT4Publisher()); // Publish data to NetworkTables
+        Logger.start();
+
         Robot.FIELD.logToShuffleboard(Robot.isSimulation());
         Controls.initializeLogs();
         this.robotContainer = new RobotContainer();
@@ -65,6 +91,9 @@ public class Robot extends LoggedRobot {
         CommandScheduler.getInstance().run(); 
         Controls.logControls();
         Robot.CLOCK.update();
+
+        logger.log("Robot Type", RobotSelector.getRobot());
+        logger.log("Match Mode", Robot.MODE);
     }
 
     /** This function is called once each time the robot enters Disabled mode. */

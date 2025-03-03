@@ -1,12 +1,13 @@
 package org.team8592.frc.robot.subsystems.swerve;
 
+import java.util.Set;
 import java.util.function.DoubleSupplier;
 
 import org.team8592.frc.robot.subsystems.swerve.SwerveSubsystem.DriveModes;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
 
 public class SwerveCommands {
     private SwerveSubsystem swerve;
@@ -24,13 +25,13 @@ public class SwerveCommands {
      * @return the command
      */
     public Command joystickDriveCommand(DoubleSupplier translateX, DoubleSupplier translateY, DoubleSupplier rotate) {
-        return swerve.run(() -> {
+        return new DeferredCommand(() -> swerve.run(() -> {
             swerve.drive(swerve.processJoystickInputs(
                 translateX.getAsDouble(),
                 translateY.getAsDouble(),
                 rotate.getAsDouble()
             ), DriveModes.AUTOMATIC);
-        }).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
+        }), Set.of(swerve));
     }
 
     /**

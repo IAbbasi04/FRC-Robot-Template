@@ -4,7 +4,6 @@ import java.util.*;
 
 import org.team8592.frc.robot.Constants;
 import org.team8592.frc.robot.RobotSelector;
-import org.team8592.frc.robot.subsystems.logger.*;
 import org.team8592.frc.robot.subsystems.swerve.*;
 import org.team8592.frc.robot.subsystems.vision.*;
 import org.team8592.lib.MatchMode;
@@ -15,27 +14,13 @@ import edu.wpi.first.wpilibj2.command.*;
 public class SubsystemManager extends SubsystemBase {
     public SwerveSubsystem swerve;
     public VisionSubsystem vision;
-    public LoggerSubsystem logger;
 
     private List<NewtonSubsystem> activeSubystems = new ArrayList<>();
 
     public SubsystemManager() {
-        this.logger = new LoggerSubsystem();
 
         switch(RobotSelector.getRobot()) {
-            case PRAC_BOT:
-                this.swerve = new SwerveSubsystem(
-                    new SwerveIOCTRE()
-                );
-
-                this.vision = new VisionSubsystem(
-                    new CameraIOArducam(
-                        getName(),
-                        Constants.VISION.CAMERA_OFFSET
-                    )
-                );
-                break;
-            case SIM_BOT:
+            case SIM_BOT: // Robot for simulation
                 this.swerve = new SwerveSubsystem(
                     new SwerveIOCTRE() 
                 );
@@ -47,7 +32,20 @@ public class SubsystemManager extends SubsystemBase {
                     )
                 );
                 break;
-            case COMP_BOT: // Fall through intentional
+            case DEV_BOT: // Development robot
+                this.swerve = new SwerveSubsystem(
+                    new SwerveIOCTRE()
+                );
+
+                this.vision = new VisionSubsystem(
+                    new CameraIOArducam(
+                        getName(),
+                        Constants.VISION.CAMERA_OFFSET
+                    )
+                );
+                break;
+            case COMP_BOT: // Main robot for competition
+            // Note - Fall through intentional
             default:
                 this.swerve = new SwerveSubsystem(
                     new SwerveIOCTRE() 
@@ -64,10 +62,8 @@ public class SubsystemManager extends SubsystemBase {
 
         this.activeSubystems = List.of(
             // Add all active subsystems here
-            logger,
-            swerve
-            // ,
-            // vision
+            swerve,
+            vision
         );
 
         this.activeSubystems.forEach(s -> {

@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
 import org.team8592.frc.robot.Constants;
+import org.team8592.frc.robot.Robot;
 import org.team8592.frc.robot.subsystems.swerve.SwerveSubsystem;
 import org.team8592.frc.robot.subsystems.vision.VisionSubsystem;
 
@@ -29,7 +30,9 @@ public final class NewtonCommands {
                     }
                 }
             }
-        }, swerve, vision).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
+        }, swerve, vision)
+        .withInterruptBehavior(InterruptionBehavior.kCancelSelf)
+        .onlyIf(() -> Robot.isReal());
     }
 }
 

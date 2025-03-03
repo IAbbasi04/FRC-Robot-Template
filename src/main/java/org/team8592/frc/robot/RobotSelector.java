@@ -13,7 +13,7 @@ public class RobotSelector {
 
     public static enum RobotType {
         COMP_BOT,
-        PRAC_BOT,
+        DEV_BOT,
         SIM_BOT
     }
 }
