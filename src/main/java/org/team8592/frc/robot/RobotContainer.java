@@ -34,7 +34,6 @@ public class RobotContainer {
         this.swerve = manager.swerve;
         this.vision = manager.vision;
 
-
         Controls.applyControlSet(ControlSets.DUAL_DRIVER);
 
         passSubsystems();
