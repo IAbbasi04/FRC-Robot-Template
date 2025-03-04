@@ -65,6 +65,11 @@ public abstract class NewtonSubsystem extends SubsystemBase {
         }
         return super.getCurrentCommand();
     }
+
+    public void periodic() {
+        periodicTelemetry();
+        periodicOutputs();
+    }
     
     public void periodicOutputs() {}
 

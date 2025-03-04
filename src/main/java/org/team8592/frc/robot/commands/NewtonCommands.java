@@ -12,11 +12,10 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 public final class NewtonCommands {
     public static Command updateOdometryWithVision(SwerveSubsystem swerve, VisionSubsystem vision) {
-        return new InstantCommand(() -> {
+        return vision.run(() -> {
             Optional<EstimatedRobotPose> estimatedRobotPose = vision.getRobotPoseVision();
             if (estimatedRobotPose.isPresent()) {
                 Pose2d robotPose = estimatedRobotPose.get().estimatedPose.toPose2d();
@@ -24,13 +23,13 @@ public final class NewtonCommands {
 
                 if(Math.abs(ambiguity) < Constants.VISION.MAX_ACCEPTABLE_AMBIGUITY) {
                     if (DriverStation.isDisabled()){
-                        swerve.resetPose(robotPose);        
+                        swerve.resetPose(robotPose);
                     } else {
                         swerve.addVisionMeasurement(robotPose);
                     }
                 }
             }
-        }, swerve, vision)
+        })
         .withInterruptBehavior(InterruptionBehavior.kCancelSelf)
         .onlyIf(() -> Robot.isReal());
     }

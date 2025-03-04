@@ -12,10 +12,8 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.*;
 
 public class SubsystemManager extends SubsystemBase {
-    // public SwerveSubsystem swerve;
-    public VisionSubsystem vision;
-
     public SwerveSubsystem swerve;
+    public VisionSubsystem vision;
 
     private List<NewtonSubsystem> activeSubystems = new ArrayList<>();
 
@@ -98,10 +96,10 @@ public class SubsystemManager extends SubsystemBase {
 
     @Override
     public void periodic() {
-        this.activeSubystems.forEach(s -> {
-            s.periodicTelemetry();
-            s.periodicOutputs();
-        });
+        // this.activeSubystems.forEach(s -> {
+        //     s.periodicTelemetry();
+        //     s.periodicOutputs();
+        // });
     }
 
     @Override
