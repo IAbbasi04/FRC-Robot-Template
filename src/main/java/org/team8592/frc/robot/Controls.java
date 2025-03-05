@@ -37,6 +37,9 @@ public final class Controls {
     protected static Trigger snapWest = driverController.pov(270);
     protected static Trigger snapEast = driverController.pov(90);
 
+    protected static Trigger intake = driverController.leftTrigger();
+    protected static Trigger score = driverController.rightTrigger();
+
     /**
      * Change the variables in the Controls class to match the specified
      * control set. Note that this doesn't edit or remove bindings.

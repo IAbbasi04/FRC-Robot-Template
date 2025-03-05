@@ -9,6 +9,7 @@ import org.team8592.frc.robot.commands.NewtonCommands;
 import org.team8592.frc.robot.commands.autonomous.*;
 import org.team8592.frc.robot.commands.largecommands.LargeCommand;
 import org.team8592.frc.robot.subsystems.SubsystemManager;
+import org.team8592.frc.robot.subsystems.roller.RollerSubsystem;
 import org.team8592.frc.robot.subsystems.swerve.SwerveSubsystem;
 import org.team8592.frc.robot.subsystems.vision.VisionSubsystem;
 import org.team8592.lib.MatchMode;
@@ -23,6 +24,7 @@ public class RobotContainer {
     private final SubsystemManager manager;
     private final SwerveSubsystem swerve;
     private final VisionSubsystem vision;
+    private final RollerSubsystem roller;
 
     /**
      * Create the robot container. This creates and configures subsystems, sets
@@ -33,6 +35,7 @@ public class RobotContainer {
 
         this.swerve = manager.swerve;
         this.vision = manager.vision;
+        this.roller = manager.roller;
 
         Controls.applyControlSet(ControlSets.DUAL_DRIVER);
 
@@ -63,6 +66,8 @@ public class RobotContainer {
         ));
 
         vision.setDefaultCommand(NewtonCommands.updateOdometryWithVision(swerve, vision));
+
+        roller.setStopAsDefaultCommand();
     }
 
     /**
@@ -116,6 +121,9 @@ public class RobotContainer {
                 Controls.driveTranslateY
             ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
+
+        Controls.intake.whileTrue(roller.setPercentPower(0.5));
+        Controls.score.whileTrue(roller.setPercentPower(-0.5));
     };
 
     public Command onModeInit(MatchMode mode) {

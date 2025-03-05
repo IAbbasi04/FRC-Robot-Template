@@ -2,8 +2,8 @@ package org.team8592.frc.robot.subsystems;
 
 import java.util.*;
 
-import org.team8592.frc.robot.Constants;
-import org.team8592.frc.robot.RobotSelector;
+import org.team8592.frc.robot.*;
+import org.team8592.frc.robot.subsystems.roller.*;
 import org.team8592.frc.robot.subsystems.swerve.*;
 import org.team8592.frc.robot.subsystems.vision.*;
 import org.team8592.lib.MatchMode;
@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.*;
 public class SubsystemManager extends SubsystemBase {
     public SwerveSubsystem swerve;
     public VisionSubsystem vision;
+    public RollerSubsystem roller;
 
     private List<NewtonSubsystem> activeSubystems = new ArrayList<>();
 
@@ -30,6 +31,10 @@ public class SubsystemManager extends SubsystemBase {
                         Constants.VISION.CAMERA_OFFSET
                     )
                 );
+
+                this.roller = new RollerSubsystem(
+                    new RollerIOKrakenX60Sim()
+                );
                 break;
             case DEV_BOT: // Development robot
                 this.swerve = new SwerveSubsystem(
@@ -41,6 +46,10 @@ public class SubsystemManager extends SubsystemBase {
                         getName(),
                         Constants.VISION.CAMERA_OFFSET
                     )
+                );
+
+                this.roller = new RollerSubsystem(
+                    new RollerIOKrakenX60(Ports.ROLLER_CAN_ID)
                 );
                 break;
             case COMP_BOT: // Main robot for competition
@@ -56,13 +65,18 @@ public class SubsystemManager extends SubsystemBase {
                         Constants.VISION.CAMERA_OFFSET
                     )
                 );
+
+                this.roller = new RollerSubsystem(
+                    new RollerIOKrakenX60(Ports.ROLLER_CAN_ID)
+                );
                 break;
         }
 
         this.activeSubystems = List.of(
             // Add all active subsystems here
             swerve,
-            vision
+            vision,
+            roller
         );
 
         this.activeSubystems.forEach(s -> {
