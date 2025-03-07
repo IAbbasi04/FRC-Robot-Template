@@ -67,21 +67,13 @@ public class RobotContainer {
      * Configure all button bindings
      */
     private void configureBindings() {
-        Controls.slowMode.onTrue(
-            Commands.runOnce(() -> manager.swerve.setSlowMode(true)).ignoringDisable(true)
-        ).onFalse(
-            Commands.runOnce(() -> manager.swerve.setSlowMode(false)).ignoringDisable(true)
-        );
+        Controls.slowMode.onTrue(manager.swerve.setSlowMode(true).ignoringDisable(true))
+            .onFalse(manager.swerve.setSlowMode(false).ignoringDisable(true));
 
-        Controls.zeroGryoscope.onTrue(
-            Commands.runOnce(() -> manager.swerve.resetHeading())
-        );
+        Controls.zeroGryoscope.onTrue(manager.swerve.resetHeading());
 
-        Controls.robotRelative.onTrue(
-            Commands.runOnce(() -> manager.swerve.setRobotRelative(true)).ignoringDisable(true)
-        ).onFalse(
-            Commands.runOnce(() -> manager.swerve.setRobotRelative(false)).ignoringDisable(true)
-        );
+        Controls.robotRelative.onTrue(manager.swerve.setRobotRelative(true).ignoringDisable(true))
+            .onFalse(manager.swerve.setRobotRelative(false).ignoringDisable(true));
 
         Controls.snapNorth.whileTrue(
             swerve.snapToAngle(
