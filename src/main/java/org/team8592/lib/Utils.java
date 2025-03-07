@@ -1,12 +1,11 @@
 package org.team8592.lib;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import org.team8592.frc.robot.Robot;
+
+import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.trajectory.Trajectory.State;
 
 public class Utils {
-    private static final double RED_WALL_X = 16.542;
-
     /**
      * Clamps the value between a given range
      */
@@ -39,12 +38,23 @@ public class Utils {
         Pose2d newPose = pose;
         if (flip) {
             newPose = new Pose2d(
-                new Translation2d(RED_WALL_X - pose.getX(), pose.getY()),
-                Rotation2d.fromDegrees(180).minus(pose.getRotation())
+                Robot.FIELD.getFieldLength() - pose.getX(),
+                /*Robot.FIELD.getFieldWidth() - */pose.getY(),
+                Rotation2d.fromRadians(Math.PI).minus(pose.getRotation())
             );
         }
 
         return newPose;
+    }
+
+    public static State mirrorState(State state, boolean flip) {
+        return new State(
+            state.timeSeconds, 
+            state.velocityMetersPerSecond, 
+            state.accelerationMetersPerSecondSq, 
+            mirrorPose(state.poseMeters, flip),
+            state.curvatureRadPerMeter
+        );
     }
 
     public static double getMOIForRoller(double massKG, double radiusMeters) {

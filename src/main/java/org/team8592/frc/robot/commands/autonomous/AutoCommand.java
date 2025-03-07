@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.team8592.frc.robot.subsystems.SubsystemManager;
 
+import choreo.Choreo;
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -15,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.*;
 /**
  * Class to provide subsystems, convenient methods, and a constructor to autonomous commands
  */
-public class AutoCommand extends WrapperCommand{
+public abstract class AutoCommand extends WrapperCommand{
     protected static SubsystemManager manager;
     public static void addSubsystems(SubsystemManager manager){
         AutoCommand.manager = manager;
@@ -48,6 +49,15 @@ public class AutoCommand extends WrapperCommand{
         super(Commands.none());
     }
 
+    protected static AutoCommand none() {
+        return new AutoCommand() {
+            @Override
+                public Pose2d getStartPose() {return new Pose2d();}
+        };
+    }
+
+    public abstract Pose2d getStartPose();
+
     /**
      * Get a choreo trajectory by name as a WPILib trajectory.
      *
@@ -58,14 +68,14 @@ public class AutoCommand extends WrapperCommand{
      * {@code FileNotFoundException} if the name doesn't represent a .traj file
      * located in the {@code choreo} folder in the {@code deploy} folder
      */
+    @SuppressWarnings("unchecked")
     protected static final Trajectory getChoreoTrajectory(String name){
         if(cachedChoreoTrajectories.containsKey(name)){
             return cachedChoreoTrajectories.get(name);
         }
         else{
             try{
-            //    Trajectory wpilibTrajectory = fromChoreoPath((choreo.trajectory.Trajectory<SwerveSample>) Choreo.loadTrajectory(name).get());
-               Trajectory wpilibTrajectory = new Trajectory();
+               Trajectory wpilibTrajectory = fromChoreoPath((choreo.trajectory.Trajectory<SwerveSample>) Choreo.loadTrajectory(name).get());
 
                 cachedChoreoTrajectories.put(name, wpilibTrajectory);
                 return wpilibTrajectory;
@@ -73,20 +83,14 @@ public class AutoCommand extends WrapperCommand{
             catch(Exception e){
                 throw new RuntimeException(e);
             }
-            // return new Trajectory();
         }
     }
 
-    /**
-     * Set the start pose of this auto to the first pose of a Choreo path.
-     *
-     * @param name the name of the Choreo path to get the start pose from
-     */
-    protected void setStartStateFromChoreoTrajectory(String name){
+    protected Pose2d getStartPoseFromChoreoTrajectory(String name) {
         if(!cachedChoreoTrajectories.containsKey(name)){
             getChoreoTrajectory(name); // Adds the path to the cached trajectory map
         }
-        this.startPose = cachedChoreoTrajectories.get(name).getInitialPose();
+        return cachedChoreoTrajectories.get(name).getInitialPose();
     }
 
     /**
@@ -99,7 +103,7 @@ public class AutoCommand extends WrapperCommand{
         List<SwerveSample> choreoSamples = path.samples();
         ArrayList<State> wpilibStates = new ArrayList<>();
 
-        // Convert all the PathPlanner states to WPILib trajectory states and add
+        // Convert all the Choreo states to WPILib trajectory states and add
         // them to the wpilibStates ArrayList
         for (SwerveSample choreoSample : choreoSamples) {
             double metersPerSecond = Math.sqrt(Math.pow(choreoSample.vx, 2)+Math.pow(choreoSample.vy, 2));

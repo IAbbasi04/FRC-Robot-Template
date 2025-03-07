@@ -5,9 +5,8 @@
 package org.team8592.frc.robot;
 
 import org.team8592.frc.robot.Controls.ControlSets;
-import org.team8592.frc.robot.commands.NewtonCommands;
+import org.team8592.frc.robot.commands.SuperCommands;
 import org.team8592.frc.robot.commands.autonomous.*;
-import org.team8592.frc.robot.commands.largecommands.LargeCommand;
 import org.team8592.frc.robot.subsystems.SubsystemManager;
 import org.team8592.frc.robot.subsystems.swerve.SwerveSubsystem;
 import org.team8592.frc.robot.subsystems.vision.VisionSubsystem;
@@ -49,20 +48,19 @@ public class RobotContainer {
     private void passSubsystems(){
         AutoManager.addSubsystems(manager);
         AutoCommand.addSubsystems(manager);
-        LargeCommand.addSubsystems(manager);
     }
 
     /**
      * Configure default commands for the subsystems
      */
     private void configureDefaults(){
-        swerve.setDefaultCommand(swerve.commands.joystickDriveCommand(
+        swerve.setDefaultCommand(swerve.joystickDrive(
             Controls.driveTranslateX, 
             Controls.driveTranslateY, 
             Controls.driveRotate
         ));
 
-        vision.setDefaultCommand(NewtonCommands.updateOdometryWithVision(swerve, vision));
+        vision.setDefaultCommand(SuperCommands.updateOdometryWithVision(swerve, vision));
     }
 
     /**
@@ -86,7 +84,7 @@ public class RobotContainer {
         );
 
         Controls.snapNorth.whileTrue(
-            swerve.commands.snapToAngleCommand(
+            swerve.snapToAngle(
                 Rotation2d.fromDegrees(0),
                 Controls.driveTranslateX,
                 Controls.driveTranslateY
@@ -94,7 +92,7 @@ public class RobotContainer {
         );
 
         Controls.snapSouth.whileTrue(
-            swerve.commands.snapToAngleCommand(
+            swerve.snapToAngle(
                 Rotation2d.fromDegrees(180),
                 Controls.driveTranslateX,
                 Controls.driveTranslateY
@@ -102,7 +100,7 @@ public class RobotContainer {
         );
 
         Controls.snapEast.whileTrue(
-            swerve.commands.snapToAngleCommand(
+            swerve.snapToAngle(
                 Rotation2d.fromDegrees(270),
                 Controls.driveTranslateX,
                 Controls.driveTranslateY
@@ -110,7 +108,7 @@ public class RobotContainer {
         );
 
         Controls.snapWest.whileTrue(
-            swerve.commands.snapToAngleCommand(
+            swerve.snapToAngle(
                 Rotation2d.fromDegrees(90),
                 Controls.driveTranslateX,
                 Controls.driveTranslateY
