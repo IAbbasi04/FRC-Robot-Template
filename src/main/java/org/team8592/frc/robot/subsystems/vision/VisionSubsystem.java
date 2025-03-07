@@ -64,6 +64,8 @@ public class VisionSubsystem extends NewtonSubsystem {
             allVisibleTags.add(target);
         }
         
+        if (Robot.isSimulation()) return; // Do not log below if simulation
+
         this.logger.logIf("Best Target Yaw", bestTarget.yaw, -1d, isAnyTargetVisible());
         this.logger.logIf("Best Target Pitch", bestTarget.pitch, -1d, isAnyTargetVisible());
         this.logger.logIf("Best Target Skew", bestTarget.skew, -1d, isAnyTargetVisible());

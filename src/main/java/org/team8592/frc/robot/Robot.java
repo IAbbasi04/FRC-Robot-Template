@@ -8,6 +8,7 @@ import org.team8592.frc.robot.Constants.CONFIG;
 import org.team8592.lib.MatchMode;
 import org.team8592.lib.RobotClock;
 import org.team8592.lib.field.FieldLayout;
+import org.team8592.lib.field.ReefscapeFieldLayout;
 import org.team8592.lib.logging.SmartLogger;
 
 import java.time.LocalDateTime;
@@ -40,7 +41,7 @@ public class Robot extends LoggedRobot {
     public static MatchMode MODE = MatchMode.DISABLED;
     
     public static final RobotClock CLOCK = new RobotClock();
-    public static final FieldLayout FIELD = FieldLayout.none();
+    public static final FieldLayout FIELD = new ReefscapeFieldLayout();
 
     /**
      * This function is run when the robot is first started up and should be used

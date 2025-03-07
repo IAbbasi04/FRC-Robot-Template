@@ -5,9 +5,8 @@
 package org.team8592.frc.robot;
 
 import org.team8592.frc.robot.Controls.ControlSets;
-import org.team8592.frc.robot.commands.NewtonCommands;
+import org.team8592.frc.robot.commands.SuperCommands;
 import org.team8592.frc.robot.commands.autonomous.*;
-import org.team8592.frc.robot.commands.largecommands.LargeCommand;
 import org.team8592.frc.robot.subsystems.SubsystemManager;
 import org.team8592.frc.robot.subsystems.roller.RollerSubsystem;
 import org.team8592.frc.robot.subsystems.swerve.SwerveSubsystem;
@@ -52,21 +51,19 @@ public class RobotContainer {
     private void passSubsystems(){
         AutoManager.addSubsystems(manager);
         AutoCommand.addSubsystems(manager);
-        LargeCommand.addSubsystems(manager);
     }
 
     /**
      * Configure default commands for the subsystems
      */
     private void configureDefaults(){
-        swerve.setDefaultCommand(swerve.commands.joystickDriveCommand(
+        swerve.setDefaultCommand(swerve.joystickDrive(
             Controls.driveTranslateX, 
             Controls.driveTranslateY, 
             Controls.driveRotate
         ));
 
-        vision.setDefaultCommand(NewtonCommands.updateOdometryWithVision(swerve, vision));
-
+        vision.setDefaultCommand(SuperCommands.updateOdometryWithVision(swerve, vision));
         roller.setStopAsDefaultCommand();
     }
 
@@ -74,24 +71,16 @@ public class RobotContainer {
      * Configure all button bindings
      */
     private void configureBindings() {
-        Controls.slowMode.onTrue(
-            Commands.runOnce(() -> manager.swerve.setSlowMode(true)).ignoringDisable(true)
-        ).onFalse(
-            Commands.runOnce(() -> manager.swerve.setSlowMode(false)).ignoringDisable(true)
-        );
+        Controls.slowMode.onTrue(manager.swerve.setSlowMode(true).ignoringDisable(true))
+            .onFalse(manager.swerve.setSlowMode(false).ignoringDisable(true));
 
-        Controls.zeroGryoscope.onTrue(
-            Commands.runOnce(() -> manager.swerve.resetHeading())
-        );
+        Controls.zeroGryoscope.onTrue(manager.swerve.resetHeading());
 
-        Controls.robotRelative.onTrue(
-            Commands.runOnce(() -> manager.swerve.setRobotRelative(true)).ignoringDisable(true)
-        ).onFalse(
-            Commands.runOnce(() -> manager.swerve.setRobotRelative(false)).ignoringDisable(true)
-        );
+        Controls.robotRelative.onTrue(manager.swerve.setRobotRelative(true).ignoringDisable(true))
+            .onFalse(manager.swerve.setRobotRelative(false).ignoringDisable(true));
 
         Controls.snapNorth.whileTrue(
-            swerve.commands.snapToAngleCommand(
+            swerve.snapToAngle(
                 Rotation2d.fromDegrees(0),
                 Controls.driveTranslateX,
                 Controls.driveTranslateY
@@ -99,7 +88,7 @@ public class RobotContainer {
         );
 
         Controls.snapSouth.whileTrue(
-            swerve.commands.snapToAngleCommand(
+            swerve.snapToAngle(
                 Rotation2d.fromDegrees(180),
                 Controls.driveTranslateX,
                 Controls.driveTranslateY
@@ -107,7 +96,7 @@ public class RobotContainer {
         );
 
         Controls.snapEast.whileTrue(
-            swerve.commands.snapToAngleCommand(
+            swerve.snapToAngle(
                 Rotation2d.fromDegrees(270),
                 Controls.driveTranslateX,
                 Controls.driveTranslateY
@@ -115,7 +104,7 @@ public class RobotContainer {
         );
 
         Controls.snapWest.whileTrue(
-            swerve.commands.snapToAngleCommand(
+            swerve.snapToAngle(
                 Rotation2d.fromDegrees(90),
                 Controls.driveTranslateX,
                 Controls.driveTranslateY

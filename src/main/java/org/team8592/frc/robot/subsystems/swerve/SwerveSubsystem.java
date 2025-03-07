@@ -4,17 +4,26 @@
 
 package org.team8592.frc.robot.subsystems.swerve;
 
+import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
 
 import org.team8592.frc.robot.*;
+import org.team8592.frc.robot.Constants.SWERVE;
 import org.team8592.frc.robot.subsystems.NewtonSubsystem;
 import org.team8592.lib.MatchMode;
 import org.team8592.lib.SmoothingFilter;
+import org.team8592.lib.Utils;
 
 import static org.team8592.frc.robot.Constants.SWERVE.*;
+
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 
 public class SwerveSubsystem extends NewtonSubsystem {
     /**
@@ -39,12 +48,17 @@ public class SwerveSubsystem extends NewtonSubsystem {
 
     private SwerveIO io;
 
-    public SwerveCommands commands;
-
     private ChassisSpeeds desiredSpeeds = new ChassisSpeeds();
 
+    private Timer trajectoryTimer = new Timer();
+
+    private HolonomicDriveController pathFollowerCtrl = new HolonomicDriveController(
+        SWERVE.PATH_FOLLOW_TRANSLATE_GAINS.toPIDController(),
+        SWERVE.PATH_FOLLOW_TRANSLATE_GAINS.toPIDController(),
+        SWERVE.PATH_FOLLOW_ROTATE_GAINS.toProfiledPIDController()
+    );
+
     public SwerveSubsystem(SwerveIO io) {
-        this.commands = new SwerveCommands(this);
 
         smoothingFilter = new SmoothingFilter(
             TRANSLATION_SMOOTHING_AMOUNT,
@@ -56,6 +70,13 @@ public class SwerveSubsystem extends NewtonSubsystem {
 
         this.io = io;
         this.io.registerTelemetry((state) -> {});
+
+        this.pathFollowerCtrl.setTolerance(new Pose2d(
+            new Translation2d(
+                SWERVE.PATH_FOLLOW_TRANSLATE_GAINS.toPIDController().getPositionTolerance(), 
+                SWERVE.PATH_FOLLOW_TRANSLATE_GAINS.toPIDController().getPositionTolerance()),
+            new Rotation2d(SWERVE.PATH_FOLLOW_ROTATE_GAINS.toProfiledPIDController().getPositionTolerance())
+        ));
     }
 
     /**
@@ -63,7 +84,7 @@ public class SwerveSubsystem extends NewtonSubsystem {
      *
      * @param speeds the speeds to run the drivetrain at
      */
-    public void drive(ChassisSpeeds speeds){
+    private void drive(ChassisSpeeds speeds){
         // TODO: implement something that allows the commented code to work
         this.desiredSpeeds = speeds;
         io.drive(speeds, false);
@@ -74,7 +95,7 @@ public class SwerveSubsystem extends NewtonSubsystem {
      *
      * @param speeds the speeds to run the drivetrain at
      */
-    public void drive(ChassisSpeeds speeds, DriveModes mode){
+    private void drive(ChassisSpeeds speeds, DriveModes mode){
         this.desiredSpeeds = speeds;
         // TODO: implement something that allows the commented code to work'
         io.drive(
@@ -91,33 +112,6 @@ public class SwerveSubsystem extends NewtonSubsystem {
     }
 
     /**
-     * Set whether human-input-processed joystick input should be slowed
-     *
-     * @param slowMode whether to slow the drivetrain
-     */
-    public void setSlowMode(boolean slowMode){
-        this.isSlowMode = slowMode;
-    }
-
-    /**
-     * Set whether human-input-processed joystick input should be robot-relative
-     * (as opposed to field-relative)
-     *
-     * @param robotRelative whether to run the drivetrain robot-relative
-     */
-    public void setRobotRelative(boolean robotRelative){
-        this.robotRelative = robotRelative;
-    }
-
-    /**
-     * Define whatever direction the robot is facing as forward
-     */
-    public void resetHeading(){
-        // TODO: implement something that allows the commented code to work
-        io.resetHeading();
-    }
-
-    /**
      * Get the current robot yaw as a Rotation2d
      */
     public Rotation2d getYaw() {
@@ -131,8 +125,6 @@ public class SwerveSubsystem extends NewtonSubsystem {
     public Pose2d getCurrentPosition() {
         return io.getCurrentOdometryPosition();
     }
-
-   
 
     /**
      * Reset the robot's known position.
@@ -166,21 +158,21 @@ public class SwerveSubsystem extends NewtonSubsystem {
      * @param setpoint the setpoint to snap to
      * @return the rotational velocity setpoint as a Rotation2d
      */
-    public double snapToAngle(Rotation2d setpoint) {
-        double currYaw = Math.toRadians(getYaw().getDegrees()%360);
-        double errorAngle = setpoint.getRadians() - currYaw;
+    // private double snapToAngle(Rotation2d setpoint) {
+    //     double currYaw = Math.toRadians(getYaw().getDegrees()%360);
+    //     double errorAngle = setpoint.getRadians() - currYaw;
 
-        if(errorAngle > Math.PI){
-            errorAngle -= 2*Math.PI;
-        }
-        else if(errorAngle <= -Math.PI){
-            errorAngle += 2*Math.PI;
-        }
+    //     if(errorAngle > Math.PI){
+    //         errorAngle -= 2*Math.PI;
+    //     }
+    //     else if(errorAngle <= -Math.PI){
+    //         errorAngle += 2*Math.PI;
+    //     }
 
-        double out = snapToController.calculate(0, errorAngle);
+    //     double out = snapToController.calculate(0, errorAngle);
 
-        return out;
-    }
+    //     return out;
+    // }
 
     /**
      * Process joystick inputs for human control
@@ -194,7 +186,7 @@ public class SwerveSubsystem extends NewtonSubsystem {
      *
      * @return a ChassisSpeeds ready to be sent to the swerve.
      */
-    public ChassisSpeeds processJoystickInputs(double rawX, double rawY, double rawRot){
+    private ChassisSpeeds processJoystickInputs(double rawX, double rawY, double rawRot){
         double driveTranslateY = (
             rawY >= 0
             ? (Math.pow(Math.abs(rawY), JOYSTICK_EXPONENT))
@@ -239,7 +231,7 @@ public class SwerveSubsystem extends NewtonSubsystem {
 
     @Override
     public void onModeInit(MatchMode mode) {
-
+        stop();
     }
 
     @Override
@@ -265,5 +257,132 @@ public class SwerveSubsystem extends NewtonSubsystem {
     @Override
     public void stop(){
         drive(new ChassisSpeeds());
+    }
+
+    // ================ Commands =============== \\
+
+    /**
+     * Set whether human-input-processed joystick input should be slowed
+     *
+     * @param slowMode whether to slow the drivetrain
+     */
+    public Command setSlowMode(boolean slowMode){
+        return runOnce(() -> this.isSlowMode = slowMode);
+    }
+
+    /**
+     * Set whether human-input-processed joystick input should be robot-relative
+     * (as opposed to field-relative)
+     *
+     * @param robotRelative whether to run the drivetrain robot-relative
+     */
+    public Command setRobotRelative(boolean robotRelative){
+        return runOnce(() -> this.robotRelative = robotRelative);
+    }
+
+    /**
+     * Define whatever direction the robot is facing as forward
+     */
+    public Command resetHeading(){
+        return runOnce(() -> io.resetHeading());
+    }
+
+        /**
+     * Command to drive the swerve with translation and rotation processed for human input
+     * 
+     * @param translateX a lambda returning the driver's X input
+     * @param translateY a lambda returning the driver's Y input
+     * @param rotate a lambda returning the driver's rotate input
+     *
+     * @return the command
+     */
+    public Command joystickDrive(DoubleSupplier translateX, DoubleSupplier translateY, DoubleSupplier rotate) {
+        return run(() -> {
+            drive(processJoystickInputs(
+                translateX.getAsDouble(),
+                translateY.getAsDouble(),
+                rotate.getAsDouble()
+            ), DriveModes.AUTOMATIC);
+        });
+    }
+
+    /**
+     * Command to drive the swerve with translation processed for human input and
+     * rotation controlled by the snap-to PID controller (snapping to the passed-in)
+     * angle
+     *
+     * @param angle the angle to snap to
+     * @param translateX a lambda returning the driver's X input
+     * @param translateY a lambda returning the driver's Y input
+     *
+     * @return the command
+     */
+    public Command snapToAngle(Rotation2d angle, DoubleSupplier translateX, DoubleSupplier translateY) {
+        return run(() -> {
+            double currYaw = Math.toRadians(getYaw().getDegrees()%360);
+            double errorAngle = angle.getRadians() - currYaw;
+
+            if(errorAngle > Math.PI){
+                errorAngle -= 2*Math.PI;
+            }
+            else if(errorAngle <= -Math.PI){
+                errorAngle += 2*Math.PI;
+            }
+
+            double rotSpeed = snapToController.calculate(0, errorAngle);
+
+            drive(
+                processJoystickInputs(
+                    translateX.getAsDouble(),
+                    translateY.getAsDouble(),
+                    rotSpeed
+                ), DriveModes.AUTOMATIC);
+        });
+    }
+
+    public Command followTrajectory(Trajectory trajectory) {
+        return followTrajectory(trajectory, () -> false);
+    }
+
+    public Command followTrajectory(Trajectory trajectory, BooleanSupplier flip) {
+        return runOnce(() -> { // Initialize
+            drive(new ChassisSpeeds());
+            trajectoryTimer.reset();
+            trajectoryTimer.restart();
+            this.pathFollowerCtrl = new HolonomicDriveController(
+                SWERVE.PATH_FOLLOW_TRANSLATE_GAINS.toPIDController(),
+                SWERVE.PATH_FOLLOW_TRANSLATE_GAINS.toPIDController(),
+                SWERVE.PATH_FOLLOW_ROTATE_GAINS.toProfiledPIDController()
+            );
+
+            this.pathFollowerCtrl.setTolerance(new Pose2d(
+                new Translation2d(
+                    SWERVE.PATH_FOLLOW_TRANSLATE_GAINS.toPIDController().getPositionTolerance(), 
+                    SWERVE.PATH_FOLLOW_TRANSLATE_GAINS.toPIDController().getPositionTolerance()),
+                new Rotation2d(SWERVE.PATH_FOLLOW_ROTATE_GAINS.toProfiledPIDController().getPositionTolerance())
+            ));
+
+            if (Robot.isSimulation()) { resetPose(trajectory.getInitialPose(), flip.getAsBoolean()); }
+        }).andThen(run(() -> { // Drive along path
+            State desiredState = trajectory.sample(trajectoryTimer.get());
+            if(flip.getAsBoolean()){
+                desiredState = Utils.mirrorState(desiredState, flip.getAsBoolean());
+            }
+
+            ChassisSpeeds driveSpeeds = pathFollowerCtrl.calculate(
+                getCurrentPosition(),
+                desiredState,
+                desiredState.poseMeters.getRotation()
+            );
+
+            drive(driveSpeeds);
+
+        })).until(() -> // End condition
+            trajectoryTimer.hasElapsed(trajectory.getTotalTimeSeconds()) && 
+                (pathFollowerCtrl.atReference() || !Robot.isReal())
+        )
+        .andThen(() -> { // Reset to stop at path completion
+            drive(new ChassisSpeeds());
+        });
     }
 }

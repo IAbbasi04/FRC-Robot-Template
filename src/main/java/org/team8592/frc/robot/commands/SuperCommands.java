@@ -13,7 +13,10 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 
-public final class NewtonCommands {
+/**
+ * A class that holds all commands that are inter-subsystem or require multiple different parts or mechanisms
+ */
+public final class SuperCommands {
     public static Command updateOdometryWithVision(SwerveSubsystem swerve, VisionSubsystem vision) {
         return vision.run(() -> {
             Optional<EstimatedRobotPose> estimatedRobotPose = vision.getRobotPoseVision();
