@@ -6,12 +6,12 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import org.team8592.lib.hardware.motor.MotorConstants;
 
-public class SparkMaxMotor extends SparkBaseMotor<SparkMax, SparkMaxConfig> {
-    public SparkMaxMotor(int motorID) {
+public class NeoMotor extends SparkBaseMotor<SparkMax, SparkMaxConfig> {
+    public NeoMotor(int motorID) {
         this(motorID, false);
     }
 
-    public SparkMaxMotor(int motorID, boolean inverted) {
+    public NeoMotor(int motorID, boolean inverted) {
         super(
             new SparkMax(motorID, MotorType.kBrushless), 
             new SparkMaxConfig(),

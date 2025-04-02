@@ -36,7 +36,7 @@ public class RollerIOKrakenX60 extends RollerIO {
 
     @Override
     public double getVoltage() {
-        return this.rollerMotor.getVoltage();
+        return this.rollerMotor.getMotorVoltage();
     }
 
     @Override

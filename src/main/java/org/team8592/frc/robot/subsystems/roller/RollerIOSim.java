@@ -6,9 +6,8 @@ import org.team8592.lib.PIDProfile;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.*;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class RollerIOKrakenX60Sim extends RollerIO {
+public class RollerIOSim extends RollerIO {
     private PIDProfile velocityGains = new PIDProfile()
         .setP(1d)
         .setV(5E-4)
@@ -21,17 +20,13 @@ public class RollerIOKrakenX60Sim extends RollerIO {
             velocityGains.kV, 
             0.0005
         ),
-        rollerMotor, 
-        new double[] {0.5, 0.5}
+        rollerMotor,
+        new double[] {}
     );
 
-    private PIDController velocityCtrl;
+    private PIDController velocityCtrl = velocityGains.toPIDController();
 
     private final double KRAKEN_KV = 502.1;
-
-    public RollerIOKrakenX60Sim() {
-        this.velocityCtrl = velocityGains.toPIDController();
-    }
 
     @Override
     public void setVelocityRPM(double desiredRPM) {
@@ -42,7 +37,6 @@ public class RollerIOKrakenX60Sim extends RollerIO {
     @Override
     public void setPercentOutput(double desiredPercent) {
         double desiredVoltage = velocityCtrl.calculate(getVoltage(), desiredPercent * 12d);
-        SmartDashboard.putNumber("MMM DESIRED VOLTAGE", desiredVoltage);
         this.rollerMotorSim.setInput(desiredVoltage);
     }
 

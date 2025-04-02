@@ -1,6 +1,6 @@
 package org.team8592.frc.robot.subsystems.roller;
 
-import org.team8592.frc.robot.subsystems.SubsystemIO;
+import org.team8592.lib.hardware.SubsystemIO;
 
 public abstract class RollerIO implements SubsystemIO {
     public abstract void setVelocityRPM(double desiredRPM);

@@ -1,16 +1,19 @@
 package org.team8592.lib.hardware.motor;
 
+import static edu.wpi.first.units.Units.*;
+
 import org.team8592.lib.PIDProfile;
+import org.team8592.lib.Utils;
 
 import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.controls.*;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 public class MinionMotor extends NewtonMotor {
     private TalonFXS motor;
     private TalonFXSConfiguration configuration;
-    private TalonFXSConfigurator configurator;
 
     private DutyCycleOut percentPowerOutput = new DutyCycleOut(0);
     private VoltageOut voltageOutput = new VoltageOut(0);
@@ -36,7 +39,6 @@ public class MinionMotor extends NewtonMotor {
 
         this.motor = new TalonFXS(motorID);
         this.configuration = new TalonFXSConfiguration();
-        this.configurator = motor.getConfigurator();
 
         this.configuration.MotorOutput.Inverted = inverted ? 
             InvertedValue.Clockwise_Positive : 
@@ -50,15 +52,27 @@ public class MinionMotor extends NewtonMotor {
         this.velocityOutput.OverrideBrakeDurNeutral = true;
     }
 
+    
+    @Override
+    public void configureMotionProfile(double maxAcceleration, double cruiseVelocity){
+        MotionMagicConfigs motionMagicConfig = configuration.MotionMagic;
+
+        motionMagicConfig.withMotionMagicAcceleration(RotationsPerSecondPerSecond.of(maxAcceleration));
+        motionMagicConfig.withMotionMagicCruiseVelocity(RotationsPerSecond.of(cruiseVelocity));
+        motionMagicConfig.withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(maxAcceleration*100));
+        motor.getConfigurator().apply(configuration);
+    }
+
     @Override
     public void setInverted(boolean inverted) {
         this.configuration.MotorOutput.Inverted = inverted ? 
-            InvertedValue.Clockwise_Positive : 
-            InvertedValue.CounterClockwise_Positive
-        ;
+            InvertedValue.Clockwise_Positive :
+            InvertedValue.CounterClockwise_Positive;
 
-        configurator.apply(configuration);
+        this.motor.getConfigurator().apply(configuration);
     }
+
+    
 
     @Override
     public void withGains(PIDProfile gains) {
@@ -109,14 +123,8 @@ public class MinionMotor extends NewtonMotor {
                 this.motor.getConfigurator().apply(slotConfig);
                 break;
         }
-    }
 
-    @Override
-    public void configureMotionProfile(double maxVelocity, double maxAcceleration) {
-        MotionMagicConfigs mmConfigs = configuration.MotionMagic;
-        mmConfigs.withMotionMagicCruiseVelocity(maxVelocity);
-        mmConfigs.withMotionMagicAcceleration(maxAcceleration);
-        configurator.apply(configuration);
+        
     }
 
     @Override
@@ -126,73 +134,102 @@ public class MinionMotor extends NewtonMotor {
 
     @Override
     public void setVoltage(double voltage, int slot) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setVoltage'");
+        this.motor.setVoltage(voltage);
+        motor.getMotorVoltage();
     }
 
     @Override
     public void setVelocity(double desiredRPM, int pidSlot) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setVelocity'");
+        double desiredRPS = desiredRPM / 60.0;
+        if (motorPIDGains.get(pidSlot) != null) {
+            Utils.clamp(
+                desiredRPS, 
+                -motorPIDGains.get(pidSlot).maxVelocity,
+                motorPIDGains.get(pidSlot).maxVelocity
+            );
+        }
+        this.motor.setControl(velocityOutput.withSlot(pidSlot).withVelocity(desiredRPS));
     }
 
     @Override
     public void setPosition(double desiredRotations, int pidSlot) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setPosition'");
+        if (motorPIDGains.get(pidSlot) != null) {
+            Utils.clamp(
+                desiredRotations,
+                motorPIDGains.get(pidSlot).softLimitMin,
+                motorPIDGains.get(pidSlot).softLimitMax
+            );
+        }
+        this.motor.setControl(motionMagicOutput.withSlot(pidSlot).withPosition(desiredRotations));
     }
 
     @Override
     public void setFollowerTo(NewtonMotor master, boolean reversed) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setFollowerTo'");
+        
     }
 
     @Override
     public void setCurrentLimit(int currentAmps) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setCurrentLimit'");
-    }
+        CurrentLimitsConfigs currentConfigs = new CurrentLimitsConfigs();
+        currentConfigs.StatorCurrentLimit = currentAmps;
+        currentConfigs.StatorCurrentLimitEnable = true;
 
-    @Override
-    public void setIdleMode(IdleMode idleMode) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setIdleMode'");
-    }
-
-    @Override
-    public double getVelocityRPM() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getVelocityRPM'");
-    }
-
-    @Override
-    public double getRotations() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getRotations'");
-    }
-
-    @Override
-    public double getAppliedVoltage() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAppliedVoltage'");
-    }
-
-    @Override
-    public void resetEncoderPosition(double rotations) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'resetEncoderPosition'");
+        this.configuration.CurrentLimits = currentConfigs;
+        this.motor.getConfigurator().apply(configuration);
     }
 
     @Override
     public void setSoftLimits(double min, double max) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setSoftLimits'");
+
+        SoftwareLimitSwitchConfigs soft_limit_motor = new SoftwareLimitSwitchConfigs();
+        soft_limit_motor.ForwardSoftLimitEnable = true;
+        soft_limit_motor.ReverseSoftLimitEnable = true;
+
+        soft_limit_motor.ForwardSoftLimitThreshold = max;
+        soft_limit_motor.ReverseSoftLimitThreshold = min;
+
+        this.configuration.withSoftwareLimitSwitch(soft_limit_motor);
+
+        this.motor.getConfigurator().apply(this.configuration);
+
     }
 
     @Override
-    public double getVoltage() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getVoltage'");
+    public void setIdleMode(IdleMode idleMode) {
+        NeutralModeValue neutralMode = NeutralModeValue.Brake;
+        switch(idleMode) {
+            case kCoast:
+                neutralMode = NeutralModeValue.Coast;
+                break;
+            case kBrake: default: // Should default to brake mode
+                break;
+        }
+        this.motor.setNeutralMode(neutralMode);
+    }
+
+
+    @Override
+    public double getVelocityRPM() {
+        return this.motor.getVelocity().getValueAsDouble() * 60d;
+    }
+
+    @Override
+    public double getRotations() {
+        return this.motor.getPosition().getValueAsDouble();
+    }
+
+    @Override
+    public double getInputVoltage() {
+        return this.motor.getSupplyVoltage().getValueAsDouble();
+    }
+
+    @Override
+    public double getMotorVoltage() {
+        return this.motor.getMotorVoltage().getValueAsDouble();
+    }
+
+    @Override
+    public void resetEncoderPosition(double rotations) {
+        this.motor.setPosition(rotations);
     }
 }

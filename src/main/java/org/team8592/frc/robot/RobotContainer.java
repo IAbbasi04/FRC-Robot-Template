@@ -9,6 +9,9 @@ import org.team8592.frc.robot.commands.SuperCommands;
 import org.team8592.frc.robot.commands.autonomous.*;
 import org.team8592.frc.robot.subsystems.SubsystemManager;
 import org.team8592.frc.robot.subsystems.roller.RollerSubsystem;
+import org.team8592.frc.robot.subsystems.superstructure.elevator.ElevatorSubsystem;
+import org.team8592.frc.robot.subsystems.superstructure.shoulder.ShoulderSubsystem;
+import org.team8592.frc.robot.subsystems.superstructure.wrist.WristSubsystem;
 import org.team8592.frc.robot.subsystems.swerve.SwerveSubsystem;
 import org.team8592.frc.robot.subsystems.vision.VisionSubsystem;
 import org.team8592.lib.MatchMode;
@@ -24,6 +27,9 @@ public class RobotContainer {
     private final SwerveSubsystem swerve;
     private final VisionSubsystem vision;
     private final RollerSubsystem roller;
+    private final WristSubsystem wrist;
+    private final ShoulderSubsystem shoulder;
+    private final ElevatorSubsystem elevator;
 
     /**
      * Create the robot container. This creates and configures subsystems, sets
@@ -35,6 +41,9 @@ public class RobotContainer {
         this.swerve = manager.swerve;
         this.vision = manager.vision;
         this.roller = manager.roller;
+        this.wrist = manager.wrist;
+        this.shoulder = manager.shoulder;
+        this.elevator = manager.elevator;
 
         Controls.applyControlSet(ControlSets.DUAL_DRIVER);
 
@@ -65,19 +74,22 @@ public class RobotContainer {
 
         vision.setDefaultCommand(SuperCommands.updateOdometryWithVision(swerve, vision));
         roller.setStopAsDefaultCommand();
+        wrist.setStopAsDefaultCommand();
+        shoulder.setDefaultCommand(shoulder.setDegrees(() -> 90).ignoringDisable(false));
+        elevator.setDefaultCommand(elevator.setInches(() -> 10).ignoringDisable(false));
     }
 
     /**
      * Configure all button bindings
      */
     private void configureBindings() {
-        Controls.slowMode.onTrue(manager.swerve.setSlowMode(true).ignoringDisable(true))
-            .onFalse(manager.swerve.setSlowMode(false).ignoringDisable(true));
+        Controls.slowMode.onTrue(manager.swerve.setSlowMode(true))
+            .onFalse(manager.swerve.setSlowMode(false));
 
         Controls.zeroGryoscope.onTrue(manager.swerve.resetHeading());
 
-        Controls.robotRelative.onTrue(manager.swerve.setRobotRelative(true).ignoringDisable(true))
-            .onFalse(manager.swerve.setRobotRelative(false).ignoringDisable(true));
+        Controls.robotRelative.onTrue(manager.swerve.setRobotRelative(true))
+            .onFalse(manager.swerve.setRobotRelative(false));
 
         Controls.snapNorth.whileTrue(
             swerve.snapToAngle(
@@ -113,6 +125,12 @@ public class RobotContainer {
 
         Controls.intake.whileTrue(roller.setPercentPower(0.5));
         Controls.score.whileTrue(roller.setPercentPower(-0.5));
+
+        Controls.getDriver().y().whileTrue(wrist.setPercentPower(0.5));
+        Controls.getDriver().a().whileTrue(wrist.setPercentPower(-0.5));
+        // Controls.getDriver().y().whileTrue(wrist.setDegrees(90));
+        // Controls.getDriver().a().whileTrue(wrist.setDegrees(-90));
+        // Controls.getDriver().x().whileTrue(wrist.setDegrees(0));
     };
 
     public Command onModeInit(MatchMode mode) {

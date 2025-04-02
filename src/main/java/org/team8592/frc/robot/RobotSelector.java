@@ -14,6 +14,10 @@ public class RobotSelector {
     public static enum RobotType {
         COMP_BOT,
         DEV_BOT,
-        SIM_BOT
+        SIM_BOT;
+
+        public boolean isCompBot() {
+            return this.equals(RobotType.COMP_BOT);
+        }
     }
 }

@@ -72,15 +72,15 @@ public abstract class NewtonMotor {
 
     public abstract double getRotations();
 
-    public abstract double getAppliedVoltage();
+    public abstract double getInputVoltage();
+
+    public abstract double getMotorVoltage();
 
     public abstract void resetEncoderPosition(double rotations);
 
     public abstract void setSoftLimits(double min, double max);
 
     public abstract void configureMotionProfile(double maxVelocity, double maxAcceleration);
-
-    public abstract double getVoltage();
 
     public boolean isInverted() {
         return this.inverted;
@@ -111,12 +111,12 @@ public abstract class NewtonMotor {
         return this.desiredVelocityRPM;
     }
 
-    public SparkFlexMotor getAsSparkFlex() {
-        return (SparkFlexMotor)this;
+    public VortexMotor getAsSparkFlex() {
+        return (VortexMotor)this;
     }
 
-    public SparkMaxMotor getAsSparkMax() {
-        return (SparkMaxMotor)this;
+    public NeoMotor getAsSparkMax() {
+        return (NeoMotor)this;
     }
 
     public TalonFXMotor getAsTalonFX() {

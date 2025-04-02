@@ -135,11 +135,6 @@ public abstract class TalonFXMotor extends NewtonMotor {
     }
 
     @Override
-    public double getVoltage() {
-        return motor.getMotorVoltage().getValueAsDouble();
-    }
-
-    @Override
     public void setVelocity(double desiredRPM, int pidSlot) {
         double desiredRPS = desiredRPM / 60.0;
         if (motorPIDGains.get(pidSlot) != null) {
@@ -220,7 +215,12 @@ public abstract class TalonFXMotor extends NewtonMotor {
     }
 
     @Override
-    public double getAppliedVoltage() {
+    public double getInputVoltage() {
+        return this.motor.getSupplyVoltage().getValueAsDouble();
+    }
+
+    @Override
+    public double getMotorVoltage() {
         return this.motor.getMotorVoltage().getValueAsDouble();
     }
 

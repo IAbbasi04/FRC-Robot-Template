@@ -21,10 +21,10 @@ public class TestMotor extends SubsystemBase {
     }
 
     public TestMotor(int deviceID, boolean inverted, Class<? extends NewtonMotor> cls) {
-        if (cls.getSimpleName().equals(SparkFlexMotor.class.getSimpleName())) {
-            this.testMotor = new SparkFlexMotor(deviceID, inverted);
-        } else if (cls.getSimpleName().equals(SparkMaxMotor.class.getSimpleName())) {
-            this.testMotor = new SparkMaxMotor(deviceID, inverted);
+        if (cls.getSimpleName().equals(VortexMotor.class.getSimpleName())) {
+            this.testMotor = new VortexMotor(deviceID, inverted);
+        } else if (cls.getSimpleName().equals(NeoMotor.class.getSimpleName())) {
+            this.testMotor = new NeoMotor(deviceID, inverted);
         } else if (cls.getSimpleName().equals(KrakenX60Motor.class.getSimpleName())) {
             this.testMotor = new KrakenX60Motor(deviceID, inverted);
         } else if (cls.getSimpleName().equals(KrakenX60FOCMotor.class.getSimpleName())) {

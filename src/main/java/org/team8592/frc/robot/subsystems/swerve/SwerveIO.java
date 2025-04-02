@@ -2,7 +2,7 @@ package org.team8592.frc.robot.subsystems.swerve;
 
 import java.util.function.Consumer;
 
-import org.team8592.frc.robot.subsystems.SubsystemIO;
+import org.team8592.lib.hardware.SubsystemIO;
 
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 

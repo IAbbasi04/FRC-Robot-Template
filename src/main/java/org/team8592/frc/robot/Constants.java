@@ -42,6 +42,24 @@ public class Constants {
         public static final double MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND = Math.toRadians(720); // rad/s
     }
 
+    public class ROLLER {
+        
+    }
+
+    public class WRIST {
+        public static final double WRIST_GEAR_RATIO = 1/75.0;
+
+        public static final double WRIST_ANGLE_DEGREES_MIN = CONFIG.ROBOT_TYPE.isCompBot()?-45d:-45d; // Currently the same between the 2 bots
+        public static final double WRIST_ANGLE_DEGREES_MAX = CONFIG.ROBOT_TYPE.isCompBot()?220:220; // Currently the same between the 2 bots
+
+        public static final double WRIST_POSITION_TOLERANCE = 2.0;
+
+        public static final int WRIST_CURRENT_LIMIT = 60;//amps
+
+        public static final double WRIST_MAX_ACCELERATION = 400;
+        public static final double WRIST_MAX_VELOCITY = 100; //used to be 100
+    }
+
     public class VISION {
         public static final String CAM_NAME = "Arducam_[]";
 
