@@ -2,10 +2,10 @@ package org.team8592.frc.robot.subsystems;
 
 import java.util.*;
 
-import org.team8592.frc.robot.Constants;
 import org.team8592.frc.robot.RobotSelector;
 import org.team8592.frc.robot.subsystems.swerve.*;
 import org.team8592.frc.robot.subsystems.vision.*;
+import org.team8592.frc.robot.subsystems.swerve.ctreswerve.TunerConstants;
 import org.team8592.lib.MatchMode;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -21,40 +21,19 @@ public class SubsystemManager extends SubsystemBase {
         switch(RobotSelector.getRobot()) {
             case SIM_BOT: // Robot for simulation
                 this.swerve = new SwerveSubsystem(
-                    new SwerveIOCTRE() 
-                );
-
-                this.vision = new VisionSubsystem(
-                    new CameraIOSim(
-                        getName(), 
-                        Constants.VISION.CAMERA_OFFSET
-                    )
+                    new SwerveIOCTRE<TunerConstants>() // CTRE Swerve works well in simulation
                 );
                 break;
             case DEV_BOT: // Development robot
                 this.swerve = new SwerveSubsystem(
-                    new SwerveIOCTRE()
-                );
-
-                this.vision = new VisionSubsystem(
-                    new CameraIOArducam(
-                        getName(),
-                        Constants.VISION.CAMERA_OFFSET
-                    )
+                    new SwerveIOCTRE<TunerConstants>()
                 );
                 break;
             case COMP_BOT: // Main robot for competition
             // Note - Fall through intentional
             default:
                 this.swerve = new SwerveSubsystem(
-                    new SwerveIOCTRE() 
-                );
-
-                this.vision = new VisionSubsystem(
-                    new CameraIOArducam(
-                        getName(), 
-                        Constants.VISION.CAMERA_OFFSET
-                    )
+                    new SwerveIOCTRE<TunerConstants>()
                 );
                 break;
         }

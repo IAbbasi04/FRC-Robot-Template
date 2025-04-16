@@ -7,7 +7,7 @@ import com.ctre.phoenix6.controls.*;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.signals.InvertedValue;
 
-public class MinionMotor extends NewtonMotor {
+public class TalonFXSMotor extends NewtonMotor {
     private TalonFXS motor;
     private TalonFXSConfiguration configuration;
     private TalonFXSConfigurator configurator;
@@ -18,20 +18,14 @@ public class MinionMotor extends NewtonMotor {
     private PositionVoltage positionOutput = new PositionVoltage(0);
     private VelocityVoltage velocityOutput = new VelocityVoltage(0);
 
-    public MinionMotor(int motorID) {
+    public TalonFXSMotor(int motorID) {
         this(motorID, false);
     }
 
-    public MinionMotor(int motorID, boolean inverted) {
+    public TalonFXSMotor(int motorID, boolean inverted) {
         super(
             motorID, 
-            inverted, 
-            new MotorConstants(
-                7384, 
-                200, 
-                3.10, 
-                627.6
-            )
+            inverted
         );
 
         this.motor = new TalonFXS(motorID);

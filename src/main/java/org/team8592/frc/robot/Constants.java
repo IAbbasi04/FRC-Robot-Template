@@ -43,7 +43,7 @@ public class Constants {
     }
 
     public class VISION {
-        public static final String CAM_NAME = "Arducam_[]";
+        public static final String CAM_NAME = "Arducam_[NAME]";
 
         public static final Transform3d CAMERA_OFFSET = new Transform3d();
 

@@ -8,7 +8,7 @@ import org.team8592.lib.logging.SmartLogger;
 import edu.wpi.first.wpilibj2.command.*;
 
 public class TestMotor extends SubsystemBase {
-    private NewtonMotor testMotor;
+    protected NewtonMotor testMotor; // accesible to other test motors
     private double desiredOutput = 0d;
     private SmartLogger logger;
     private OutputType outputType = OutputType.kNone;
@@ -25,20 +25,23 @@ public class TestMotor extends SubsystemBase {
             this.testMotor = new SparkFlexMotor(deviceID, inverted);
         } else if (cls.getSimpleName().equals(SparkMaxMotor.class.getSimpleName())) {
             this.testMotor = new SparkMaxMotor(deviceID, inverted);
-        } else if (cls.getSimpleName().equals(KrakenX60Motor.class.getSimpleName())) {
-            this.testMotor = new KrakenX60Motor(deviceID, inverted);
-        } else if (cls.getSimpleName().equals(KrakenX60FOCMotor.class.getSimpleName())) {
-            this.testMotor = new KrakenX60FOCMotor(deviceID, inverted);
-        } else if (cls.getSimpleName().equals(Falcon500Motor.class.getSimpleName())) {
-            this.testMotor = new Falcon500Motor(deviceID, inverted);
-        } else if (cls.getSimpleName().equals(Falcon500FOCMotor.class.getSimpleName())) {
-            this.testMotor = new Falcon500FOCMotor(deviceID, inverted);
-        } else if (cls.getSimpleName().equals(MinionMotor.class.getSimpleName())) {
-            this.testMotor = new MinionMotor(deviceID, inverted);
+        } else if (cls.getSimpleName().equals(TalonFXMotor.class.getSimpleName())) {
+            this.testMotor = new TalonFXMotor(deviceID, inverted);
+        } else if (cls.getSimpleName().equals(TalonFXSMotor.class.getSimpleName())) {
+            this.testMotor = new TalonFXSMotor(deviceID, inverted);
         }
 
         this.logger = new SmartLogger("TestMotor/" + cls.getSimpleName() + "[" + deviceID + "]");
         this.logger.log("Class Type", cls.getSimpleName());
+    }
+
+    public TestMotor withFollower(TestMotor other, boolean inverted) {
+        other.testMotor.setFollowerTo(this.testMotor, inverted);
+        return this;
+    }
+
+    public TestMotor withFollower(TestMotor other) {
+        return this.withFollower(other, false);
     }
 
     public TestMotor withGains(PIDProfile profile) {

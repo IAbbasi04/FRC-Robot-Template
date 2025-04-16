@@ -60,10 +60,6 @@ public final class Controls {
         
     }
 
-    public static void initializeLogs() {
-        Controls.logger = new SmartLogger("Controls");
-    }
-
     public static void logControls() {
         for (Field field : Controls.class.getDeclaredFields()) {
             try {

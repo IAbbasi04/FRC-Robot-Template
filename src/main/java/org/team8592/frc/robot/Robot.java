@@ -66,7 +66,6 @@ public class Robot extends LoggedRobot {
         Logger.start();
 
         Robot.FIELD.logToShuffleboard(Robot.isSimulation());
-        Controls.initializeLogs();
         this.robotContainer = new RobotContainer();
     }
 

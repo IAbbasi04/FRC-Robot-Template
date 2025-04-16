@@ -7,8 +7,7 @@ import org.team8592.lib.PIDProfile;
 import org.team8592.lib.hardware.motor.spark.*;
 import org.team8592.lib.hardware.motor.talonfx.*;
 
-import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import edu.wpi.first.wpilibj.simulation.EncoderSim;
+import edu.wpi.first.wpilibj.simulation.*;
 
 public abstract class NewtonMotor {
     protected List<PIDProfile> motorPIDGains = new ArrayList<>();
@@ -19,10 +18,9 @@ public abstract class NewtonMotor {
     protected EncoderSim simEncoder; 
     protected DCMotorSim simMotor;
 
-    protected NewtonMotor(int id, boolean inverted, MotorConstants constants) {
+    protected NewtonMotor(int id, boolean inverted) {
         this.deviceID = id;
         this.inverted = inverted;
-        this.motorConstants = constants;
     }
 
     public enum IdleMode {
