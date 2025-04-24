@@ -9,67 +9,58 @@ import org.team8592.frc.robot.subsystems.SubsystemManager;
 import choreo.Choreo;
 import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.*;
 import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.wpilibj2.command.*;
-
-/**
- * Class to provide subsystems, convenient methods, and a constructor to autonomous commands
- */
-public abstract class AutoCommand extends WrapperCommand{
-    protected static SubsystemManager manager;
+public abstract class AutoCommand extends WrapperCommand {
+    private Command command; // The compiled command of what to run in auto
+    
+    protected static SubsystemManager manager; // A manager of all active subsystems on the robot
     public static void addSubsystems(SubsystemManager manager){
         AutoCommand.manager = manager;
     }
 
-    /**
-     * If this is set, the odometry's known position will be set to this at the start of auto
-     */
-    protected Pose2d startPose = null;
+    public static AutoCommand none() {
+        return new AutoCommand() {
+            @Override
+            public Pose2d getStartPose() {
+                return new Pose2d();
+            }
+        };
+    }
+
+    public boolean isDefault() {
+        return this.equals(none());
+    }
 
     /**
      * Startup time saving if/when multiple copies of the same path are requested
      */
     private static HashMap<String, Trajectory> cachedChoreoTrajectories = new HashMap<String,Trajectory>();
 
-    /**
-     * Create an auto routine from the passed-in commands.
-     *
-     * @param commands as many commands as you want. Will
-     * be run in sequence (one after the other).
-     */
+    protected AutoCommand(Command command) {
+        super(command);
+        this.command = command;
+    }
+
     protected AutoCommand(Command... commands) {
         super(Commands.sequence(commands));
+        this.command = Commands.sequence(commands);
     }
 
-    /**
-     * {@link Commands#none()} as an {@link AutoCommand}
-     */
-    protected AutoCommand(){
+    public AutoCommand() {
         super(Commands.none());
-    }
-
-    protected static AutoCommand none() {
-        return new AutoCommand() {
-            @Override
-                public Pose2d getStartPose() {return new Pose2d();}
-        };
+        this.command = Commands.none();
     }
 
     public abstract Pose2d getStartPose();
 
-    /**
-     * Get a choreo trajectory by name as a WPILib trajectory.
-     *
-     * @param name the name of the .traj file; this shouldn't contain the path or
-     * the filename extension
-     *
-     * @return The trajectory converted to WPILib's {@link Trajectory}. Throws a
-     * {@code FileNotFoundException} if the name doesn't represent a .traj file
-     * located in the {@code choreo} folder in the {@code deploy} folder
-     */
+    public Command getAutoRoutine() {
+        return command;
+    }
+
     @SuppressWarnings("unchecked")
-    protected static final Trajectory getChoreoTrajectory(String name){
+    public static Trajectory getChoreoTrajectory(String name) {
         if(cachedChoreoTrajectories.containsKey(name)){
             return cachedChoreoTrajectories.get(name);
         }
@@ -86,7 +77,7 @@ public abstract class AutoCommand extends WrapperCommand{
         }
     }
 
-    protected Pose2d getStartPoseFromChoreoTrajectory(String name) {
+    protected static Pose2d getStartPoseFromChoreoTrajectory(String name) {
         if(!cachedChoreoTrajectories.containsKey(name)){
             getChoreoTrajectory(name); // Adds the path to the cached trajectory map
         }

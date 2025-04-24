@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 
 import org.team8592.frc.robot.Robot;
@@ -67,26 +68,25 @@ public final class AutoManager {
      */
     public static Command getAutonomousCommand(){
         AutoCommand autoCommand = autoChooser.getSelected();
-
-        if(autoCommand.getStartPose() == null){ // If we have no start pose, just run the auto
-            return getAutonomousInitCommand().andThen(
+        return new ConditionalCommand(
+            getAutonomousInitCommand().andThen(
                 // If we don't keep this command from registering as composed,
                 // the code will crash if we try to run an auto twice without
                 // restarting robot code.
                 new MultiComposableCommand(autoCommand)
-            );
-        }
-        else{ // If we do have a starting pose, reset the odometry to that first
-            return getAutonomousInitCommand().andThen(
-                manager.swerve.runOnce(() -> manager.swerve.resetPose(
-                    autoCommand.getStartPose(),
-                    DriverStation.getAlliance().isPresent() && 
-                        DriverStation.getAlliance().get() == Alliance.Red
-                ))
+            ), 
+                getAutonomousInitCommand().andThen(
+                    manager.swerve.runOnce(() -> manager.swerve.resetPose(
+                        autoCommand.getStartPose(),
+                        DriverStation.getAlliance().isPresent() && 
+                            DriverStation.getAlliance().get() == Alliance.Red
+                    )
+                )
             ).andThen(
                 new MultiComposableCommand(autoCommand)
-            );
-        }
+            ),
+            () -> autoCommand.getStartPose().equals(null)
+        );
     }
 
     /**
@@ -96,14 +96,9 @@ public final class AutoManager {
      */
     private static Command getAutonomousInitCommand(){
         return new ParallelCommandGroup(
-            // manager.swerve.runOnce(() -> {
-            //     manager.swerve.stop();
-            //     manager.swerve.resetHeading();
-            // })
             manager.swerve.getStopCommand().alongWith(
                 manager.swerve.resetHeading()
             )
-            // TODO: Add any other commands that need to be run on autonomous init here
         );
     }
 

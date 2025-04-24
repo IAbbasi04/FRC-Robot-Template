@@ -1,5 +1,6 @@
 package org.team8592.frc.robot.subsystems;
 
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 
@@ -66,9 +67,22 @@ public abstract class NewtonSubsystem extends SubsystemBase {
         return super.getCurrentCommand();
     }
 
+    public Command getDefaultCommand() {
+        if (super.getDefaultCommand() == null) {// No default command
+            return Commands.none();
+        }
+        return super.getDefaultCommand();
+    }
+
     public void periodic() {
         periodicTelemetry();
         periodicOutputs();
+        if (logger != null) {
+            logger.log("Actively Command", !getCurrentCommand().equals(Commands.none()));
+            logger.log("Has Default Command", !getDefaultCommand().equals(Commands.none()));
+            logger.log("Active Command", getCurrentCommand().getName());
+            logger.log("Default Command", getDefaultCommand().getName());
+        }
     }
     
     public void periodicOutputs() {}
@@ -78,4 +92,20 @@ public abstract class NewtonSubsystem extends SubsystemBase {
     public abstract void periodicTelemetry();
 
     public abstract void stop();
+
+    @Override
+    public void initSendable(SendableBuilder builder) {
+        builder.setSmartDashboardType("Subsystem");
+
+        builder.addBooleanProperty(".hasDefault", () -> getDefaultCommand() != null, null);
+        builder.addStringProperty(
+            ".default",
+            () -> getDefaultCommand() != null ? getDefaultCommand().getName() : "none",
+            null);
+        builder.addBooleanProperty(".currentlyCommanded", () -> getCurrentCommand() != null, null);
+        builder.addStringProperty(
+            ".currentCommand",
+            () -> getCurrentCommand() != null ? getCurrentCommand().getName() : "none",
+            null);
+    }
 }
