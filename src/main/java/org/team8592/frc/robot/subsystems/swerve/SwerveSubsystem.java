@@ -346,7 +346,6 @@ public class SwerveSubsystem extends NewtonSubsystem {
 
     public Command followTrajectory(Trajectory trajectory, BooleanSupplier flip) {
         return runOnce(() -> { // Initialize
-            drive(new ChassisSpeeds());
             trajectoryTimer.reset();
             trajectoryTimer.restart();
             this.pathFollowerCtrl = new HolonomicDriveController(

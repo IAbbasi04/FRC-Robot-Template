@@ -15,6 +15,7 @@ import org.team8592.frc.robot.subsystems.superstructure.wrist.WristIOSim;
 import org.team8592.frc.robot.subsystems.superstructure.wrist.WristSubsystem;
 import org.team8592.frc.robot.subsystems.swerve.*;
 import org.team8592.frc.robot.subsystems.vision.*;
+import org.team8592.frc.robot.subsystems.swerve.ctreswerve.TunerConstants;
 import org.team8592.lib.MatchMode;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -54,13 +55,6 @@ public class SubsystemManager extends SubsystemBase {
                         false, 
                         Ports.BACK_ELEVATOR_CAN_ID, 
                         true
-                    )
-                );
-
-                this.vision = new VisionSubsystem(
-                    new CameraIOArducam(
-                        getName(),
-                        Constants.VISION.CAMERA_OFFSET
                     )
                 );
                 break;

@@ -2,7 +2,6 @@ package org.team8592.lib.hardware.motor.spark;
 
 import org.team8592.lib.PIDProfile;
 import org.team8592.lib.Utils;
-import org.team8592.lib.hardware.motor.MotorConstants;
 import org.team8592.lib.hardware.motor.NewtonMotor;
 
 import com.revrobotics.RelativeEncoder;
@@ -18,8 +17,8 @@ public abstract class SparkBaseMotor<M extends SparkBase, C extends SparkBaseCon
     protected RelativeEncoder encoder;
     protected C config;
 
-    protected SparkBaseMotor(M motor, C config, boolean inverted, MotorConstants constants) {
-        super(motor.getDeviceId(), inverted, constants);
+    protected SparkBaseMotor(M motor, C config, boolean inverted) {
+        super(motor.getDeviceId(), inverted);
         this.motor = motor;
         this.motorCtrl = motor.getClosedLoopController();
         this.encoder = motor.getEncoder();

@@ -11,6 +11,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 
 public abstract class SwerveIO implements SubsystemIO {
+    protected ChassisSpeeds targetSpeeds = new ChassisSpeeds();
+
     public abstract void drive(ChassisSpeeds speeds, boolean driveFieldRelative);
 
     public abstract void resetHeading();
@@ -27,7 +29,13 @@ public abstract class SwerveIO implements SubsystemIO {
 
     public abstract void pointAt(Rotation2d direction);
 
+    public abstract void snapToHeading(ChassisSpeeds targetSpeeds, Rotation2d heading);
+
     public abstract void registerTelemetry(Consumer<SwerveDriveState> driveState);
 
     public abstract void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds);
+
+    public ChassisSpeeds getTargetSpeeds() {
+        return this.targetSpeeds;
+    }
 }

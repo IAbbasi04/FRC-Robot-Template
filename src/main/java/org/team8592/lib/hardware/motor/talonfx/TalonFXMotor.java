@@ -7,7 +7,6 @@ import static edu.wpi.first.units.Units.Second;
 
 import org.team8592.lib.PIDProfile;
 import org.team8592.lib.Utils;
-import org.team8592.lib.hardware.motor.MotorConstants;
 import org.team8592.lib.hardware.motor.NewtonMotor;
 
 import com.ctre.phoenix6.configs.*;
@@ -16,7 +15,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-public abstract class TalonFXMotor extends NewtonMotor {
+public class TalonFXMotor extends NewtonMotor {
     protected TalonFX motor;
 
     protected TalonFXConfiguration configuration;
@@ -27,12 +26,12 @@ public abstract class TalonFXMotor extends NewtonMotor {
     protected MotionMagicVoltage motionMagicOutput = new MotionMagicVoltage(0);
     protected VoltageOut voltageOutput = new VoltageOut(0);
 
-    protected TalonFXMotor(int motorID, MotorConstants constants) {
-        this(motorID, false, constants);
+    public TalonFXMotor(int motorID) {
+        this(motorID, false);
     }
 
-    protected TalonFXMotor(int motorID, boolean inverted, MotorConstants constants) {
-        super(motorID, inverted, constants);
+    public TalonFXMotor(int motorID, boolean inverted) {
+        super(motorID, inverted);
         
         this.motor = new TalonFX(motorID);
         this.configuration = new TalonFXConfiguration();

@@ -1,15 +1,15 @@
 package org.team8592.frc.robot.subsystems.superstructure.elevator;
 
-import org.team8592.lib.hardware.motor.talonfx.KrakenX60Motor;
+import org.team8592.lib.hardware.motor.talonfx.TalonFXMotor;
 
 public class ElevatorIOKrakenX60 extends ElevatorIO {
-    private KrakenX60Motor backElevatorMotor;
-    private KrakenX60Motor frontElevatorMotor;
+    private TalonFXMotor backElevatorMotor;
+    private TalonFXMotor frontElevatorMotor;
 
     public ElevatorIOKrakenX60(int CANIdFront, boolean reversedFront, int CANIdBack, boolean reversedBack) {
-        this.frontElevatorMotor = new KrakenX60Motor(CANIdFront, reversedFront);
+        this.frontElevatorMotor = new TalonFXMotor(CANIdFront, reversedFront);
 
-        this.backElevatorMotor = new KrakenX60Motor(CANIdBack, reversedBack);
+        this.backElevatorMotor = new TalonFXMotor(CANIdBack, reversedBack);
         this.backElevatorMotor.setFollowerTo(frontElevatorMotor, reversedBack);
     }
 
