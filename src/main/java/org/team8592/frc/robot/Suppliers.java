@@ -3,6 +3,7 @@ package org.team8592.frc.robot;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
+import org.team8592.frc.robot.RobotSelector.RobotType;
 import org.team8592.lib.MatchMode;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -16,4 +17,6 @@ public class Suppliers {
     public static final BooleanSupplier IS_SIMULATION = () -> Robot.isSimulation();
 
     public static final Supplier<MatchMode> CURRENT_MODE = () -> Robot.MODE;
+
+    public static final Supplier<RobotType> CURRENT_ROBOT = () -> RobotSelector.getRobot();
 }
