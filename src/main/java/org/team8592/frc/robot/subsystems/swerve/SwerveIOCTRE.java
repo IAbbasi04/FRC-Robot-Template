@@ -18,10 +18,12 @@ import org.team8592.frc.robot.subsystems.swerve.ctreswerve.CommandSwerveDrivetra
 import org.team8592.frc.robot.subsystems.swerve.ctreswerve.TunerConstants;
 
 public class SwerveIOCTRE<E extends TunerConstants> extends SwerveIO {
+    public String tunerConstantsName;
+
     private final ProfiledPIDController kSnapToCtrl = Constants.SWERVE.SNAP_TO_GAINS.toProfiledPIDController();
 
-    private double MaxSpeed = E.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+    private final double MaxSpeed = E.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    private final double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric fieldRelative = new SwerveRequest.FieldCentric()
@@ -33,6 +35,10 @@ public class SwerveIOCTRE<E extends TunerConstants> extends SwerveIO {
         .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
        
     public final CommandSwerveDrivetrain drivetrain = E.createDrivetrain();
+    
+    public <T extends TunerConstants> SwerveIOCTRE(Class<E> tunerClass) {
+        this.tunerConstantsName = tunerClass.getSimpleName();
+    }
 
     @Override
     public void drive(ChassisSpeeds speeds, boolean driveFieldRelative) {
@@ -107,5 +113,15 @@ public class SwerveIOCTRE<E extends TunerConstants> extends SwerveIO {
             ),
             true
         );
+    }
+
+    @Override
+    public double getMaxTranslationalSpeed() {
+        return MaxSpeed;
+    }
+
+    @Override
+    public double getMaxRotationalSpeed() {
+        return MaxAngularRate;
     }
 }

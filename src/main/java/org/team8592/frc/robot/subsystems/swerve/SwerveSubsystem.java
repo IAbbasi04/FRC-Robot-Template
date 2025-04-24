@@ -209,16 +209,16 @@ public class SwerveSubsystem extends NewtonSubsystem {
 
         if (isSlowMode) {
             currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
-                driveTranslateY * TRANSLATE_POWER_SLOW * MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
-                driveTranslateX * TRANSLATE_POWER_SLOW * MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
-                driveRotate * ROTATE_POWER_SLOW * MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND
+                driveTranslateY * TRANSLATE_POWER_SLOW * io.getMaxRotationalSpeed(),
+                driveTranslateX * TRANSLATE_POWER_SLOW * io.getMaxRotationalSpeed(),
+                driveRotate * ROTATE_POWER_SLOW * io.getMaxRotationalSpeed()
             ));
         }
         else {
             currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
-                driveTranslateY * TRANSLATE_POWER_FAST * MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
-                driveTranslateX * TRANSLATE_POWER_FAST * MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
-                driveRotate * ROTATE_POWER_FAST * MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND
+                driveTranslateY * TRANSLATE_POWER_FAST * io.getMaxRotationalSpeed(),
+                driveTranslateX * TRANSLATE_POWER_FAST * io.getMaxRotationalSpeed(),
+                driveRotate * ROTATE_POWER_FAST * io.getMaxRotationalSpeed()
             ));
         }
 
@@ -248,6 +248,12 @@ public class SwerveSubsystem extends NewtonSubsystem {
     public void periodicTelemetry() {
         logger.log("Current Pose", getCurrentPosition());
         logger.log("Desired Speeds", desiredSpeeds);
+        // Only log TunerConstants type if we are using CTRE Swerve
+        logger.logIf("Tuner Constants Type",
+            ((SwerveIOCTRE<?>)io).tunerConstantsName,
+            "No Tuner Constants",
+            io.getClass().getSimpleName().equals("SwerveIOCTRE")
+        );
         io.updateInputs();
     }
 

@@ -4,6 +4,7 @@ import java.util.function.DoubleSupplier;
 
 import org.team8592.frc.robot.subsystems.NewtonSubsystem;
 import org.team8592.lib.MatchMode;
+import org.team8592.lib.Utils;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -13,6 +14,18 @@ public class ElevatorSubsystem extends NewtonSubsystem {
     
     public ElevatorSubsystem(ElevatorIO io) {
         this.io = io;
+    }
+
+    public double getInches() {
+        return io.getInches();
+    }
+
+    public boolean atPosition() {
+        return atPosition(this.desiredInches);
+    }
+
+    public boolean atPosition(double inches) {
+        return Utils.isWithin(this.getInches(), inches, 0.25);
     }
 
     @Override

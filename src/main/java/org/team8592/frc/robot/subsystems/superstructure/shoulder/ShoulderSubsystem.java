@@ -25,7 +25,7 @@ public class ShoulderSubsystem extends NewtonSubsystem {
         this.io.setDegrees(degrees);
     }
     
-    private double getDegrees() {
+    public double getDegrees() {
         return this.io.getDegrees();
     }
 

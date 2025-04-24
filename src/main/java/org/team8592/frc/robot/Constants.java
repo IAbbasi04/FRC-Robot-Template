@@ -1,7 +1,6 @@
 package org.team8592.frc.robot;
 
 import org.team8592.frc.robot.RobotSelector.RobotType;
-import org.team8592.frc.robot.subsystems.swerve.ctreswerve.TunerConstants;
 import org.team8592.lib.PIDProfile;
 
 import edu.wpi.first.math.geometry.Transform3d;
@@ -37,13 +36,55 @@ public class Constants {
         public static final int ROTATION_SMOOTHING_AMOUNT = 1;
 
         public static final double JOYSTICK_EXPONENT = 1.2;
-
-        public static final double MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND = TunerConstants.kSpeedAt12Volts.baseUnitMagnitude(); // m/s
-        public static final double MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND = Math.toRadians(720); // rad/s
     }
 
     public class ROLLER {
         
+    }
+
+    public class SHOULDER {
+        public static final double SHOULDER_GEAR_RATIO = 1/180.0;
+
+        public static final double SHOULDER_MIN_DEGREES = Suppliers.CURRENT_ROBOT.get().equals(RobotType.DEV_BOT) ? -2 : -2;
+        public static final double SHOULDER_MAX_DEGREES = Suppliers.CURRENT_ROBOT.get().equals(RobotType.DEV_BOT) ? 180 : 180;
+
+        public static final double SAFE_SHOULDER_TO_ROTATE_WRIST_DEGREES = Suppliers.CURRENT_ROBOT.get().equals(RobotType.DEV_BOT)  ? 75 : 40;
+
+        public static final double SHOULDER_POSITION_TOLERANCE_DEGREES = 2.0;
+
+        public static final int SHOULDER_CURRENT_LIMIT_AMPS = 40; //amps
+
+        public static final double SHOULDER_MAX_ACCELERATION = 250;
+        public static final double SHOULDER_MAX_VELOCITY = 100;
+
+        public static final double SHOULDER_P = Suppliers.CURRENT_ROBOT.get().equals(RobotType.DEV_BOT) ? /*RIPTIDE: */3: /*PERRY: */3;
+        public static final double SHOULDER_I = Suppliers.CURRENT_ROBOT.get().equals(RobotType.DEV_BOT) ? /*RIPTIDE: */0: /*PERRY: */0;
+        public static final double SHOULDER_D = Suppliers.CURRENT_ROBOT.get().equals(RobotType.DEV_BOT) ? /*RIPTIDE: */0: /*PERRY: */0;
+        public static final double SHOULDER_S = Suppliers.CURRENT_ROBOT.get().equals(RobotType.DEV_BOT) ? /*RIPTIDE: */0: /*PERRY: */0;
+        public static final double SHOULDER_V = Suppliers.CURRENT_ROBOT.get().equals(RobotType.DEV_BOT) ? /*RIPTIDE: */0: /*PERRY: */0;
+        public static final double SHOULDER_A = Suppliers.CURRENT_ROBOT.get().equals(RobotType.DEV_BOT) ? /*RIPTIDE: */0: /*PERRY: */0;
+    }
+
+    public class ELEVATOR {
+        public static final double EXTENSION_GEAR_RATIO = 0.25;
+        public static final double EXTENSION_DRUM_DIAMETER_INCHES = 1;
+
+        public static final double EXTENSION_INCHES_MAX = Suppliers.CURRENT_ROBOT.get().equals(RobotType.DEV_BOT) ? /*RIPTIDE*/ 19.5: /*PERRY*/ 19.6; //this is in inches
+        public static final double EXTENSION_INCHES_MIN = Suppliers.CURRENT_ROBOT.get().equals(RobotType.DEV_BOT) ? /*RIPTIDE*/ 0.5 : /*PERRY*/ 0.5;
+
+        public static final double EXTENSION_POSITION_TOLERANCE_INCHES = 0.1;
+
+        public static final int ELEVATOR_CURRENT_LIMIT_AMPS = 40;//amps
+
+        public static final double ELEVATOR_MAX_ACCELERATION = 250;
+        public static final double ELEVATOR_MAX_VELOCITY = 100; //formerly 100
+
+        public static final double ELEVATOR_POSITION_P = Suppliers.CURRENT_ROBOT.get().equals(RobotType.DEV_BOT) ? /*RIPTIDE: */3.5: /*PERRY: */3.5;
+        public static final double ELEVATOR_POSITION_I = Suppliers.CURRENT_ROBOT.get().equals(RobotType.DEV_BOT) ? /*RIPTIDE: */0: /*PERRY: */0;
+        public static final double ELEVATOR_POSITION_D = Suppliers.CURRENT_ROBOT.get().equals(RobotType.DEV_BOT) ? /*RIPTIDE: */0: /*PERRY: */0;
+        public static final double ELEVATOR_POSITION_S = Suppliers.CURRENT_ROBOT.get().equals(RobotType.DEV_BOT) ? /*RIPTIDE: */0: /*PERRY: */0;
+        public static final double ELEVATOR_POSITION_V = Suppliers.CURRENT_ROBOT.get().equals(RobotType.DEV_BOT) ? /*RIPTIDE: */0: /*PERRY: */0;
+        public static final double ELEVATOR_POSITION_A = Suppliers.CURRENT_ROBOT.get().equals(RobotType.DEV_BOT) ? /*RIPTIDE: */0: /*PERRY: */0;
     }
 
     public class WRIST {

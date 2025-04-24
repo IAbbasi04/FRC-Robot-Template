@@ -4,18 +4,16 @@ import java.util.*;
 
 import org.team8592.frc.robot.*;
 import org.team8592.frc.robot.subsystems.roller.*;
-import org.team8592.frc.robot.subsystems.superstructure.elevator.ElevatorIOKrakenX60;
-import org.team8592.frc.robot.subsystems.superstructure.elevator.ElevatorIOSim;
-import org.team8592.frc.robot.subsystems.superstructure.elevator.ElevatorSubsystem;
-import org.team8592.frc.robot.subsystems.superstructure.shoulder.ShoulderIOKrakenX60;
-import org.team8592.frc.robot.subsystems.superstructure.shoulder.ShoulderIOSim;
-import org.team8592.frc.robot.subsystems.superstructure.shoulder.ShoulderSubsystem;
-import org.team8592.frc.robot.subsystems.superstructure.wrist.WristIOKrakenX60;
-import org.team8592.frc.robot.subsystems.superstructure.wrist.WristIOSim;
-import org.team8592.frc.robot.subsystems.superstructure.wrist.WristSubsystem;
+
+import org.team8592.frc.robot.subsystems.superstructure.elevator.*;
+import org.team8592.frc.robot.subsystems.superstructure.shoulder.*;
+import org.team8592.frc.robot.subsystems.superstructure.wrist.*;
+
 import org.team8592.frc.robot.subsystems.swerve.*;
+import org.team8592.frc.robot.subsystems.swerve.ctreswerve.*;
+
 import org.team8592.frc.robot.subsystems.vision.*;
-import org.team8592.frc.robot.subsystems.swerve.ctreswerve.TunerConstants;
+
 import org.team8592.lib.MatchMode;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
@@ -32,10 +30,9 @@ public class SubsystemManager extends SubsystemBase {
     private List<NewtonSubsystem> activeSubystems = new ArrayList<>();
 
     public SubsystemManager() {
-        this.swerve = new SwerveSubsystem(new SwerveIOCTRE()); // Default amongst all bots
-
         switch(RobotSelector.getRobot()) {
             case SIM_BOT: // Robot for simulation
+                this.swerve = new SwerveSubsystem(new SwerveIOCTRE<PerryConstants>(PerryConstants.class));
                 this.roller = new RollerSubsystem(new RollerIOSim());
                 this.wrist = new WristSubsystem(new WristIOSim());
                 this.shoulder = new ShoulderSubsystem(new ShoulderIOSim());
@@ -46,6 +43,7 @@ public class SubsystemManager extends SubsystemBase {
                 break;
 
             case DEV_BOT: // Development robot
+                this.swerve = new SwerveSubsystem(new SwerveIOCTRE<RiptideConstants>(RiptideConstants.class));
                 this.roller = new RollerSubsystem(new RollerIOKrakenX60(Ports.ROLLER_CAN_ID));
                 this.wrist = new WristSubsystem(new WristIOKrakenX60(Ports.WRIST_CAN_ID));
                 this.shoulder = new ShoulderSubsystem(new ShoulderIOKrakenX60(Ports.SHOULDER_CAN_ID));
@@ -62,6 +60,7 @@ public class SubsystemManager extends SubsystemBase {
             case COMP_BOT: // Main robot for competition
             // Note - Fall through intentional
             default:
+                this.swerve = new SwerveSubsystem(new SwerveIOCTRE<PerryConstants>(PerryConstants.class));
                 this.roller = new RollerSubsystem(new RollerIOKrakenX60(Ports.ROLLER_CAN_ID));
                 this.wrist = new WristSubsystem(new WristIOKrakenX60(Ports.WRIST_CAN_ID));
                 this.shoulder = new ShoulderSubsystem(new ShoulderIOKrakenX60(Ports.SHOULDER_CAN_ID));
@@ -98,7 +97,7 @@ public class SubsystemManager extends SubsystemBase {
         });
     }
 
-    public Command onModeInitCommand(MatchMode mode) {
+    public Command onModeInit(MatchMode mode) {
         NewtonSubsystem[] subs = new NewtonSubsystem[activeSubystems.size()];
         for (int i = 0; i < activeSubystems.size(); i++) {
             subs[i] = activeSubystems.get(i);
@@ -123,10 +122,7 @@ public class SubsystemManager extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // this.activeSubystems.forEach(s -> {
-        //     s.periodicTelemetry();
-        //     s.periodicOutputs();
-        // });
+        // TODO - Figure out if we can add something here
     }
 
     @Override

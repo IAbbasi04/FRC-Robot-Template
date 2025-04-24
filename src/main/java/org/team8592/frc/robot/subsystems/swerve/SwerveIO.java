@@ -35,6 +35,10 @@ public abstract class SwerveIO implements SubsystemIO {
 
     public abstract void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds);
 
+    public abstract double getMaxTranslationalSpeed();
+
+    public abstract double getMaxRotationalSpeed();
+
     public ChassisSpeeds getTargetSpeeds() {
         return this.targetSpeeds;
     }
