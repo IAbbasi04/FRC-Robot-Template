@@ -18,7 +18,7 @@ import org.team8592.frc.robot.subsystems.swerve.ctreswerve.CommandSwerveDrivetra
 import org.team8592.frc.robot.subsystems.swerve.ctreswerve.TunerConstants;
 
 public class SwerveIOCTRE<E extends TunerConstants> extends SwerveIO {
-    public String tunerConstantsName;
+    public String tunerConstantsName = "";
 
     private final ProfiledPIDController kSnapToCtrl = Constants.SWERVE.SNAP_TO_GAINS.toProfiledPIDController();
 
@@ -36,7 +36,7 @@ public class SwerveIOCTRE<E extends TunerConstants> extends SwerveIO {
        
     public final CommandSwerveDrivetrain drivetrain = E.createDrivetrain();
     
-    public <T extends TunerConstants> SwerveIOCTRE(Class<E> tunerClass) {
+    public SwerveIOCTRE(Class<E> tunerClass) {
         this.tunerConstantsName = tunerClass.getSimpleName();
     }
 
