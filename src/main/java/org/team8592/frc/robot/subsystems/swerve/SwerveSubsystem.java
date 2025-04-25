@@ -11,7 +11,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.*;
 
 import org.team8592.frc.robot.*;
 import org.team8592.frc.robot.Constants.SWERVE;
@@ -24,6 +24,7 @@ import static org.team8592.frc.robot.Constants.SWERVE.*;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 public class SwerveSubsystem extends NewtonSubsystem {
     /**
@@ -131,13 +132,13 @@ public class SwerveSubsystem extends NewtonSubsystem {
      *
      * @param pose the pose to set the robot's known position to.
      */
-    public void resetPose(Pose2d pose) {
+    private void resetPose(Pose2d pose) {
         // TODO: implement something that allows the commented code to work
         io.setKnownOdometryPose(pose);
         logger.log("Reset Pose", pose);
     }
     
-    public void resetPose(Pose2d pose, boolean flip) {
+    private void resetPose(Pose2d pose, boolean flip) {
         if(flip){
             Pose2d flipped = new Pose2d(
                 new Translation2d(
@@ -151,28 +152,6 @@ public class SwerveSubsystem extends NewtonSubsystem {
         }
         io.setKnownOdometryPose(pose);
     }
-
-    /**
-     * Use PID to snap the robot to a rotational setpoint
-     *
-     * @param setpoint the setpoint to snap to
-     * @return the rotational velocity setpoint as a Rotation2d
-     */
-    // private double snapToAngle(Rotation2d setpoint) {
-    //     double currYaw = Math.toRadians(getYaw().getDegrees()%360);
-    //     double errorAngle = setpoint.getRadians() - currYaw;
-
-    //     if(errorAngle > Math.PI){
-    //         errorAngle -= 2*Math.PI;
-    //     }
-    //     else if(errorAngle <= -Math.PI){
-    //         errorAngle += 2*Math.PI;
-    //     }
-
-    //     double out = snapToController.calculate(0, errorAngle);
-
-    //     return out;
-    // }
 
     /**
      * Process joystick inputs for human control
@@ -225,7 +204,7 @@ public class SwerveSubsystem extends NewtonSubsystem {
         return currentSpeeds;
     }
 
-    public void addVisionMeasurement(Pose2d visionRobotPoseMeters) {
+    private void addVisionMeasurement(Pose2d visionRobotPoseMeters) {
         io.addVisionMeasurement(visionRobotPoseMeters, Timer.getFPGATimestamp());
     }
 
@@ -388,6 +367,34 @@ public class SwerveSubsystem extends NewtonSubsystem {
         )
         .andThen(() -> { // Reset to stop at path completion
             drive(new ChassisSpeeds());
+        });
+    }
+
+    public Command resetPose(Supplier<Pose2d> pose) {
+        return Commands.runOnce(() -> {
+            this.resetPose(pose.get());
+        });
+    }
+
+    public Command resetPose(Supplier<Pose2d> pose, BooleanSupplier flip) {
+        return Commands.runOnce(() -> {
+            if(flip.getAsBoolean()){
+                Pose2d flipped = new Pose2d(
+                    new Translation2d(
+                        Robot.FIELD.getFieldLength()-pose.get().getX(),
+                        pose.get().getY()
+                    ),
+                    Rotation2d.fromDegrees(180).minus(pose.get().getRotation())
+                );
+                io.setKnownOdometryPose(flipped);
+            }
+            io.setKnownOdometryPose(pose.get());
+        });
+    }
+
+    public Command addVisionMeasurement(Supplier<Pose2d> visionRobotPoseMeters) {
+        return Commands.runOnce(() -> {
+            this.addVisionMeasurement(visionRobotPoseMeters.get());
         });
     }
 }

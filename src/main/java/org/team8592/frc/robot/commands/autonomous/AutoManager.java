@@ -7,8 +7,6 @@ package org.team8592.frc.robot.commands.autonomous;
 import java.util.ArrayList;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -16,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 
 import org.team8592.frc.robot.Robot;
+import org.team8592.frc.robot.Suppliers;
 import org.team8592.frc.robot.commands.proxies.*;
 import org.team8592.frc.robot.subsystems.SubsystemManager;
 
@@ -77,9 +76,8 @@ public final class AutoManager {
             ), 
                 getAutonomousInitCommand().andThen(
                     manager.swerve.runOnce(() -> manager.swerve.resetPose(
-                        autoCommand.getStartPose(),
-                        DriverStation.getAlliance().isPresent() && 
-                            DriverStation.getAlliance().get() == Alliance.Red
+                        () -> autoCommand.getStartPose(),
+                        Suppliers.IS_RED_ALLIANCE
                     )
                 )
             ).andThen(
