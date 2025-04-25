@@ -21,19 +21,19 @@ public class SubsystemManager extends SubsystemBase {
         switch(RobotSelector.getRobot()) {
             case SIM_BOT: // Robot for simulation
                 this.swerve = new SwerveSubsystem(
-                    new SwerveIOCTRE<TunerConstants>() // CTRE Swerve works well in simulation
+                    new SwerveIOCTRE<TunerConstants>(TunerConstants.class) // CTRE Swerve works well in simulation
                 );
                 break;
             case DEV_BOT: // Development robot
                 this.swerve = new SwerveSubsystem(
-                    new SwerveIOCTRE<TunerConstants>()
+                    new SwerveIOCTRE<TunerConstants>(TunerConstants.class)
                 );
                 break;
             case COMP_BOT: // Main robot for competition
             // Note - Fall through intentional
             default:
                 this.swerve = new SwerveSubsystem(
-                    new SwerveIOCTRE<TunerConstants>()
+                    new SwerveIOCTRE<TunerConstants>(TunerConstants.class)
                 );
                 break;
         }
@@ -75,10 +75,7 @@ public class SubsystemManager extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // this.activeSubystems.forEach(s -> {
-        //     s.periodicTelemetry();
-        //     s.periodicOutputs();
-        // });
+       
     }
 
     @Override

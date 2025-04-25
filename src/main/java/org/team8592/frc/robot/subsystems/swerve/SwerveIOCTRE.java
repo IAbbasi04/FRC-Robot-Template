@@ -18,6 +18,8 @@ import org.team8592.frc.robot.subsystems.swerve.ctreswerve.CommandSwerveDrivetra
 import org.team8592.frc.robot.subsystems.swerve.ctreswerve.TunerConstants;
 
 public class SwerveIOCTRE<E extends TunerConstants> extends SwerveIO {
+    public String tunerConstantsName = "";
+
     private final ProfiledPIDController kSnapToCtrl = Constants.SWERVE.SNAP_TO_GAINS.toProfiledPIDController();
 
     private double MaxSpeed = E.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -33,6 +35,10 @@ public class SwerveIOCTRE<E extends TunerConstants> extends SwerveIO {
         .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
        
     public final CommandSwerveDrivetrain drivetrain = E.createDrivetrain();
+
+    public SwerveIOCTRE(Class<E> tunerClass) {
+        this.tunerConstantsName = tunerClass.getSimpleName();
+    }
 
     @Override
     public void drive(ChassisSpeeds speeds, boolean driveFieldRelative) {
