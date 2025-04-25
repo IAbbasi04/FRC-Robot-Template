@@ -8,10 +8,16 @@ import org.team8592.frc.robot.subsystems.superstructure.elevator.ElevatorSubsyst
 import org.team8592.frc.robot.subsystems.superstructure.shoulder.ShoulderSubsystem;
 import org.team8592.frc.robot.subsystems.superstructure.wrist.WristSubsystem;
 
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj2.command.*;
 
 public class Superstructure {
     // TODO - Put mech2d here
+    public static Mechanism2d superstructure = new Mechanism2d(1d, 1d);
+    public static MechanismRoot2d root = superstructure.getRoot("Superstructure", 0, 0);
+    // public static MechanismLigament2d elevatorLigament = root.append(new MechanismLigament2d("Elevator", 0.5, 0, 0));
     
     public static GamePiece targetPiece = GamePiece.CORAL; // Which game piece the robot is targetting
 
