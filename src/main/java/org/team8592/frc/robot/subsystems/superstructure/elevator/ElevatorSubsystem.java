@@ -37,6 +37,7 @@ public class ElevatorSubsystem extends NewtonSubsystem {
     public void periodicTelemetry() {
         logger.log("Current Inches", io.getInches());
         logger.log("Desired Inches", desiredInches);
+        logger.log("At Target", this.atPosition());
     }
 
     @Override

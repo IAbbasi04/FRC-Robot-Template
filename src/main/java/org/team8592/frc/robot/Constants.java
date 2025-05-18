@@ -4,14 +4,15 @@ import org.team8592.frc.robot.RobotSelector.RobotType;
 import org.team8592.lib.PIDProfile;
 
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.util.Units;
 
 public class Constants {
     public class CONFIG {
         public static final RobotType ROBOT_TYPE = RobotType.COMP_BOT;
         public static final boolean IGNORE_SIMBOT = false; // Runs the selected robot type in simulation rather than the simbot
-        public static final String GAME = "[_]";
-        public static final String YEAR = "202[_]";
-        public static final String ROBOT = "[_]";
+        public static final String GAME = "Reefscape";
+        public static final String YEAR = "2025";
+        public static final String ROBOT = ROBOT_TYPE.kName;
         public static final String TEAM = "8592";
     }
 
@@ -38,6 +39,19 @@ public class Constants {
         public static final double JOYSTICK_EXPONENT = 1.2;
     }
 
+    public class SUPERSTRUCTURE {
+        public static final double[] ROOT_LOCATION = {0.1, 0.1}; //meters (x, y)
+        public static final double ELEVATOR_LENGTH_METERS = Units.inchesToMeters(40d);
+        public static final double SHOULDER_LENGTH_METERS = Units.inchesToMeters(30d);
+        public static final double WRIST_LENGTH_METERS = Units.inchesToMeters(12d);
+
+        public static final double ELEVATOR_OFFSET_DEGREES = 90d;
+        public static final double SHOULDER_OFFSET_DEGREES = -170d;
+        public static final double WRIST_OFFSET_DEGREES = 170d;
+    
+        public static final double ELEVATOR_CARRIAGE_MASS_KG = Units.lbsToKilograms(30);
+    }
+
     public class ROLLER {
         
     }
@@ -45,12 +59,14 @@ public class Constants {
     public class SHOULDER {
         public static final double SHOULDER_GEAR_RATIO = 1/180.0;
 
-        public static final double SHOULDER_MIN_DEGREES = Suppliers.CURRENT_ROBOT.get().equals(RobotType.DEV_BOT) ? -2 : -2;
+        public static final double SHOULDER_MIN_DEGREES = Suppliers.CURRENT_ROBOT.get().equals(RobotType.DEV_BOT) ? -20 : -20;
         public static final double SHOULDER_MAX_DEGREES = Suppliers.CURRENT_ROBOT.get().equals(RobotType.DEV_BOT) ? 180 : 180;
+
+        public static final double SHOULDER_MOMENT_OF_INERTIA = (1d/12d * Units.lbsToKilograms(10) * Units.inchesToMeters(Math.pow(SUPERSTRUCTURE.SHOULDER_LENGTH_METERS / 2d, 2d)));
 
         public static final double SAFE_SHOULDER_TO_ROTATE_WRIST_DEGREES = Suppliers.CURRENT_ROBOT.get().equals(RobotType.DEV_BOT)  ? 75 : 40;
 
-        public static final double SHOULDER_POSITION_TOLERANCE_DEGREES = 2.0;
+        public static final double SHOULDER_POSITION_TOLERANCE_DEGREES = 1.0;
 
         public static final int SHOULDER_CURRENT_LIMIT_AMPS = 40; //amps
 
@@ -90,10 +106,12 @@ public class Constants {
     public class WRIST {
         public static final double WRIST_GEAR_RATIO = 1/75.0;
 
-        public static final double WRIST_ANGLE_DEGREES_MIN = CONFIG.ROBOT_TYPE.isCompBot()?-45d:-45d; // Currently the same between the 2 bots
-        public static final double WRIST_ANGLE_DEGREES_MAX = CONFIG.ROBOT_TYPE.isCompBot()?220:220; // Currently the same between the 2 bots
+        public static final double WRIST_ANGLE_DEGREES_MIN = Suppliers.CURRENT_ROBOT.get().equals(RobotType.DEV_BOT) ? -225d : -225d;
+        public static final double WRIST_ANGLE_DEGREES_MAX = Suppliers.CURRENT_ROBOT.get().equals(RobotType.DEV_BOT) ? 213 : 213;
 
-        public static final double WRIST_POSITION_TOLERANCE = 2.0;
+        public static final double WRIST_POSITION_TOLERANCE_DEGREES = 1.0;
+
+        public static final double WRIST_MOMENT_OF_INERTIA = (1d/12d * Units.lbsToKilograms(3) * Units.inchesToMeters(Math.pow(SUPERSTRUCTURE.WRIST_LENGTH_METERS / 2d, 2d)));
 
         public static final int WRIST_CURRENT_LIMIT = 60;//amps
 

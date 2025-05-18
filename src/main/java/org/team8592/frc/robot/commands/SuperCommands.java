@@ -1,13 +1,17 @@
 package org.team8592.frc.robot.commands;
 
-import org.team8592.frc.robot.Constants;
-import org.team8592.frc.robot.Robot;
+import java.util.Optional;
+import java.util.Set;
+
+import org.photonvision.EstimatedRobotPose;
+import org.team8592.frc.robot.commands.proxies.NamedCommand;
 import org.team8592.frc.robot.subsystems.swerve.SwerveSubsystem;
 import org.team8592.frc.robot.subsystems.vision.VisionSubsystem;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 
 /**
@@ -15,19 +19,27 @@ import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
  */
 public final class SuperCommands {
     public static Command updateOdometryWithVision(SwerveSubsystem swerve, VisionSubsystem vision) {
-        return new ConditionalCommand(
-            // If we are disabled, reset robot pose to the vision-based estimated pose
-            swerve.resetPose(() -> vision.getRobotPoseVision().get().estimatedPose.toPose2d())
-                .onlyWhile(() -> Math.abs(vision.getPoseAmbiguityRatio()) < Constants.VISION.MAX_ACCEPTABLE_AMBIGUITY), 
-
-            // If we are enabled, add the vision-based estimated pose to the odometry
-            swerve.addVisionMeasurement(() -> vision.getRobotPoseVision().get().estimatedPose.toPose2d())
-                .onlyWhile(() -> Math.abs(vision.getPoseAmbiguityRatio()) < Constants.VISION.MAX_ACCEPTABLE_AMBIGUITY),
-
-            // If driver station is disabled
-            () -> DriverStation.isDisabled()
-        )
-        .onlyWhile(() -> vision.getRobotPoseVision().isPresent() && Robot.isReal())
-        .withInterruptBehavior(InterruptionBehavior.kCancelSelf);
+        return new NamedCommand("Field Localize", new DeferredCommand(() -> {
+            if (RobotBase.isReal()){
+                Optional<EstimatedRobotPose> robotPose = vision.getRobotPoseVision();
+                if (robotPose.isPresent()) {
+                    if(
+                        vision.getTargets().size() > 1 || (
+                            Math.abs(vision.getPoseAmbiguityRatio()) < 0.1
+                            && vision.getTargets().size() > 0 && vision.getTargets().get(0).bestCameraToTarget.getX() < 1.0
+                        )
+                    ) {
+                        if (DriverStation.isDisabled() && !robotPose.get().estimatedPose.toPose2d().equals(new Pose2d())){
+                            return swerve.resetPose(() -> robotPose.get().estimatedPose.toPose2d());
+                        } else {
+                            return swerve.addVisionMeasurement(() -> robotPose.get().estimatedPose.toPose2d(), () -> robotPose.get().timestampSeconds);
+                        }
+                    }
+                }
+            }
+            return Commands.none();
+        }, Set.of(vision)))
+        .withInterruptBehavior(InterruptionBehavior.kCancelSelf)
+        .ignoringDisable(true);
     }
 }

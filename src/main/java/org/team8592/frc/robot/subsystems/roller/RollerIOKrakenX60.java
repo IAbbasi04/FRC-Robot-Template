@@ -43,5 +43,4 @@ public class RollerIOKrakenX60 extends RollerIO {
     public double getMaxVelocityRPM() {
         return this.rollerMotor.getMaxFreeVelocity();
     }
-    
 }

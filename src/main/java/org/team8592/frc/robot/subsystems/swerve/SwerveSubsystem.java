@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.*;
 
 import org.team8592.frc.robot.*;
 import org.team8592.frc.robot.Constants.SWERVE;
+import org.team8592.frc.robot.commands.proxies.NamedCommand;
 import org.team8592.frc.robot.subsystems.NewtonSubsystem;
 import org.team8592.lib.MatchMode;
 import org.team8592.lib.SmoothingFilter;
@@ -204,8 +205,12 @@ public class SwerveSubsystem extends NewtonSubsystem {
         return currentSpeeds;
     }
 
+    private void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestamp) {
+        io.addVisionMeasurement(visionRobotPoseMeters, timestamp);
+    }
+
     private void addVisionMeasurement(Pose2d visionRobotPoseMeters) {
-        io.addVisionMeasurement(visionRobotPoseMeters, Timer.getFPGATimestamp());
+        this.addVisionMeasurement(visionRobotPoseMeters, Timer.getFPGATimestamp());
     }
 
     @Override
@@ -282,13 +287,14 @@ public class SwerveSubsystem extends NewtonSubsystem {
      * @return the command
      */
     public Command joystickDrive(DoubleSupplier translateX, DoubleSupplier translateY, DoubleSupplier rotate) {
-        return run(() -> {
-            drive(processJoystickInputs(
-                translateX.getAsDouble(),
-                translateY.getAsDouble(),
-                rotate.getAsDouble()
-            ), DriveModes.AUTOMATIC);
-        });
+        return new NamedCommand("Joystick Drive", run(() -> {
+            drive(
+                processJoystickInputs(
+                    translateX.getAsDouble(),
+                    translateY.getAsDouble(),
+                    rotate.getAsDouble()
+                ), DriveModes.AUTOMATIC);
+        }));
     }
 
     /**
@@ -303,7 +309,7 @@ public class SwerveSubsystem extends NewtonSubsystem {
      * @return the command
      */
     public Command snapToAngle(Rotation2d angle, DoubleSupplier translateX, DoubleSupplier translateY) {
-        return run(() -> {
+        return new NamedCommand("Snap To " + angle.getDegrees() + " Degrees", run(() -> {
             double currYaw = Math.toRadians(getYaw().getDegrees()%360);
             double errorAngle = angle.getRadians() - currYaw;
 
@@ -322,7 +328,7 @@ public class SwerveSubsystem extends NewtonSubsystem {
                     translateY.getAsDouble(),
                     rotSpeed
                 ), DriveModes.AUTOMATIC);
-        });
+        }));
     }
 
     public Command followTrajectory(Trajectory trajectory) {
@@ -330,7 +336,7 @@ public class SwerveSubsystem extends NewtonSubsystem {
     }
 
     public Command followTrajectory(Trajectory trajectory, BooleanSupplier flip) {
-        return runOnce(() -> { // Initialize
+        return new NamedCommand("Follow Trajectory", this.runOnce(() -> { // Initialize
             trajectoryTimer.reset();
             trajectoryTimer.restart();
             this.pathFollowerCtrl = new HolonomicDriveController(
@@ -367,7 +373,7 @@ public class SwerveSubsystem extends NewtonSubsystem {
         )
         .andThen(() -> { // Reset to stop at path completion
             drive(new ChassisSpeeds());
-        });
+        }));
     }
 
     public Command resetPose(Supplier<Pose2d> pose) {
@@ -395,6 +401,12 @@ public class SwerveSubsystem extends NewtonSubsystem {
     public Command addVisionMeasurement(Supplier<Pose2d> visionRobotPoseMeters) {
         return Commands.runOnce(() -> {
             this.addVisionMeasurement(visionRobotPoseMeters.get());
+        });
+    }
+
+    public Command addVisionMeasurement(Supplier<Pose2d> visionRobotPoseMeters, DoubleSupplier timestamp) {
+        return Commands.runOnce(() -> {
+            this.addVisionMeasurement(visionRobotPoseMeters.get(), timestamp.getAsDouble());
         });
     }
 }

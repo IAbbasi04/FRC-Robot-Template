@@ -25,38 +25,16 @@ public class WristIOKrakenX60 extends WristIO {
 
     @Override
     public void setPercentOutput(double desiredPercent) {
-        targetVoltage = desiredPercent * 12d;
         this.wristMotor.setPercentOutput(desiredPercent);
     }
 
     @Override
-    public void setDegrees(double desiredDegrees) {
-        this.wristMotor.setPosition(desiredDegrees);
-        targetVoltage = Double.NaN;
-    }
-
-    @Override
-    public void trimAngle(double trimDeltaDegrees) {
-        setDegrees(getTargetDegrees() + trimDeltaDegrees);
+    public void setDegrees(double degrees) {
+        this.wristMotor.setPosition(degrees);
     }
 
     @Override
     public double getDegrees() {
         return wristMotor.getRotations() * Constants.WRIST.WRIST_GEAR_RATIO;
-    }
-
-    @Override
-    public double getVoltage() {
-        return wristMotor.getMotorVoltage();
-    }
-
-    @Override
-    public double getTargetVoltage() {
-        return this.targetVoltage;
-    }
-
-    @Override
-    public double getVelocityRPM() {
-        return wristMotor.getVelocityRPM();
     }
 }

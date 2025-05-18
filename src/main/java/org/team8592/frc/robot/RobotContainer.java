@@ -7,6 +7,7 @@ package org.team8592.frc.robot;
 import org.team8592.frc.robot.Controls.ControlSets;
 import org.team8592.frc.robot.commands.SuperCommands;
 import org.team8592.frc.robot.commands.autonomous.*;
+import org.team8592.frc.robot.commands.proxies.NamedCommand;
 import org.team8592.frc.robot.subsystems.SubsystemManager;
 import org.team8592.frc.robot.subsystems.roller.RollerSubsystem;
 import org.team8592.frc.robot.subsystems.superstructure.Superstructure;
@@ -47,6 +48,8 @@ public class RobotContainer {
         configureDefaults();
 
         AutoManager.prepare();
+
+        Superstructure.initializeMech2d();
     }
 
     /**
@@ -55,6 +58,7 @@ public class RobotContainer {
     private void passSubsystems(){
         AutoManager.addSubsystems(manager);
         AutoCommand.addSubsystems(manager);
+        Superstructure.addSubsystems(manager);
     }
 
     /**
@@ -117,165 +121,148 @@ public class RobotContainer {
 
         Controls.intake.whileTrue(
             // Check to see if we are in algae mode
-            new ConditionalCommand( 
-                
-                // Spin rollers to intake algae
-                manager.roller.setPercentPower(-0.3),
-
-                // Check to see if we are in coral mode
+            new NamedCommand(
+                "Intake", 
                 new ConditionalCommand( 
-
-                    // Spin rollers to intake coral
-                    manager.roller.setPercentPower(1.0),
-
-                    // Check to see if we are in deep climb mode
+                    // Spin rollers to intake algae
+                    manager.roller.setPercentPower(-0.3),
+                    // Check to see if we are in coral mode
                     new ConditionalCommand( 
-
-                        // Run Deep climb intake if we are neither in coral or algae mode
-                        // TODO - ADD ABILITY TO INTAKE CAGE
-                        Commands.none(),
-
-                        // Do nothing if we are in neither coral, algae, nor deep climb mode
-                        Commands.none(), 
-
-                        // If we are in climb mode
-                        Suppliers.IS_CLIMB_MODE
+                        // Spin rollers to intake coral
+                        manager.roller.setPercentPower(1.0),
+                        // Check to see if we are in deep climb mode
+                        new ConditionalCommand( 
+                            // Run Deep climb intake if we are neither in coral or algae mode
+                            // TODO - ADD ABILITY TO INTAKE CAGE
+                            Commands.none(),
+                            // Do nothing if we are in neither coral, algae, nor deep climb mode
+                            Commands.none(), 
+                            // If we are in climb mode
+                            Suppliers.IS_CLIMB_MODE
+                        ), 
+                        // If we are in coral mode
+                        Suppliers.IS_CORAL_MODE
                     ), 
-
-                    // If we are in coral mode
-                    Suppliers.IS_CORAL_MODE
-                ), 
-
-                // If we are in algae mode
-                Suppliers.IS_ALGAE_MODE
+                    // If we are in algae mode
+                    Suppliers.IS_ALGAE_MODE
+                )
             )
         );
 
         Controls.score.whileTrue(
-            // Check to see if we are in algae mode
-            new ConditionalCommand( 
-                
-                // Spin rollers to score algae
-                manager.roller.setPercentPower(1.0),
-
-                // Check to see if we are in coral mode
+            new NamedCommand(
+                "Score", 
+                // Check to see if we are in algae mode
                 new ConditionalCommand( 
-
-                    // Check to see if we are in coral L1 scoring mode
-                    new ConditionalCommand(
-
-                        // Score at lowered speed for L1
-                        manager.roller.setPercentPower(-0.5), 
-
-                        // Spin rollers to score coral
-                        manager.roller.setPercentPower(-1.0), 
-
-                        // If we are in L1 mode
-                        () -> Superstructure.appliedState.equals(States.L1)
-                    ),
-
-                    // Check to see if we are in deep climb mode
+                    // Spin rollers to score algae
+                    manager.roller.setPercentPower(1.0),
+                    // Check to see if we are in coral mode
                     new ConditionalCommand( 
+                        // Check to see if we are in coral L1 scoring mode
+                        new ConditionalCommand(
+                            // Score at lowered speed for L1
+                            manager.roller.setPercentPower(-0.5), 
+                            // Spin rollers to score coral
+                            manager.roller.setPercentPower(-1.0), 
+                            // If we are in L1 mode
+                            () -> Superstructure.appliedState.equals(States.L1)
+                        ),
+                        // Check to see if we are in deep climb mode
+                        new ConditionalCommand( 
+                            // Run deep climb rollers to outtake if we are in climb mode
+                            // TODO - ADD ABILITY TO OUTTAKE CAGE
+                            Commands.none(),
 
-                        // Run deep climb rollers to outtake if we are in climb mode
-                        // TODO - ADD ABILITY TO OUTTAKE CAGE
-                        Commands.none(),
+                            // Do nothing if we are in neither coral, algae, nor deep climb mode
+                            Commands.none(), 
 
-                        // Do nothing if we are in neither coral, algae, nor deep climb mode
-                        Commands.none(), 
-
-                        // If we are in climb mode
-                        Suppliers.IS_CLIMB_MODE
+                            // If we are in climb mode
+                            Suppliers.IS_CLIMB_MODE
+                        ), 
+                        // If we are in coral mode
+                        Suppliers.IS_CORAL_MODE
                     ), 
-
-                    // If we are in coral mode
-                    Suppliers.IS_CORAL_MODE
-                ), 
-
-                // If we are in algae mode
-                Suppliers.IS_ALGAE_MODE
+                    // If we are in algae mode
+                    Suppliers.IS_ALGAE_MODE
+                )
             )
         );
 
         Controls.stow.onTrue(
-            // Check to see if we are in algae mode
-            new ConditionalCommand( 
-                
-                // Spin rollers to intake algae
-                manager.roller.setPercentPower(-0.3),
-
-                // Check to see if we are in coral mode
+            new NamedCommand("Stow", // Check to see if we are in algae mode
                 new ConditionalCommand( 
-
-                    // Spin rollers to intake coral
-                    manager.roller.setPercentPower(1.0),
-
-                    // Check to see if we are in deep climb mode
+                    // Set to algae stow position
+                    Superstructure.goToPosition(States.ALGAE_STOW),
+                    // Check to see if we are in coral mode
                     new ConditionalCommand( 
-                        // Go back to coral stow mode and reset climber
-                        Superstructure.setTargetGamePiece(GamePiece.CORAL).alongWith(
-                            Superstructure.goToPosition(States.DEEP_CLIMB_CLEARANCE)
-                            // TODO - ADD ABILITY TO RESET CLIMBER
-                        ).andThen(
-                            Superstructure.goToPosition(States.STOW)
-                        ),
-
-                        // Do nothing if we are in neither coral, algae, nor deep climb mode
-                        Commands.none(), 
-
-                        // If we are in climb mode
-                        Suppliers.IS_CLIMB_MODE
+                        // Set to coral stow position
+                        Superstructure.goToPosition(States.CORAL_STOW),
+                        // Check to see if we are in deep climb mode
+                        new ConditionalCommand( 
+                            // Go back to coral stow mode and reset climber
+                            Superstructure.setTargetGamePiece(GamePiece.CORAL).alongWith(
+                                Superstructure.goToPosition(States.DEEP_CLIMB_CLEARANCE)
+                                // TODO - ADD ABILITY TO RESET CLIMBER
+                            ).andThen(
+                                Superstructure.goToPosition(States.CORAL_STOW)
+                            ),
+                            // Do nothing if we are in neither coral, algae, nor deep climb mode
+                            Commands.none(), 
+                            // If we are in climb mode
+                            Suppliers.IS_CLIMB_MODE
+                        ), 
+                        // If we are in coral mode
+                        Suppliers.IS_CORAL_MODE
                     ), 
-
-                    // If we are in coral mode
-                    Suppliers.IS_CORAL_MODE
-                ), 
-
-                // If we are in algae mode
-                Suppliers.IS_ALGAE_MODE
+                    // If we are in algae mode
+                    Suppliers.IS_ALGAE_MODE
+                )
             )
         );
 
-        Controls.goToTargetPosition.onTrue(Superstructure.goToTargetPosition());
+        Controls.goToTargetPosition.onTrue(new NamedCommand("Go To Target Position", Superstructure.goToTargetPosition()));
 
-        Controls.setCoralMode.onTrue(Superstructure.setTargetGamePiece(GamePiece.CORAL));
-        Controls.setAlgaeMode.onTrue(Superstructure.setTargetGamePiece(GamePiece.ALGAE));
-        Controls.setDeepClimbMode.onTrue(Superstructure.setTargetGamePiece(GamePiece.CAGE));
+        Controls.setCoralMode.onTrue(new NamedCommand("Set to Coral Mode", Superstructure.setTargetGamePiece(GamePiece.CORAL)));
+        Controls.setAlgaeMode.onTrue(new NamedCommand("Set to Algae Mode", Superstructure.setTargetGamePiece(GamePiece.ALGAE)));
+        Controls.setDeepClimbMode.onTrue(new NamedCommand("Set to Climb Mode", Superstructure.setTargetGamePiece(GamePiece.CAGE)));
 
-        Controls.primeL1.onTrue(Superstructure.setTargetPosition(States.L1));
-        Controls.primeL2.onTrue(Superstructure.setTargetPosition(States.L2));
-        Controls.primeL3.onTrue(Superstructure.setTargetPosition(States.L3));
-        Controls.primeL4.onTrue(Superstructure.setTargetPosition(States.L4));
+        Controls.primeL1.onTrue(new NamedCommand("Prime to L1", Superstructure.setTargetPosition(States.L1)));
+        Controls.primeL2.onTrue(new NamedCommand("Prime to L2", Superstructure.setTargetPosition(States.L2)));
+        Controls.primeL3.onTrue(new NamedCommand("Prime to L3", Superstructure.setTargetPosition(States.L3)));
+        Controls.primeL4.onTrue(new NamedCommand("Prime to L4", Superstructure.setTargetPosition(States.L4)));
 
-        Controls.primeProcessor.onTrue(Superstructure.setTargetPosition(States.PROCESSOR));
-        Controls.primeL2Algae.onTrue(Superstructure.setTargetPosition(States.L2_ALGAE));
-        Controls.primeL3Algae.onTrue(Superstructure.setTargetPosition(States.L3_ALGAE));
-        Controls.primeNet.onTrue(Superstructure.setTargetPosition(States.NET));
+        Controls.primeProcessor.onTrue(new NamedCommand("Prime to Processor", Superstructure.setTargetPosition(States.PROCESSOR)));
+        Controls.primeL2Algae.onTrue(new NamedCommand("Prime to L2 Algae", Superstructure.setTargetPosition(States.L2_ALGAE)));
+        Controls.primeL3Algae.onTrue(new NamedCommand("Prime to L3 Algae", Superstructure.setTargetPosition(States.L3_ALGAE)));
+        Controls.primeNet.onTrue(new NamedCommand("Prime to Net", Superstructure.setTargetPosition(States.NET)));
 
         Controls.autoLockLeftBranch.whileTrue(
             // TODO - ADD ABILITY TO AUTO LOCK
-            Commands.none()
+            new NamedCommand("Auto Lock to Left Branch", Commands.none())
         );
 
         Controls.autoLockRightBranch.whileTrue(
             // TODO - ADD ABILITY TO AUTO LOCK
-            Commands.none()
+            new NamedCommand("Auto Lock to Right Branch", Commands.none())
         );
 
         Controls.manualDeepClimbUp.whileTrue(
             // TODO - ADD ABILITY TO MOVE DEEP CLIMB UP
-            Commands.none()
+            new NamedCommand("Manually Raise Deep Climb", Commands.none())
         );
 
         Controls.manualDeepClimbDown.whileTrue(
             // TODO - ADD ABILITY TO MOVE DEEP CLIMB DOWN
-            Commands.none()
+            new NamedCommand("Manually Lower Deep Climb", Commands.none())
         );
 
         Controls.deepClimbInitialize.onTrue(
             // TODO - ADD ABILITY TO INITIALIZE DEEP CLIMB
-            Commands.none()
+            new NamedCommand("Initialize Deep Climb", Commands.none())
         );
+
+        Controls.getDriver().b().onTrue(manager.elevator.setInches(() -> States.L4.elevatorInches));
+        Controls.getDriver().y().onTrue(manager.elevator.setInches(() -> States.CORAL_STOW.elevatorInches));
     };
 
     public Command onModeInit(MatchMode mode) {

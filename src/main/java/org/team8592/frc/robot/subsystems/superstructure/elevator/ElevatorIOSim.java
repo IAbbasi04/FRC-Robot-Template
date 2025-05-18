@@ -1,35 +1,38 @@
 package org.team8592.frc.robot.subsystems.superstructure.elevator;
 
 import org.team8592.frc.robot.Robot;
+import org.team8592.frc.robot.Constants.ELEVATOR;
+import org.team8592.frc.robot.Constants.SUPERSTRUCTURE;
+import org.team8592.frc.robot.subsystems.superstructure.Superstructure;
+import org.team8592.lib.PIDProfile;
 
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
-import edu.wpi.first.wpilibj.smartdashboard.*;
 
 public class ElevatorIOSim extends ElevatorIO {
+    private final ProfiledPIDController positionCtrl = new PIDProfile()
+        .setP(1.0)
+        .setMaxVelocity(100d)
+        .setMaxAcceleration(300d)
+        .toProfiledPIDController();
+
     private ElevatorSim elevatorSim = new ElevatorSim(
         DCMotor.getKrakenX60(2),
-        4.0,
-        Units.lbsToKilograms(30),
-        Units.inchesToMeters(1),
-        Units.inchesToMeters(30),
-        Units.inchesToMeters(60),
+        1d / ELEVATOR.EXTENSION_GEAR_RATIO,
+        SUPERSTRUCTURE.ELEVATOR_CARRIAGE_MASS_KG,
+        ELEVATOR.EXTENSION_DRUM_DIAMETER_INCHES,
+        SUPERSTRUCTURE.ELEVATOR_LENGTH_METERS,
+        SUPERSTRUCTURE.ELEVATOR_LENGTH_METERS + Units.inchesToMeters(ELEVATOR.EXTENSION_INCHES_MAX),
         false,
-        Units.inchesToMeters(30)
+        SUPERSTRUCTURE.ELEVATOR_LENGTH_METERS
     );
-
-    private Mechanism2d elevatorMech = new Mechanism2d(2d, 2d);
-    private MechanismRoot2d root = elevatorMech.getRoot("Elevator Root", 0.1, 0.1);
-    private MechanismLigament2d elevator = root.append(new MechanismLigament2d("Elevator", Units.inchesToMeters(30), 90d));
-
-    public ElevatorIOSim() {
-        SmartDashboard.putData("Elevator Sim", elevatorMech);
-    }
 
     @Override
     public void setInches(double inches) {
-        elevatorSim.setState(Units.inchesToMeters(inches), 0d);
+        double desiredVoltage = positionCtrl.calculate(getInches(), inches);
+        this.elevatorSim.setInput(0, desiredVoltage, 0);
     }
 
     @Override
@@ -39,12 +42,13 @@ public class ElevatorIOSim extends ElevatorIO {
 
     @Override
     public void setPercentOutput(double percentOutput) {
-        elevatorSim.setInput(percentOutput * 12d);
+        this.elevatorSim.setInput(percentOutput * 12d);
     }
 
     @Override
     public void updateInputs() {
-        elevatorSim.update(Robot.CLOCK.dt());
-        this.elevator.setLength(getInches());
+        this.elevatorSim.update(Robot.CLOCK.dt());
+        // Superstructure.elevatorLigament.setLength(Units.inchesToMeters(getInches()) + SUPERSTRUCTURE.ELEVATOR_LENGTH_METERS);
+        Superstructure.elevatorLigament.setAngle(Robot.CLOCK.get());
     }
 }

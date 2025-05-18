@@ -2,6 +2,8 @@ package org.team8592.frc.robot.subsystems.superstructure.shoulder;
 
 import java.util.function.DoubleSupplier;
 
+import org.team8592.frc.robot.Robot;
+import org.team8592.frc.robot.Constants.SHOULDER;
 import org.team8592.frc.robot.subsystems.NewtonSubsystem;
 import org.team8592.lib.MatchMode;
 import org.team8592.lib.Utils;
@@ -34,7 +36,7 @@ public class ShoulderSubsystem extends NewtonSubsystem {
     }
 
     public boolean atPosition(double degrees) {
-        return Utils.isWithin(this.getDegrees(), degrees, 0.25);
+        return Utils.isWithin(this.getDegrees(), degrees, SHOULDER.SHOULDER_POSITION_TOLERANCE_DEGREES);
     }
 
     @Override
@@ -44,8 +46,9 @@ public class ShoulderSubsystem extends NewtonSubsystem {
 
     @Override
     public void periodicTelemetry() {
-        logger.log("Current Degrees", io.getDegrees());
-        logger.log("Target Degrees", targetDegrees);
+        logger.log("Current Degrees", this.io.getDegrees());
+        logger.log("Target Degrees", this.targetDegrees);
+        logger.log("At Target", this.atPosition());
         this.io.updateInputs();
     }
 
@@ -61,7 +64,10 @@ public class ShoulderSubsystem extends NewtonSubsystem {
     public Command setDegrees(DoubleSupplier degrees) {
         return this.run(() -> {
             this.setDegrees(degrees.getAsDouble());
-        }).until(() -> atPosition());
+        }).until(() -> atPosition())
+        .finallyDo(() -> { // Simulation forgets to actually end the command
+            if (Robot.isSimulation()) this.io.setPercentOutput(0d);
+        });
     }
 
     public Command setPercentOutput(DoubleSupplier percent) {

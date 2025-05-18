@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 
 import org.team8592.lib.logging.SmartLogger;
+import org.team8592.frc.robot.commands.proxies.NamedCommand;
 import org.team8592.lib.MatchMode;
 
 public abstract class NewtonSubsystem extends SubsystemBase {
@@ -32,7 +33,7 @@ public abstract class NewtonSubsystem extends SubsystemBase {
      * Creates a stop command for this subsystem
      */
     public Command getStopCommand() {
-        return this.runOnce(() -> {stop();});
+        return new NamedCommand("Stop", this.runOnce(() -> {stop();}));
     }
 
     /**
@@ -49,6 +50,7 @@ public abstract class NewtonSubsystem extends SubsystemBase {
      */
     @Override
     public void setDefaultCommand(Command command) {
+        command.addRequirements(this);
         super.setDefaultCommand(command.withInterruptBehavior(InterruptionBehavior.kCancelSelf));
     }
 
@@ -62,14 +64,14 @@ public abstract class NewtonSubsystem extends SubsystemBase {
 
     public Command getCurrentCommand() {
         if (super.getCurrentCommand() == null) {// No command currently running
-            return Commands.none();
+            return new NamedCommand("No Command", Commands.none());
         }
         return super.getCurrentCommand();
     }
 
     public Command getDefaultCommand() {
         if (super.getDefaultCommand() == null) {// No default command
-            return Commands.none();
+            return new NamedCommand("No Command", Commands.none());
         }
         return super.getDefaultCommand();
     }

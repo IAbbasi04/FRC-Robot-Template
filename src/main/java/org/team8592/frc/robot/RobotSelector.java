@@ -12,9 +12,15 @@ public class RobotSelector {
     }
 
     public static enum RobotType {
-        COMP_BOT,
-        DEV_BOT,
-        SIM_BOT;
+        COMP_BOT("Perry"),
+        DEV_BOT("Riptide"),
+        SIM_BOT("SimBot"),
+        ;
+
+        public final String kName;
+        private RobotType(String name) {
+            this.kName = name;
+        }
 
         public boolean isCompBot() {
             return this.equals(RobotType.COMP_BOT);

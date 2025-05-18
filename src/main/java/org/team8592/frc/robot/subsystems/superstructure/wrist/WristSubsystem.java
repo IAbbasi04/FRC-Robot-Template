@@ -2,6 +2,8 @@ package org.team8592.frc.robot.subsystems.superstructure.wrist;
 
 import java.util.function.DoubleSupplier;
 
+import org.team8592.frc.robot.Constants;
+import org.team8592.frc.robot.Robot;
 import org.team8592.frc.robot.subsystems.NewtonSubsystem;
 import org.team8592.lib.MatchMode;
 import org.team8592.lib.Utils;
@@ -34,7 +36,7 @@ public class WristSubsystem extends NewtonSubsystem {
     }
 
     public boolean atPosition(double degrees) {
-        return Utils.isWithin(this.getDegrees(), degrees, 0.25);
+        return Utils.isWithin(getDegrees(), targetDegrees, Constants.WRIST.WRIST_POSITION_TOLERANCE_DEGREES);
     }
 
     @Override
@@ -44,14 +46,9 @@ public class WristSubsystem extends NewtonSubsystem {
 
     @Override
     public void periodicTelemetry() {
+        logger.log("Target Wrist Degrees", this.targetDegrees);
         logger.log("Current Wrist Degrees", io.getDegrees());
-        logger.log("Target Wrist Degrees", io.getTargetDegrees());
-        logger.log("At Target Position", io.atTargetPosition());
-
-        logger.log("Target Voltage", io.getTargetVoltage());
-        logger.log("Current Voltage", io.getVoltage());
-        
-        logger.log("Current Velocity RPM", io.getVelocityRPM());
+        logger.log("At Target Position", this.atPosition());
 
         io.updateInputs();
     }
@@ -63,8 +60,13 @@ public class WristSubsystem extends NewtonSubsystem {
 
     // ========= Commands ======== \\
 
-    public Command setDegrees(DoubleSupplier desiredDegrees) {
-        return run(() -> this.setDegrees(desiredDegrees.getAsDouble())).until(() -> io.atTargetPosition());
+    public Command setDegrees(DoubleSupplier degrees) {
+        return this.run(() -> {
+            this.setDegrees(degrees.getAsDouble());
+        }).until(() -> atPosition())
+        .finallyDo(() -> { // Simulation forgets to actually end the command
+            if (Robot.isSimulation()) this.io.setPercentOutput(0d);
+        });
     }
 
     public Command setPercentPower(DoubleSupplier desiredPercent) {
