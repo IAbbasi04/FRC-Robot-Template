@@ -38,7 +38,10 @@ public class PIDProfile implements Sendable {
 
     public boolean useSmartMotion = false;
 
+    public SimpleMotorFeedforward feedForward = null;
+
     private static int instances = 0;
+
 
     public PIDProfile() {
         SendableRegistry.add(this, this.getClass().getSimpleName(), instances);
@@ -96,6 +99,7 @@ public class PIDProfile implements Sendable {
 
     public PIDProfile setV(double gain) {
         this.kV = gain;
+        this.refreshFF();
         return this;
     }
 
@@ -105,6 +109,7 @@ public class PIDProfile implements Sendable {
 
     public PIDProfile setA(double gain) {
         this.kA = gain;
+        this.refreshFF();
         return this;
     }
 
@@ -114,6 +119,7 @@ public class PIDProfile implements Sendable {
 
     public PIDProfile setS(double gain) {
         this.kS = gain;
+        this.refreshFF();
         return this;
     }
 
@@ -259,6 +265,10 @@ public class PIDProfile implements Sendable {
 
     public PIDConstants toPIDConstants() {
         return new PIDConstants(kP, kI, kD);
+    }
+
+    private void refreshFF() {
+        this.feedForward = new SimpleMotorFeedforward(kS, kV, kA);
     }
 
     @Override
