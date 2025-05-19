@@ -12,7 +12,6 @@ public abstract class NewtonMotor {
     protected List<PIDProfile> motorPIDGains = new ArrayList<>();
     protected int deviceID = 0;
     protected boolean inverted = false;
-    protected MotorConstants motorConstants = null;
     protected double desiredVelocityRPM = 0d;
     protected EncoderSim simEncoder; 
     protected DCMotorSim simMotor;
@@ -85,18 +84,6 @@ public abstract class NewtonMotor {
 
     public int getDeviceID() {
         return this.deviceID;
-    }
-
-    public double getMaxFreeVelocity() {
-        return this.motorConstants.MAX_VELOCITY_RPM;
-    }
-
-    public MotorConstants getMotorConstants() {
-        return this.motorConstants;
-    }
-
-    public double getVoltageToRPMRatio() {
-        return this.motorConstants.MOTOR_KV;
     }
 
     public List<PIDProfile> getPIDGains() {
