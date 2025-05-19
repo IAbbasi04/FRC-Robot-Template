@@ -5,7 +5,7 @@ import edu.wpi.first.math.util.Units;
 public final class ElevatorConstants {
     public static final double DRUM_RADIUS_METERS = Units.inchesToMeters(1d);
 
-    public static final double GEAR_RATIO = 1d / 25d;
+    public static final double GEAR_RATIO = 1d / 16d;
 
     public static final double BASE_STAGE_HEIGHT_METERS = Units.inchesToMeters(30d);
 

@@ -82,7 +82,7 @@ public class SubsystemManager extends SubsystemBase {
 
         return Commands.runOnce(() -> {
             activeSubystems.forEach(s -> s.onModeInit(mode));
-        }, subs);
+        }, subs).ignoringDisable(mode.equals(MatchMode.DISABLED));
     }
 
     public List<Subsystem> getAllSubsystemsAsList() {

@@ -14,6 +14,9 @@ import frc.robot.subsystems.SubsystemManager;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import lib.team1731.MatchMode;
+import lib.team8592.PIDProfile;
+import lib.team8592.hardware.motor.TestMotor;
+import lib.team8592.hardware.motor.talonfx.TalonFXMotor;
 
 public class RobotContainer {
     // The robot's subsystems
@@ -22,6 +25,9 @@ public class RobotContainer {
     private final VisionSubsystem vision;
 
     private final AutoLoader autoLoader;
+
+    private TestMotor testElevator = new TestMotor(20, false, TalonFXMotor.class)
+        .withGains(new PIDProfile().setP(0.01).setV(0.1));
 
     /**
      * Create the robot container. This creates and configures subsystems, sets
@@ -57,6 +63,8 @@ public class RobotContainer {
         ));
 
         vision.setDefaultCommand(SuperCommands.updateOdometryWithVision(swerve, vision));
+
+        testElevator.setDefaultCommand(testElevator.setPosition(testElevator.getRotations()));
     }
 
     /**
@@ -103,8 +111,8 @@ public class RobotContainer {
             ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
 
-        Controls.getDriver().y().onTrue(manager.elevator.setInches(() -> 20));
-        Controls.getDriver().a().onTrue(manager.elevator.setInches(() -> 0));
+        Controls.getDriver().rightTrigger().whileTrue(testElevator.setPosition(5));
+        Controls.getDriver().leftTrigger().whileTrue(testElevator.setPosition(0));
     };
 
     public Command onModeInit(MatchMode mode) {

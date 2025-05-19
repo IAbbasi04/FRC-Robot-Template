@@ -25,7 +25,9 @@ public class ElevatorIOSim extends ElevatorIO {
 
     private final PIDProfile positionCtrl = new PIDProfile()
         .setP(1d)
-        .setV(1E-1);
+        .setV(5d)
+        .setA(0.02)
+        .setS(0.01);
 
     private Mechanism2d elevatorMech = new Mechanism2d(1d, 2d);
     private MechanismRoot2d elevatorRoot = elevatorMech.getRoot("Root", 0.5, 0d);
@@ -38,7 +40,9 @@ public class ElevatorIOSim extends ElevatorIO {
     @Override
     public void setInches(double inches) {
         this.desiredInches = inches;
-        double voltage = positionCtrl.toProfiledPIDController().calculate(getCurrentInches(), inches);
+        double pid = positionCtrl.toProfiledPIDController().calculate(getCurrentInches(), inches);
+        double ff = positionCtrl.feedForward.calculate(elevatorSim.getVelocityMetersPerSecond());
+        double voltage = pid + ff;
 
         elevatorSim.setInputVoltage(voltage);
     }
@@ -50,7 +54,7 @@ public class ElevatorIOSim extends ElevatorIO {
 
     @Override
     public void halt() {
-        elevatorSim.setInputVoltage(0);
+        elevatorSim.setInput(0);
     }
 
     @Override

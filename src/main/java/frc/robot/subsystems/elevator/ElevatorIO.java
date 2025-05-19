@@ -2,15 +2,14 @@ package frc.robot.subsystems.elevator;
 
 import frc.robot.subsystems.SubsystemIO;
 import lib.team8592.Utils;
+import frc.robot.subsystems.IHaltableSubsystemIO;
 
-public abstract class ElevatorIO implements SubsystemIO {
+public abstract class ElevatorIO implements SubsystemIO, IHaltableSubsystemIO {
     protected double desiredInches = 0d;
 
     public abstract void setInches(double inches);
 
     public abstract double getCurrentInches();
-
-    public abstract void halt();
 
     public double getDesiredInches() {
         return desiredInches;
