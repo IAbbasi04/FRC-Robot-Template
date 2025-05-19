@@ -48,6 +48,18 @@ public class TestMotor extends SubsystemBase {
         return this;
     }
 
+    public double getRotations() {
+        return this.testMotor.getRotations();
+    }
+
+    public double getVelocityRPM() {
+        return this.testMotor.getVelocityRPM();
+    }
+
+    public double getAppliedVoltage() {
+        return this.testMotor.getAppliedVoltage();
+    }
+
     public Command setPercentOutput(double percent) {
         return new InstantCommand(() -> {
             this.desiredOutput = percent;
