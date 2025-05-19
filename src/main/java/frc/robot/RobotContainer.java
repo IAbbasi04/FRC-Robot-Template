@@ -15,7 +15,6 @@ import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import lib.team1731.MatchMode;
 
-
 public class RobotContainer {
     // The robot's subsystems
     private final SubsystemManager manager;
@@ -103,6 +102,9 @@ public class RobotContainer {
                 Controls.driveTranslateY
             ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
+
+        Controls.getDriver().y().onTrue(manager.elevator.setInches(() -> 20));
+        Controls.getDriver().a().onTrue(manager.elevator.setInches(() -> 0));
     };
 
     public Command onModeInit(MatchMode mode) {
