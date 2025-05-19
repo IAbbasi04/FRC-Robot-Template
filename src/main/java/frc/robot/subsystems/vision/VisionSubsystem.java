@@ -7,10 +7,10 @@ import org.photonvision.targeting.*;
 
 import edu.wpi.first.math.geometry.*;
 import frc.robot.Robot;
-import frc.robot.subsystems.NewtonSubsystem;
+import frc.robot.subsystems.Subsystem;
 import lib.team1731.MatchMode;
 
-public class VisionSubsystem extends NewtonSubsystem {
+public class VisionSubsystem extends Subsystem {
     private CameraIO io;
 
     private List<PhotonTrackedTarget> allVisibleTags = new ArrayList<>();

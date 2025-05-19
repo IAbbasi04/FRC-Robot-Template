@@ -50,7 +50,7 @@ public abstract class FieldLayout {
     }
 
     public void logToShuffleboard(boolean log) {
-        if (log) LogUtils.addSendable(field);
+        if (log) LogUtils.addSendable("Field", field);
     }
 
     public static FieldLayout none() {

@@ -6,12 +6,12 @@ import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import lib.team1731.MatchMode;
 import lib.team8592.logging.SmartLogger;
 
-public abstract class NewtonSubsystem extends SubsystemBase {
+public abstract class Subsystem extends SubsystemBase {
     private boolean enabled = false; // TODO - Get Working
 
     protected SmartLogger logger;
 
-    protected NewtonSubsystem() {
+    protected Subsystem() {
         this.logger = new SmartLogger(getName());
     }
 

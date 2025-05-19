@@ -8,8 +8,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import frc.robot.Controls.ControlSets;
+import frc.robot.autonomous.*;
 import frc.robot.commands.SuperCommands;
-import frc.robot.commands.autonomous.*;
 import frc.robot.subsystems.SubsystemManager;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
@@ -22,36 +22,29 @@ public class RobotContainer {
     private final SwerveSubsystem swerve;
     private final VisionSubsystem vision;
 
+    private final AutoLoader autoLoader;
+
     /**
      * Create the robot container. This creates and configures subsystems, sets
      * up button bindings, and prepares for autonomous.
      */
     public RobotContainer() {
         this.manager = new SubsystemManager();
+        this.autoLoader = new AutoLoader(manager);
 
         this.swerve = manager.swerve;
         this.vision = manager.vision;
 
         Controls.applyControlSet(ControlSets.DUAL_DRIVER);
         
-        passSubsystems();
-        configureNamedCommands();
-        configureBindings();
-        configureDefaults();
-
-        AutoManager.prepare();
+        this.configureNamedCommands();
+        this.configureBindings();
+        this.configureDefaults();
     }
 
     private void configureNamedCommands() {
+        // NamedCommands.registerCommand("Example", exampleCommand());
         // TODO - Add named commands to use during PathPlanner autos
-    }
-
-    /**
-     * Pass subsystems everywhere they're needed
-     */
-    private void passSubsystems(){
-        AutoManager.addSubsystems(manager);
-        AutoCommand.addSubsystems(manager);
     }
 
     /**
@@ -122,6 +115,6 @@ public class RobotContainer {
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return AutoManager.getAutonomousCommand();
+        return autoLoader.loadSelectedAuto();
     }
 }

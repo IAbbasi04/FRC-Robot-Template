@@ -15,7 +15,7 @@ public class SubsystemManager extends SubsystemBase {
     public SwerveSubsystem swerve;
     public VisionSubsystem vision;
 
-    private List<NewtonSubsystem> activeSubystems = new ArrayList<>();
+    private List<Subsystem> activeSubystems = new ArrayList<>();
 
     public SubsystemManager() {
         switch(RobotSelector.getRobot()) {
@@ -63,7 +63,7 @@ public class SubsystemManager extends SubsystemBase {
     }
 
     public Command onModeInitCommand(MatchMode mode) {
-        NewtonSubsystem[] subs = new NewtonSubsystem[activeSubystems.size()];
+        Subsystem[] subs = new Subsystem[activeSubystems.size()];
         for (int i = 0; i < activeSubystems.size(); i++) {
             subs[i] = activeSubystems.get(i);
         }
@@ -73,12 +73,12 @@ public class SubsystemManager extends SubsystemBase {
         }, subs);
     }
 
-    public List<NewtonSubsystem> getAllSubsystemsAsList() {
+    public List<Subsystem> getAllSubsystemsAsList() {
         return activeSubystems;
     }
 
-    public NewtonSubsystem[] getAllSubsystemsAsArray() {
-        NewtonSubsystem[] subsystems = new NewtonSubsystem[activeSubystems.size()];
+    public Subsystem[] getAllSubsystemsAsArray() {
+        Subsystem[] subsystems = new Subsystem[activeSubystems.size()];
         for (int i = 0; i < activeSubystems.size(); i++) {
             subsystems[i] = activeSubystems.get(i);
         }

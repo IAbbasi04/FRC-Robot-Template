@@ -1,5 +1,7 @@
 package lib.team8592;
 
+import java.util.List;
+
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.trajectory.Trajectory.State;
 import frc.robot.Robot;
@@ -58,5 +60,10 @@ public class Utils {
 
     public static double getMOIForRoller(double massKG, double radiusMeters) {
         return (massKG * Math.pow(radiusMeters, 2d)) / 2d;
+    }
+
+    public static <T extends Enum<T>> List<T> getEnumAsList(Class<T> enumClass) {
+        T[] constants = enumClass.getEnumConstants();
+        return List.of(constants);
     }
 }

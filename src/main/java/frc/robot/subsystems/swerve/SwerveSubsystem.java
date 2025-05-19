@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.*;
 import frc.robot.Constants.SWERVE;
-import frc.robot.subsystems.NewtonSubsystem;
+import frc.robot.subsystems.Subsystem;
 import lib.team1731.MatchMode;
 import lib.team1731.SmoothingFilter;
 import lib.team8592.Utils;
@@ -25,7 +25,7 @@ import static frc.robot.Constants.SWERVE.*;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
-public class SwerveSubsystem extends NewtonSubsystem {
+public class SwerveSubsystem extends Subsystem {
     /**
      * Small enum to control whether to drive robot- or field-
      * relative for {@link SwerveSubsystem#drive(ChassisSpeeds, DriveModes)}
@@ -129,31 +129,6 @@ public class SwerveSubsystem extends NewtonSubsystem {
      */
     public ChassisSpeeds getWheelSpeeds() {
         return io.getWheelSpeeds();
-    }
-
-    /**
-     * Reset the robot's known position.
-     *
-     * @param pose the pose to set the robot's known position to.
-     */
-    public void resetPose(Pose2d pose) {
-        io.setKnownOdometryPose(pose);
-        logger.log("Reset Pose", pose);
-    }
-    
-    public void resetPose(Pose2d pose, boolean flip) {
-        if(flip){
-            Pose2d flipped = new Pose2d(
-                new Translation2d(
-                    Robot.FIELD.getFieldLength()-pose.getX(),
-                    pose.getY()
-                ),
-                Rotation2d.fromDegrees(180).minus(pose.getRotation())
-            );
-            io.setKnownOdometryPose(flipped);
-            return;
-        }
-        io.setKnownOdometryPose(pose);
     }
 
     /**
@@ -271,6 +246,42 @@ public class SwerveSubsystem extends NewtonSubsystem {
         return runOnce(() -> io.resetHeading());
     }
 
+    public Command resetPose(Pose2d pose){
+        return runOnce(() -> io.setKnownOdometryPose(pose));
+    }
+
+    public Command resetPose(Pose2d pose, BooleanSupplier flip) {
+        return runOnce(() -> {
+            Pose2d resetToPose = pose;
+            if (flip.getAsBoolean()) {
+                resetToPose = new Pose2d(
+                    new Translation2d(
+                        Robot.FIELD.getFieldLength() - pose.getX(),
+                        pose.getY()
+                    ),
+                    Rotation2d.fromDegrees(180).minus(pose.getRotation())
+                );
+            }
+            io.setKnownOdometryPose(resetToPose);
+        });
+    }
+
+    public Command resetAlliancePose(Pose2d pose) {
+        return runOnce(() -> {
+            Pose2d resetToPose = pose;
+            if (Suppliers.IS_RED_ALLIANCE.getAsBoolean()) {
+                resetToPose = new Pose2d(
+                    new Translation2d(
+                        Robot.FIELD.getFieldLength() - pose.getX(),
+                        pose.getY()
+                    ),
+                    Rotation2d.fromDegrees(180).minus(pose.getRotation())
+                );
+            }
+            io.setKnownOdometryPose(resetToPose);
+        });
+    }
+
         /**
      * Command to drive the swerve with translation and rotation processed for human input
      * 
@@ -356,9 +367,9 @@ public class SwerveSubsystem extends NewtonSubsystem {
                     SWERVE.PATH_FOLLOW_TRANSLATE_GAINS.toPIDController().getPositionTolerance()),
                 new Rotation2d(SWERVE.PATH_FOLLOW_ROTATE_GAINS.toProfiledPIDController().getPositionTolerance())
             ));
-
-            if (Robot.isSimulation()) { resetPose(trajectory.getInitialPose(), flip.getAsBoolean()); }
-        }).andThen(run(() -> { // Drive along path
+        })
+        .andThen(resetPose(trajectory.getInitialPose(), flip)).onlyIf(() -> Robot.isSimulation()) // Reset pose only if we are in simulation
+        .andThen(run(() -> { // Drive along path
             State desiredState = trajectory.sample(trajectoryTimer.get());
             if(flip.getAsBoolean()){
                 desiredState = Utils.mirrorState(desiredState, flip.getAsBoolean());

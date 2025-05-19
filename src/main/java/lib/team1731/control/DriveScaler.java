@@ -6,7 +6,7 @@ public class DriveScaler {
     private ScaleType type; // The type of scaling to apply
     private SlewRateLimiter slewLimiter; // Limits acceleration of inputs
     private boolean zeroAtDeadband = false; // The output starts at 0 at the deadband and not at x=0
-    private double deadband = 0.06; // The point where the inputs start translating to outputs
+    private double deadband = 0.03; // The point where the inputs start translating to outputs
 
     public enum ScaleType {
         LINEAR,
@@ -35,7 +35,6 @@ public class DriveScaler {
                 case QUADRATIC:
                 case CUBIC:
                 case LINEAR:
-                
                     // All polynomial functions follow the same rule
                     if (zeroAtDeadband) {
                         scaledInput = (1 / Math.pow(1 - deadband, type.ordinal() + 1)) * 

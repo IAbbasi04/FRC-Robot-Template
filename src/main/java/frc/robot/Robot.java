@@ -30,8 +30,8 @@ import lib.team8592.logging.SmartLogger;
  * project.
  */
 public class Robot extends LoggedRobot {
-    private Command autonomousCommand = Commands.none();
     private SmartLogger logger = new SmartLogger("Config");
+    private Command autonomousCommand = Commands.none();
 
     private RobotContainer robotContainer;
 

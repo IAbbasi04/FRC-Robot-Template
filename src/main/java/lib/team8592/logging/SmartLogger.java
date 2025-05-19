@@ -78,6 +78,9 @@ public class SmartLogger {
         Logger.recordOutput(logFolder + key, loggedValue); // Record to AdvantageKit logs
     }
 
+    public void addSendable() {
+        
+    }
 
     public static void addSendable(Sendable sendable) {
         SmartDashboard.putData(sendable);

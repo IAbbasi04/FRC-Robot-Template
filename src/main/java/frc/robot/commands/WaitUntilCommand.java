@@ -1,4 +1,4 @@
-package frc.robot.commands.proxies;
+package frc.robot.commands;
 
 import java.util.function.BooleanSupplier;
 
