@@ -5,11 +5,12 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.*;
 import edu.wpi.first.wpilibj.smartdashboard.*;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.Constants;
-import frc.robot.Suppliers;
 import frc.robot.commands.MultiComposableCommand;
 import frc.robot.subsystems.SubsystemManager;
 import lib.team1731.MatchMode;
@@ -57,9 +58,10 @@ public class AutoLoader {
                     Constants.SWERVE.PATH_FOLLOW_ROTATE_GAINS.toPIDConstants()
                 ),
                 RobotConfig.fromGUISettings(),
-                Suppliers.IS_RED_ALLIANCE, 
-                manager.swerve
-            );
+                () -> 
+                    DriverStation.getAlliance().isPresent() && 
+                    DriverStation.getAlliance().get() == Alliance.Red,
+                manager.swerve);
         } catch (Exception e) {
             System.out.println("GUI Settings not properly configured for PathPlanner");
         }

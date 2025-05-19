@@ -13,14 +13,18 @@ import choreo.trajectory.SwerveSample;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.Trajectory.State;
-import frc.robot.Suppliers;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 public final class PathUtils {
     /**
      * The initial pose for the given Choreo path
      */
     public static Pose2d getStartPoseFromTrajectory(String file) {
-        return Choreo.loadTrajectory(file).get().getInitialPose(Suppliers.IS_RED_ALLIANCE.getAsBoolean()).get();
+        return Choreo.loadTrajectory(file).get().getInitialPose(
+            DriverStation.getAlliance().isPresent() && 
+            DriverStation.getAlliance().get() == Alliance.Red
+        ).get();
     }
 
     /**

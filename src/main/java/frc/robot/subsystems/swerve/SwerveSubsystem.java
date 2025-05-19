@@ -11,6 +11,8 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.Trajectory.State;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.*;
@@ -269,7 +271,8 @@ public class SwerveSubsystem extends Subsystem {
     public Command resetAlliancePose(Pose2d pose) {
         return runOnce(() -> {
             Pose2d resetToPose = pose;
-            if (Suppliers.IS_RED_ALLIANCE.getAsBoolean()) {
+            if (DriverStation.getAlliance().isPresent() && 
+                DriverStation.getAlliance().get() == Alliance.Red) {
                 resetToPose = new Pose2d(
                     new Translation2d(
                         Robot.FIELD.getFieldLength() - pose.getX(),
@@ -401,10 +404,7 @@ public class SwerveSubsystem extends Subsystem {
             () -> {
                 logger.log("Error Degrees", snapToCtrl.getPositionError());
 
-                Pose2d desiredPose = pose;
-                if (flipPose.getAsBoolean()) {
-                    desiredPose = Utils.mirrorPose(pose, flipPose.getAsBoolean());
-                }
+                Pose2d desiredPose = Utils.mirrorPose(pose, flipPose.getAsBoolean());
 
                 this.drive(new ChassisSpeeds(
                     -driveToPoseXCtrl.calculate(getCurrentPosition().getX(), desiredPose.getX()), 
@@ -420,10 +420,10 @@ public class SwerveSubsystem extends Subsystem {
             () -> {
                 logger.log("Error Degrees", snapToCtrl.getPositionError());
 
-                Pose2d desiredPose = pose;
-                if (Suppliers.IS_RED_ALLIANCE.getAsBoolean()) {
-                    desiredPose = Utils.mirrorPose(pose, Suppliers.IS_RED_ALLIANCE.getAsBoolean());
-                }
+                boolean isRedAlliance = DriverStation.getAlliance().isPresent() && 
+                DriverStation.getAlliance().get() == Alliance.Red;
+
+                Pose2d desiredPose = Utils.mirrorPose(pose, isRedAlliance);
 
                 this.drive(new ChassisSpeeds(
                     -driveToPoseXCtrl.calculate(getCurrentPosition().getX(), desiredPose.getX()), 
