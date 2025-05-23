@@ -1,8 +1,8 @@
 package frc.robot.subsystems.elevator;
 
-import frc.robot.subsystems.SubsystemIO;
+import frc.robot.subsystems.io.IHaltableSubsystemIO;
+import frc.robot.subsystems.io.SubsystemIO;
 import lib.team8592.Utils;
-import frc.robot.subsystems.IHaltableSubsystemIO;
 
 public abstract class ElevatorIO implements SubsystemIO, IHaltableSubsystemIO {
     protected double desiredInches = 0d;

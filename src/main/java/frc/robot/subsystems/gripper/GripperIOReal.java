@@ -1,29 +1,25 @@
 package frc.robot.subsystems.gripper;
 
+import lib.team8592.hardware.motor.talonfx.TalonFXMotor;
+
 public class GripperIOReal extends GripperIO {
+    private TalonFXMotor gripperMotor;
 
-    @Override
-    public void updateInputs() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateInputs'");
-    }
-
-    @Override
-    public void halt() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'halt'");
+    public GripperIOReal(int motorID, boolean inverted) {
+        this.gripperMotor = new TalonFXMotor(motorID, inverted);
     }
 
     @Override
     public void setAngle(double degrees) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setAngle'");
+        super.desiredDegrees = degrees;
+        this.gripperMotor.setPosition(fromDegreesToMotorRotations(degrees));
     }
 
     @Override
     public double getAngle() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAngle'");
+        return fromMotorRotationsToDegrees(gripperMotor.getRotations());
     }
-    
+
+    @Override
+    public void updateInputs() {}
 }

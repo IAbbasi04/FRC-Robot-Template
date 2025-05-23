@@ -7,18 +7,24 @@ import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.Constants;
 import frc.robot.Ports;
 import frc.robot.RobotSelector;
+import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.elevator.Elevator;
 import frc.robot.subsystems.elevator.ElevatorIOKrakenX60;
 import frc.robot.subsystems.elevator.ElevatorIOSim;
+import frc.robot.subsystems.gripper.Gripper;
 import frc.robot.subsystems.swerve.*;
 import frc.robot.subsystems.swerve.ctreswerve.TunerConstants;
 import frc.robot.subsystems.vision.*;
+import frc.robot.subsystems.wrist.Wrist;
 import lib.team1731.MatchMode;
 
 public class SubsystemManager extends SubsystemBase {
     public SwerveSubsystem swerve;
     public VisionSubsystem vision;
     public Elevator elevator;
+    public Gripper gripper;
+    public Wrist wrist;
+    public Climber climber;
 
     private List<Subsystem> activeSubystems = new ArrayList<>();
 
@@ -34,17 +40,6 @@ public class SubsystemManager extends SubsystemBase {
                 );
 
                 this.elevator = new Elevator(new ElevatorIOSim());
-                break;
-            case DEV_BOT: // Development robot
-                this.swerve = new SwerveSubsystem(
-                    new SwerveIOCTRE<TunerConstants>(TunerConstants.class)
-                );
-
-                this.vision = new VisionSubsystem(
-                    new CameraIOArducam(Constants.VISION.CAM_NAME, Constants.VISION.CAMERA_OFFSET)
-                );
-
-                this.elevator = new Elevator(new ElevatorIOKrakenX60(Ports.ELEVATOR_CAN_ID, false));
                 break;
             case COMP_BOT: // Main robot for competition
             // Note - Fall through intentional
@@ -65,7 +60,10 @@ public class SubsystemManager extends SubsystemBase {
             // Add all active subsystems here
             swerve,
             vision,
-            elevator
+            elevator,
+            gripper,
+            wrist,
+            climber
         );
 
         this.activeSubystems.forEach(s -> {
