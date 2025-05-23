@@ -9,7 +9,7 @@ public interface IRotationalSubsystemIO {
     
     public boolean atAngleDegrees();
 
-    public default boolean atPosition(double degrees, double tolerance) {
+    public default boolean atAngleDegrees(double degrees, double tolerance) {
         return Math.abs(getDegrees() - degrees) < tolerance;
     }
 }
