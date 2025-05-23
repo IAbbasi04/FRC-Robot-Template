@@ -44,4 +44,4 @@ public class Conversions {
     public static double rotationsToDegrees(double rotations) {
         return rotations / 360.0;
     }
- }
+}
