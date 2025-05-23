@@ -118,4 +118,9 @@ public class SwerveIOCTRE<E extends TunerConstants> extends SwerveIO {
     public ChassisSpeeds getWheelSpeeds() {
         return this.drivetrain.getKinematics().toChassisSpeeds(this.drivetrain.getState().ModuleStates);
     }
+
+    @Override
+    public void halt() {
+        this.drive(new ChassisSpeeds(), true);
+    }
 }

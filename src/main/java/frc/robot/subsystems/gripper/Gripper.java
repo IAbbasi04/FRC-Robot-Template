@@ -12,17 +12,18 @@ public class Gripper extends Subsystem {
 
     @Override
     public void onModeInit(MatchMode mode) {
-        io.halt();
+        stop();
     }
 
     @Override
     public void periodicTelemetry() {
-        logger.log("Current Angle Degrees", io.getAngle());
-        logger.log("Desired Angle Degrees", io.getDesiredAngle());
+        logger.log("Current Angle Degrees", io.getDegrees());
+        logger.log("Desired Angle Degrees", io.getDesiredDegrees());
+        logger.log("At Angle Degrees", io.atAngleDegrees());
     }
 
     @Override
     public void stop() {
-
+        io.halt();
     }
 }

@@ -15,15 +15,15 @@ public class GripperIOSim extends GripperIO {
     }
 
     @Override
-    public void setAngle(double degrees) {
+    public void setDegrees(double degrees) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setAngle'");
+        throw new UnsupportedOperationException("Unimplemented method 'setDegrees'");
     }
 
     @Override
-    public double getAngle() {
+    public double getDegrees() {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAngle'");
+        throw new UnsupportedOperationException("Unimplemented method 'getDegrees'");
     }
     
 }

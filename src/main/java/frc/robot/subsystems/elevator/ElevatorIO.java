@@ -1,21 +1,20 @@
 package frc.robot.subsystems.elevator;
 
-import frc.robot.subsystems.io.IHaltableSubsystemIO;
-import frc.robot.subsystems.io.SubsystemIO;
-import lib.team8592.Utils;
+import static frc.robot.subsystems.elevator.ElevatorConstants.*;
 
-public abstract class ElevatorIO implements SubsystemIO, IHaltableSubsystemIO {
-    protected double desiredInches = 0d;
+import frc.robot.subsystems.io.LinearSubsystemIO;
 
-    public abstract void setInches(double inches);
-
-    public abstract double getCurrentInches();
-
-    public double getDesiredInches() {
-        return desiredInches;
+public abstract class ElevatorIO extends LinearSubsystemIO {
+    protected double getMotorRotationsFromInches(double inches) {
+        return (inches / (Math.PI * DRUM_RADIUS_METERS)) / GEAR_RATIO;
     }
 
+    protected double getInchesFromMotorRotations(double rotations) {
+        return (rotations * DRUM_RADIUS_METERS * Math.PI) * GEAR_RATIO;
+    }
+
+    @Override
     public boolean atPosition() {
-        return Utils.isWithin(getCurrentInches(), desiredInches, ElevatorConstants.POSITION_TOLERANCE_INCHES);
+        return atPosition(desiredPosition, ElevatorConstants.POSITION_TOLERANCE_INCHES);
     }
 }

@@ -21,8 +21,8 @@ public class Elevator extends Subsystem {
     @Override
     public void periodicTelemetry() {
         io.updateInputs();
-        logger.log("Current Inches", io.getCurrentInches());
-        logger.log("Desired Inches", io.getDesiredInches());
+        logger.log("Current Inches", io.getPosition());
+        logger.log("Desired Inches", io.getPosition());
         logger.log("At Position", io.atPosition());
     }
 
@@ -36,6 +36,6 @@ public class Elevator extends Subsystem {
     // ========================== \\
 
     public Command setInches(DoubleSupplier inches) {
-        return this.run(() -> io.setInches(inches.getAsDouble()));//.until(() -> io.atPosition());
+        return this.run(() -> io.setPosition(inches.getAsDouble()));//.until(() -> io.atPosition());
     }
 }

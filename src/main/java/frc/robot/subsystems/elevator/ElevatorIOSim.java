@@ -3,10 +3,7 @@ package frc.robot.subsystems.elevator;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.smartdashboard.*;
 import lib.team8592.PIDProfile;
 
 import static frc.robot.subsystems.elevator.ElevatorConstants.*;
@@ -38,9 +35,9 @@ public class ElevatorIOSim extends ElevatorIO {
     }
 
     @Override
-    public void setInches(double inches) {
-        this.desiredInches = inches;
-        double pid = positionCtrl.toProfiledPIDController().calculate(getCurrentInches(), inches);
+    public void setPosition(double inches) {
+        this.desiredPosition = inches;
+        double pid = positionCtrl.toProfiledPIDController().calculate(getPosition(), inches);
         double ff = positionCtrl.feedForward.calculate(elevatorSim.getVelocityMetersPerSecond());
         double voltage = pid + ff;
 
@@ -48,18 +45,13 @@ public class ElevatorIOSim extends ElevatorIO {
     }
 
     @Override
-    public double getCurrentInches() {
+    public double getPosition() {
         return Units.metersToInches(elevatorSim.getPositionMeters() - BASE_STAGE_HEIGHT_METERS);
-    }
-
-    @Override
-    public void halt() {
-        elevatorSim.setInput(0);
     }
 
     @Override
     public void updateInputs() {
         elevatorSim.update(0.02);
-        elevator.setLength(Units.inchesToMeters(getCurrentInches()) + BASE_STAGE_HEIGHT_METERS);
+        elevator.setLength(Units.inchesToMeters(getPosition()) + BASE_STAGE_HEIGHT_METERS);
     }
 }

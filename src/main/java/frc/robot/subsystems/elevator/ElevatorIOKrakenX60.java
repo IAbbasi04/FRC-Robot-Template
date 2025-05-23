@@ -1,7 +1,5 @@
 package frc.robot.subsystems.elevator;
 
-import static frc.robot.subsystems.elevator.ElevatorConstants.GEAR_RATIO;
-
 import lib.team8592.hardware.motor.talonfx.TalonFXMotor;
 
 public class ElevatorIOKrakenX60 extends ElevatorIO {
@@ -11,28 +9,15 @@ public class ElevatorIOKrakenX60 extends ElevatorIO {
         this.elevatorMotor = new TalonFXMotor(motorID, inverted);
     }
 
-    private double getMotorRotationsFromInches(double inches) {
-        return inches * GEAR_RATIO;
-    }
-
-    private double getInchesFromMotorRotations(double rotations) {
-        return rotations / GEAR_RATIO;
-    }
-
     @Override
-    public void setInches(double inches) {
-        this.desiredInches = inches;
+    public void setPosition(double inches) {
+        this.desiredPosition = inches;
         this.elevatorMotor.setPosition(getMotorRotationsFromInches(inches));
     }
 
     @Override
-    public double getCurrentInches() {
+    public double getPosition() {
         return getInchesFromMotorRotations(elevatorMotor.getRotations());
-    }
-
-    @Override
-    public void halt() {
-        elevatorMotor.setPosition(getMotorRotationsFromInches(getCurrentInches()));
     }
 
     @Override

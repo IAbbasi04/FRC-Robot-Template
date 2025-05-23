@@ -10,13 +10,13 @@ public class GripperIOReal extends GripperIO {
     }
 
     @Override
-    public void setAngle(double degrees) {
+    public void setDegrees(double degrees) {
         super.desiredDegrees = degrees;
         this.gripperMotor.setPosition(fromDegreesToMotorRotations(degrees));
     }
 
     @Override
-    public double getAngle() {
+    public double getDegrees() {
         return fromMotorRotationsToDegrees(gripperMotor.getRotations());
     }
 
