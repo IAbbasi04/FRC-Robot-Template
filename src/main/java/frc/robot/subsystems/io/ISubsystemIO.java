@@ -1,5 +1,5 @@
 package frc.robot.subsystems.io;
 
-public interface SubsystemIO {
+public interface ISubsystemIO {
     public void updateInputs(); // Periodic call that is used to frequently update values within the subsystem
 }

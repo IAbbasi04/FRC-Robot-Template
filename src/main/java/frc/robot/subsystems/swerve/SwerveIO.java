@@ -7,9 +7,9 @@ import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import frc.robot.subsystems.io.SubsystemIO;
+import frc.robot.subsystems.io.ISubsystemIO;
 
-public abstract class SwerveIO implements SubsystemIO {
+public abstract class SwerveIO implements ISubsystemIO {
     protected ChassisSpeeds targetSpeeds = new ChassisSpeeds();
 
     public abstract void drive(ChassisSpeeds speeds, boolean driveFieldRelative);

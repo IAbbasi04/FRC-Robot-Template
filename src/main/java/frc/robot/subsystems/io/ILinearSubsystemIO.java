@@ -2,7 +2,7 @@ package frc.robot.subsystems.io;
 
 import lib.team8592.Utils;
 
-public interface ILinearSubsystemIO {
+public interface ILinearSubsystemIO extends ISubsystemIO {
     public void setPosition(double units);
 
     public double getPosition();
