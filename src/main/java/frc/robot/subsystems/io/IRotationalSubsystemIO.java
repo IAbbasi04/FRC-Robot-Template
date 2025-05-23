@@ -1,6 +1,6 @@
 package frc.robot.subsystems.io;
 
-public interface IRotationalSubsystemIO {
+public interface IRotationalSubsystemIO extends ISubsystemIO {
     public void setDegrees(double degrees);
 
     public double getDegrees();
