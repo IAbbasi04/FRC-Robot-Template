@@ -3,10 +3,10 @@ package frc.robot.subsystems.gripper;
 import frc.robot.subsystems.Subsystem;
 import lib.team1731.MatchMode;
 
-public class Gripper extends Subsystem {
+public class GripperSubsystem extends Subsystem {
     private GripperIO io;
 
-    public Gripper(GripperIO io) {
+    public GripperSubsystem(GripperIO io) {
         this.io = io;
     }
 

@@ -1,7 +1,6 @@
 package frc.robot.subsystems.gripper;
 
-import frc.robot.subsystems.io.*;
-
+import lib.team1731.io.RotationalSubsystemIO;
 import static frc.robot.subsystems.gripper.GripperConstants.*;
 
 public abstract class GripperIO extends RotationalSubsystemIO {

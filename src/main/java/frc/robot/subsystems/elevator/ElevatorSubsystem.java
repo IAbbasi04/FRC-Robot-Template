@@ -6,10 +6,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Subsystem;
 import lib.team1731.MatchMode;
 
-public class Elevator extends Subsystem {
+public class ElevatorSubsystem extends Subsystem {
     private ElevatorIO io;
 
-    public Elevator(ElevatorIO io) {
+    public ElevatorSubsystem(ElevatorIO io) {
         this.io = io;
     }
 

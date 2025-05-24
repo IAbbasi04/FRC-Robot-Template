@@ -8,10 +8,10 @@ import frc.robot.Constants;
 import frc.robot.Ports;
 import frc.robot.RobotSelector;
 import frc.robot.subsystems.climber.Climber;
-import frc.robot.subsystems.elevator.Elevator;
+import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.elevator.ElevatorIOKrakenX60;
 import frc.robot.subsystems.elevator.ElevatorIOSim;
-import frc.robot.subsystems.gripper.Gripper;
+import frc.robot.subsystems.gripper.GripperSubsystem;
 import frc.robot.subsystems.swerve.*;
 import frc.robot.subsystems.swerve.ctreswerve.TunerConstants;
 import frc.robot.subsystems.vision.*;
@@ -21,8 +21,8 @@ import lib.team1731.MatchMode;
 public class SubsystemManager extends SubsystemBase {
     public SwerveSubsystem swerve;
     public VisionSubsystem vision;
-    public Elevator elevator;
-    public Gripper gripper;
+    public ElevatorSubsystem elevator;
+    public GripperSubsystem gripper;
     public Wrist wrist;
     public Climber climber;
 
@@ -39,7 +39,7 @@ public class SubsystemManager extends SubsystemBase {
                     new CameraIOSim(Constants.VISION.CAM_NAME, Constants.VISION.CAMERA_OFFSET)
                 );
 
-                this.elevator = new Elevator(new ElevatorIOSim());
+                this.elevator = new ElevatorSubsystem(new ElevatorIOSim());
                 break;
             case COMP_BOT: // Main robot for competition
             // Note - Fall through intentional
@@ -52,7 +52,7 @@ public class SubsystemManager extends SubsystemBase {
                     new CameraIOArducam(Constants.VISION.CAM_NAME, Constants.VISION.CAMERA_OFFSET)
                 );
 
-                this.elevator = new Elevator(new ElevatorIOKrakenX60(Ports.ELEVATOR_CAN_ID, false));
+                this.elevator = new ElevatorSubsystem(new ElevatorIOKrakenX60(Ports.ELEVATOR_CAN_ID, false));
                 break;
         }
 

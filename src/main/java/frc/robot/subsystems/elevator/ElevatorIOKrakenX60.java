@@ -1,12 +1,12 @@
 package frc.robot.subsystems.elevator;
 
-import lib.team8592.hardware.motor.talonfx.TalonFXMotor;
+import lib.team8592.hardware.motor.*;
 
 public class ElevatorIOKrakenX60 extends ElevatorIO {
     private TalonFXMotor elevatorMotor;
 
-    public ElevatorIOKrakenX60(int motorID, boolean inverted) {
-        this.elevatorMotor = new TalonFXMotor(motorID, inverted);
+    public ElevatorIOKrakenX60(PortConfig config) {
+        this.elevatorMotor = new TalonFXMotor(config);
     }
 
     @Override
@@ -19,7 +19,4 @@ public class ElevatorIOKrakenX60 extends ElevatorIO {
     public double getPosition() {
         return getInchesFromMotorRotations(elevatorMotor.getRotations());
     }
-
-    @Override
-    public void updateInputs() {}
 }
