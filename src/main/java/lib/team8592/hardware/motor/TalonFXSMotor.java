@@ -18,17 +18,10 @@ public class TalonFXSMotor extends NewtonMotor {
     private PositionVoltage positionOutput = new PositionVoltage(0);
     private VelocityVoltage velocityOutput = new VelocityVoltage(0);
 
-    public TalonFXSMotor(int motorID) {
-        this(motorID, false);
-    }
+    public TalonFXSMotor(PortConfig config) {
+        super(config);
 
-    public TalonFXSMotor(int motorID, boolean inverted) {
-        super(
-            motorID, 
-            inverted
-        );
-
-        this.motor = new TalonFXS(motorID);
+        this.motor = new TalonFXS(config.kPort);
         this.configuration = new TalonFXSConfiguration();
         this.configurator = motor.getConfigurator();
 

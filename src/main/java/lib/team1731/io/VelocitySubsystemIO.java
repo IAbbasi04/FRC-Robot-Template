@@ -1,9 +1,9 @@
-package frc.robot.subsystems.io;
+package lib.team1731.io;
 
 public abstract class VelocitySubsystemIO implements ISubsystemIO {
-    protected double desiredRPM = 0d;
+    protected double desiredRPM = 0.0;
 
-    public abstract void setVelocityRPM(double desiredRPM);
+    public abstract void setVelocity(double desiredRPM);
 
     public abstract double getVelocityRPM();
 
@@ -12,6 +12,6 @@ public abstract class VelocitySubsystemIO implements ISubsystemIO {
     public abstract double getOutputVoltage();
 
     public double getDesiredRPM() {
-        return desiredRPM;
+        return this.desiredRPM;
     }
 }

@@ -1,9 +1,8 @@
 package lib.team8592.hardware.motor;
 
 import lib.team8592.PIDProfile;
-import lib.team8592.hardware.motor.spark.*;
-import lib.team8592.hardware.motor.talonfx.*;
 import lib.team8592.logging.SmartLogger;
+
 import edu.wpi.first.wpilibj2.command.*;
 
 public class TestMotor extends SubsystemBase {
@@ -20,14 +19,15 @@ public class TestMotor extends SubsystemBase {
     }
 
     public TestMotor(int deviceID, boolean inverted, Class<? extends NewtonMotor> cls) {
+        PortConfig config = new PortConfig(deviceID, inverted);
         if (cls.getSimpleName().equals(SparkFlexMotor.class.getSimpleName())) {
-            this.testMotor = new SparkFlexMotor(deviceID, inverted);
+            this.testMotor = new SparkFlexMotor(config);
         } else if (cls.getSimpleName().equals(SparkMaxMotor.class.getSimpleName())) {
-            this.testMotor = new SparkMaxMotor(deviceID, inverted);
+            this.testMotor = new SparkMaxMotor(config);
         } else if (cls.getSimpleName().equals(TalonFXMotor.class.getSimpleName())) {
-            this.testMotor = new TalonFXMotor(deviceID, inverted);
+            this.testMotor = new TalonFXMotor(config);
         } else if (cls.getSimpleName().equals(TalonFXSMotor.class.getSimpleName())) {
-            this.testMotor = new TalonFXSMotor(deviceID, inverted);
+            this.testMotor = new TalonFXSMotor(config);
         }
 
         this.logger = new SmartLogger("TestMotor/" + cls.getSimpleName() + "[" + deviceID + "]");

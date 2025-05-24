@@ -15,7 +15,7 @@ import lib.team1731.field.FieldLayout;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.*;
 
-public class ArducamPhotonCamera {
+public class CustomPhotonCamera {
     private PhotonCamera camera;
     private PhotonCameraSim simCamera;
     private VisionSystemSim simVisionSystem;
@@ -29,7 +29,7 @@ public class ArducamPhotonCamera {
 
     private Transform3d cameraPoseToRobotPose = new Transform3d();
 
-    public ArducamPhotonCamera(String name, Transform3d robotPoseToCameraPose, AprilTagFieldLayout fieldLayout, boolean isSimulation) {
+    public CustomPhotonCamera(String name, Transform3d robotPoseToCameraPose, AprilTagFieldLayout fieldLayout, boolean isSimulation) {
         this.camera = new PhotonCamera(name);
         this.cameraPoseToRobotPose = robotPoseToCameraPose;
 
