@@ -1,19 +1,16 @@
-package lib.team8592.hardware.motor.spark;
+package lib.team8592.hardware.motor;
 
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
 
 public class SparkFlexMotor extends SparkBaseMotor<SparkFlex, SparkFlexConfig> {
-    public SparkFlexMotor(int motorID) {
-        this(motorID, false);
-    }
-
-    public SparkFlexMotor(int motorID, boolean inverted) {
+    public SparkFlexMotor(PortConfig config) {
         super(
-            new SparkFlex(motorID, MotorType.kBrushless), 
+            config.kBus,
+            new SparkFlex(config.kPort, MotorType.kBrushless), 
             new SparkFlexConfig(),
-            inverted
+            config.kInverted
         );
     }
 }

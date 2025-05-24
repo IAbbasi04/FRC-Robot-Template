@@ -1,13 +1,10 @@
-package lib.team8592.hardware.motor.talonfx;
+package lib.team8592.hardware.motor;
 
 
-import static edu.wpi.first.units.Units.RotationsPerSecond;
-import static edu.wpi.first.units.Units.RotationsPerSecondPerSecond;
-import static edu.wpi.first.units.Units.Second;
+import static edu.wpi.first.units.Units.*;
 
 import lib.team8592.PIDProfile;
 import lib.team8592.Utils;
-import lib.team8592.hardware.motor.NewtonMotor;
 
 import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.controls.*;
@@ -26,14 +23,10 @@ public class TalonFXMotor extends NewtonMotor {
     protected MotionMagicVoltage motionMagicOutput = new MotionMagicVoltage(0);
     protected VoltageOut voltageOutput = new VoltageOut(0);
 
-    public TalonFXMotor(int motorID) {
-        this(motorID, false);
-    }
-
-    public TalonFXMotor(int motorID, boolean inverted) {
-        super(motorID, inverted);
+    public TalonFXMotor(PortConfig config) {
+        super(config);
         
-        this.motor = new TalonFX(motorID);
+        this.motor = new TalonFX(config.kPort);
         this.configuration = new TalonFXConfiguration();
         this.configuration.MotorOutput.Inverted = inverted ? 
             InvertedValue.Clockwise_Positive :
@@ -66,8 +59,6 @@ public class TalonFXMotor extends NewtonMotor {
 
         this.motor.getConfigurator().apply(configuration);
     }
-
-    
 
     @Override
     public void withGains(PIDProfile gains) {

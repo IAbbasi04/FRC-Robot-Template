@@ -2,10 +2,10 @@ package lib.team8592.hardware.motor;
 
 public enum MotorConstants {
     KRAKEN_X60(6000d, 366d, 7.09, 502.1),
+    KRAKEN_X44(7530d, 275d, 4.05, 630.7),
     VORTEX(6784d, 211d, 3.6, 575.1),
     NEO(5676d, 105d, 2.6, 493.5),
-    KRAKEN_X44(7530d, 275d, 4.05, 630.7),
-    FALCON(6380d, 257d, 4.69, 534.8);
+    FALCON_500(6380d, 257d, 4.69, 534.8);
     ;
     public final double MAX_VELOCITY_RPM;
     public final double STALL_CURRENT_AMPS;

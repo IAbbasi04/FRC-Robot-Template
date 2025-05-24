@@ -4,21 +4,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lib.team8592.PIDProfile;
-import lib.team8592.hardware.motor.spark.*;
-import lib.team8592.hardware.motor.talonfx.*;
 import edu.wpi.first.wpilibj.simulation.*;
 
 public abstract class NewtonMotor {
     protected List<PIDProfile> motorPIDGains = new ArrayList<>();
+    protected String canBusName = "";
     protected int deviceID = 0;
     protected boolean inverted = false;
     protected double desiredVelocityRPM = 0d;
     protected EncoderSim simEncoder; 
     protected DCMotorSim simMotor;
 
-    protected NewtonMotor(int id, boolean inverted) {
-        this.deviceID = id;
-        this.inverted = inverted;
+    protected NewtonMotor(PortConfig config) {
+        this.canBusName = config.kBus;
+        this.deviceID = config.kPort;
+        this.inverted = config.kInverted;
     }
 
     public enum IdleMode {
@@ -29,6 +29,12 @@ public abstract class NewtonMotor {
     public abstract void setInverted(boolean inverted);
 
     public abstract void withGains(PIDProfile gains);
+
+    public void withGains(PIDProfile... gains) {
+        for (PIDProfile gain : gains) {
+            this.withGains(gain);
+        }
+    }
 
     public void withGains(PIDProfile gains, int slot) {
         this.withGains(gains.setSlot(slot));

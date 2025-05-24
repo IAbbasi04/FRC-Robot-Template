@@ -52,7 +52,7 @@ public class SwerveSubsystem extends Subsystem {
 
     private Timer trajectoryTimer = new Timer();
 
-    private PIDController snapToCtrl = SNAP_TO_GAINS.toPIDController();;
+    private PIDController snapToCtrl = SNAP_TO_GAINS.toPIDController();
 
     private HolonomicDriveController pathFollowerCtrl = new HolonomicDriveController(
         SWERVE.PATH_FOLLOW_TRANSLATE_GAINS.toPIDController(),

@@ -1,4 +1,4 @@
-package frc.robot.subsystems.io;
+package lib.team1731.io;
 
 @Deprecated (forRemoval = false)
 public interface IToggleableSubsystemIO extends ISubsystemIO {
