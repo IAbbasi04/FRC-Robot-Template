@@ -2,10 +2,10 @@ package frc.robot.subsystems.elevator;
 
 import lib.team8592.hardware.motor.*;
 
-public class ElevatorIOKrakenX60 extends ElevatorIO {
+public class ElevatorIOTalonFX extends ElevatorIO {
     private TalonFXMotor elevatorMotor;
 
-    public ElevatorIOKrakenX60(PortConfig config) {
+    public ElevatorIOTalonFX(PortConfig config) {
         this.elevatorMotor = new TalonFXMotor(config);
     }
 

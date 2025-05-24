@@ -1,12 +1,13 @@
 package frc.robot.subsystems.wrist;
 
-import lib.team8592.hardware.motor.talonfx.TalonFXMotor;
+import lib.team8592.hardware.motor.PortConfig;
+import lib.team8592.hardware.motor.TalonFXMotor;
 
-public class WristIOReal extends WristIO {
+public class WristIOTalonFX extends WristIO {
     private TalonFXMotor wristMotor;
 
-    public WristIOReal(int id, boolean reversed) {
-        this.wristMotor = new TalonFXMotor(id, reversed);
+    public WristIOTalonFX(PortConfig config) {
+        this.wristMotor = new TalonFXMotor(config);
     }
 
     @Override

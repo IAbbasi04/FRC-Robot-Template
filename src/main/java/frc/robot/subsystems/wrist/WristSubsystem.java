@@ -3,9 +3,9 @@ package frc.robot.subsystems.wrist;
 import frc.robot.subsystems.Subsystem;
 import lib.team1731.MatchMode;
 
-public class Wrist extends Subsystem {
+public class WristSubsystem extends Subsystem {
     private WristIO io;
-    public Wrist(WristIO io) {
+    public WristSubsystem(WristIO io) {
         this.io = io;
     }
 

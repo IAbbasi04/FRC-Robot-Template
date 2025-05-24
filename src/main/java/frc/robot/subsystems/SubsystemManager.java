@@ -4,27 +4,29 @@ import java.util.*;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.*;
-import frc.robot.Constants;
-import frc.robot.Ports;
-import frc.robot.RobotSelector;
-import frc.robot.subsystems.climber.Climber;
-import frc.robot.subsystems.elevator.ElevatorSubsystem;
-import frc.robot.subsystems.elevator.ElevatorIOKrakenX60;
-import frc.robot.subsystems.elevator.ElevatorIOSim;
-import frc.robot.subsystems.gripper.GripperSubsystem;
+
+import frc.robot.*;
+
+import frc.robot.subsystems.climber.*;
+import frc.robot.subsystems.elevator.*;
+import frc.robot.subsystems.gripper.*;
+import frc.robot.subsystems.roller.*;
 import frc.robot.subsystems.swerve.*;
 import frc.robot.subsystems.swerve.ctreswerve.TunerConstants;
 import frc.robot.subsystems.vision.*;
-import frc.robot.subsystems.wrist.Wrist;
+import frc.robot.subsystems.wrist.*;
+
 import lib.team1731.MatchMode;
+import lib.team8592.hardware.motor.PortConfig;
 
 public class SubsystemManager extends SubsystemBase {
     public SwerveSubsystem swerve;
     public VisionSubsystem vision;
     public ElevatorSubsystem elevator;
     public GripperSubsystem gripper;
-    public Wrist wrist;
-    public Climber climber;
+    public WristSubsystem wrist;
+    public RollerSubsystem roller;
+    public ClimberSubsystem climber;
 
     private List<Subsystem> activeSubystems = new ArrayList<>();
 
@@ -40,6 +42,10 @@ public class SubsystemManager extends SubsystemBase {
                 );
 
                 this.elevator = new ElevatorSubsystem(new ElevatorIOSim());
+                this.gripper = new GripperSubsystem(new GripperIOSim());
+                this.wrist = new WristSubsystem(new WristIOSim());
+                this.roller = new RollerSubsystem(new RollerIOSim());
+                this.climber = new ClimberSubsystem(new ClimberIOSim());
                 break;
             case COMP_BOT: // Main robot for competition
             // Note - Fall through intentional
@@ -52,7 +58,25 @@ public class SubsystemManager extends SubsystemBase {
                     new CameraIOArducam(Constants.VISION.CAM_NAME, Constants.VISION.CAMERA_OFFSET)
                 );
 
-                this.elevator = new ElevatorSubsystem(new ElevatorIOKrakenX60(Ports.ELEVATOR_CAN_ID, false));
+                this.elevator = new ElevatorSubsystem(
+                    new ElevatorIOTalonFX(new PortConfig(Ports.ELEVATOR_CAN_ID))
+                );
+
+                this.gripper = new GripperSubsystem(
+                    new GripperIOTalonFX(new PortConfig(Ports.GRIPPER_CAN_ID))
+                );
+
+                this.wrist = new WristSubsystem(
+                    new WristIOTalonFX(new PortConfig(Ports.WRIST_CAN_ID))
+                );
+
+                this.roller = new RollerSubsystem(
+                    new RollerIOTalonFX(new PortConfig(Ports.ROLLER_CAN_ID))
+                );
+
+                this.climber = new ClimberSubsystem(
+                    new ClimberIOTalonFX(new PortConfig(Ports.CLIMBER_CAN_ID))
+                );
                 break;
         }
 

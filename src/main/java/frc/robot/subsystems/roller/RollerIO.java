@@ -1,6 +1,6 @@
 package frc.robot.subsystems.roller;
 
-import frc.robot.subsystems.io.VelocitySubsystemIO;
+import lib.team1731.io.VelocitySubsystemIO;
 
 public abstract class RollerIO extends VelocitySubsystemIO {
     @Override

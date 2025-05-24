@@ -1,12 +1,12 @@
 package frc.robot.subsystems.gripper;
 
-import lib.team8592.hardware.motor.talonfx.TalonFXMotor;
+import lib.team8592.hardware.motor.*;
 
-public class GripperIOReal extends GripperIO {
+public class GripperIOTalonFX extends GripperIO {
     private TalonFXMotor gripperMotor;
 
-    public GripperIOReal(int motorID, boolean inverted) {
-        this.gripperMotor = new TalonFXMotor(motorID, inverted);
+    public GripperIOTalonFX(PortConfig config) {
+        this.gripperMotor = new TalonFXMotor(config);
     }
 
     @Override
@@ -19,7 +19,4 @@ public class GripperIOReal extends GripperIO {
     public double getDegrees() {
         return fromMotorRotationsToDegrees(gripperMotor.getRotations());
     }
-
-    @Override
-    public void updateInputs() {}
 }

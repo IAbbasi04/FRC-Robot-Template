@@ -3,9 +3,9 @@ package frc.robot.subsystems.roller;
 import frc.robot.subsystems.Subsystem;
 import lib.team1731.MatchMode;
 
-public class Roller extends Subsystem {
+public class RollerSubsystem extends Subsystem {
     private RollerIO io;
-    public Roller(RollerIO io) {
+    public RollerSubsystem(RollerIO io) {
         this.io = io;
     }
 
