@@ -1,10 +1,11 @@
-package lib.hardware.motor.rev;
+package lib.hardware.motor;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import lib.hardware.motor.*;
 import lib.hardware.motor.ctre.*;
+import lib.hardware.motor.rev.SparkFlexMotor;
+import lib.hardware.motor.rev.SparkMaxMotor;
 
 // TODO - Probably needs testing or fixing but I'm too lazy now to do it
 public class MotorFactory {
