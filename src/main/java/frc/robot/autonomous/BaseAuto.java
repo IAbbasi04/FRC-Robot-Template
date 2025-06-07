@@ -21,5 +21,10 @@ public abstract class BaseAuto extends WrapperCommand {
         };
     }
 
+    @Override
+    public String getName() {
+        return getClass().getSimpleName();
+    }
+
     public abstract Pose2d getInitialPose();
 }

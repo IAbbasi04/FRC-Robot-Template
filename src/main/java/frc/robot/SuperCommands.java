@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot;
 
 import java.util.Optional;
 
@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.Command.*;
-import frc.robot.Robot;
 import frc.robot.subsystems.swerve.*;
 import frc.robot.subsystems.vision.*;
 

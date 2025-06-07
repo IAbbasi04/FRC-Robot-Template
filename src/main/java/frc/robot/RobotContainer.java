@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import frc.robot.Controls.ControlSets;
 import frc.robot.autonomous.*;
-import frc.robot.commands.SuperCommands;
 import frc.robot.subsystems.SubsystemManager;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
