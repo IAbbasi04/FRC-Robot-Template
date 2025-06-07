@@ -14,4 +14,9 @@ public abstract class VelocitySubsystemIO implements ISubsystemIO {
     public double getDesiredRPM() {
         return this.desiredRPM;
     }
+
+    @Override
+    public void halt() {
+        this.setVelocity(0d);
+    }
 }

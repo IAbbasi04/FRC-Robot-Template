@@ -11,6 +11,7 @@ import frc.robot.Controls.ControlSets;
 import frc.robot.autonomous.*;
 import frc.robot.commands.SuperCommands;
 import frc.robot.subsystems.SubsystemManager;
+import frc.robot.subsystems.roller.RollerSubsystem;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import lib.MatchMode;
@@ -21,6 +22,7 @@ public class RobotContainer {
     private final SubsystemManager manager;
     private final SwerveSubsystem swerve;
     private final VisionSubsystem vision;
+    private final RollerSubsystem rollers;
 
     private final AutoLoader autoLoader;
 
@@ -31,12 +33,14 @@ public class RobotContainer {
     public RobotContainer() {
         this.manager = new SubsystemManager();
         this.autoLoader = new AutoLoader(manager);
+        
+        BaseAuto.initManager(manager);
+        Controls.applyControlSet(ControlSets.DUAL_DRIVER);
 
         this.swerve = manager.swerve;
         this.vision = manager.vision;
+        this.rollers = manager.rollers;
 
-        Controls.applyControlSet(ControlSets.DUAL_DRIVER);
-        
         this.configureNamedCommands();
         this.configureBindings();
         this.configureDefaults();
@@ -58,6 +62,7 @@ public class RobotContainer {
         ));
 
         vision.setDefaultCommand(SuperCommands.updateOdometryWithVision(swerve, vision));
+        rollers.setStopAsDefaultCommand();
     }
 
     /**
@@ -102,6 +107,14 @@ public class RobotContainer {
                 Controls.driveTranslateX,
                 Controls.driveTranslateY
             ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
+        );
+
+        Controls.getDriver().leftTrigger().whileTrue(
+            rollers.setVelocityRPM(() -> 3000)
+        );
+
+        Controls.getDriver().rightTrigger().whileTrue(
+            rollers.setVelocityRPM(() -> -3000)
         );
     };
 

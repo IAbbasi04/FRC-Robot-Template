@@ -5,6 +5,10 @@ import java.util.*;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.RobotSelector;
+import frc.robot.subsystems.roller.RollerConstants;
+import frc.robot.subsystems.roller.RollerIOReal;
+import frc.robot.subsystems.roller.RollerIOSim;
+import frc.robot.subsystems.roller.RollerSubsystem;
 import frc.robot.subsystems.swerve.*;
 import frc.robot.subsystems.swerve.ctreswerve.TunerConstants;
 import frc.robot.subsystems.vision.*;
@@ -13,6 +17,7 @@ import lib.MatchMode;
 public class SubsystemManager extends SubsystemBase {
     public SwerveSubsystem swerve;
     public VisionSubsystem vision;
+    public RollerSubsystem rollers;
 
     private List<Subsystem> activeSubystems = new ArrayList<>();
 
@@ -26,15 +31,8 @@ public class SubsystemManager extends SubsystemBase {
                 this.vision = new VisionSubsystem(
                     new CameraIOSim(VisionConstants.CAM_NAME, VisionConstants.CAMERA_OFFSET)
                 );
-                break;
-            case DEV_BOT: // Development robot
-                this.swerve = new SwerveSubsystem(
-                    new SwerveIOCTRE<TunerConstants>(TunerConstants.class)
-                );
 
-                this.vision = new VisionSubsystem(
-                    new CameraIOArducam(VisionConstants.CAM_NAME, VisionConstants.CAMERA_OFFSET)
-                );
+                this.rollers = new RollerSubsystem(new RollerIOSim());
                 break;
             case COMP_BOT: // Main robot for competition
             // Note - Fall through intentional
@@ -46,13 +44,16 @@ public class SubsystemManager extends SubsystemBase {
                 this.vision = new VisionSubsystem(
                     new CameraIOArducam(VisionConstants.CAM_NAME, VisionConstants.CAMERA_OFFSET)
                 );
+
+                this.rollers = new RollerSubsystem(new RollerIOReal(RollerConstants.ROLLER_CONFIG));
                 break;
         }
 
         this.activeSubystems = List.of(
             // Add all active subsystems here
             swerve,
-            vision
+            vision,
+            rollers
         );
 
         this.activeSubystems.forEach(s -> {

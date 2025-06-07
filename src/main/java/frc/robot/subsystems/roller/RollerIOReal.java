@@ -1,38 +1,33 @@
 package frc.robot.subsystems.roller;
 
-import lib.hardware.motor.PortConfig;
-import lib.hardware.motor.ctre.TalonFXMotor;
-import lib.hardware.motor.rev.MotorFactory;
+import lib.hardware.motor.*;
 
 public class RollerIOReal extends RollerIO {
-    private TalonFXMotor rollerMotor;
+    private BaseMotor rollerMotor;
 
     public RollerIOReal(PortConfig config) {
         this.rollerMotor = MotorFactory.createDefaultTalonFX(config);
+        this.rollerMotor.withGains(RollerConstants.ROLLER_GAINS);
     }
 
     @Override
     public void setVelocity(double desiredRPM) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setVelocity'");
+        this.desiredRPM = desiredRPM;
+        this.rollerMotor.setVelocity(desiredRPM);
     }
 
     @Override
     public double getVelocityRPM() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getVelocityRPM'");
+        return this.rollerMotor.getVelocityRPM();
     }
 
     @Override
     public void setPercentOutput(double desiredPercent) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setPercentOutput'");
+        this.rollerMotor.setPercentOutput(desiredPercent);
     }
 
     @Override
     public double getOutputVoltage() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getOutputVoltage'");
+        return this.rollerMotor.getAppliedVoltage();
     }
-    
 }
