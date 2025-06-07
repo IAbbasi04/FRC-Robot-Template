@@ -12,14 +12,12 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import frc.robot.Constants;
-import frc.robot.subsystems.swerve.ctreswerve.CommandSwerveDrivetrain;
-import frc.robot.subsystems.swerve.ctreswerve.TunerConstants;
+import frc.robot.subsystems.swerve.ctreswerve.*;
 
 public class SwerveIOCTRE<E extends TunerConstants> extends SwerveIO {
     public String tunerConstantsName = "";
 
-    private final ProfiledPIDController kSnapToCtrl = Constants.SWERVE.SNAP_TO_GAINS.toProfiledPIDController();
+    private final ProfiledPIDController kSnapToCtrl = SwerveConstants.SNAP_TO_GAINS.toProfiledPIDController();
 
     private double MaxSpeed = E.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity

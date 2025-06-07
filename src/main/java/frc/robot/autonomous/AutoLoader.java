@@ -10,10 +10,10 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.*;
 import edu.wpi.first.wpilibj.smartdashboard.*;
 import edu.wpi.first.wpilibj2.command.*;
-import frc.robot.Constants;
 import frc.robot.commands.MultiComposableCommand;
 import frc.robot.subsystems.SubsystemManager;
-import lib.team1731.MatchMode;
+import frc.robot.subsystems.swerve.SwerveConstants;
+import lib.MatchMode;
 
 public class AutoLoader {
     private SubsystemManager manager;
@@ -54,8 +54,8 @@ public class AutoLoader {
                 manager.swerve::getWheelSpeeds, 
                 (speeds) -> {manager.swerve.driveFieldOriented(speeds);},
                 new PPHolonomicDriveController(
-                    Constants.SWERVE.PATH_FOLLOW_TRANSLATE_GAINS.toPIDConstants(), 
-                    Constants.SWERVE.PATH_FOLLOW_ROTATE_GAINS.toPIDConstants()
+                    SwerveConstants.PATH_FOLLOW_TRANSLATE_GAINS.toPIDConstants(), 
+                    SwerveConstants.PATH_FOLLOW_ROTATE_GAINS.toPIDConstants()
                 ),
                 RobotConfig.fromGUISettings(),
                 () -> 

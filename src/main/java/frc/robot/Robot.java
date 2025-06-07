@@ -15,10 +15,9 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.*;
-import frc.robot.Constants.CONFIG;
-import lib.team1731.*;
-import lib.team1731.field.*;
-import lib.team8592.logging.SmartLogger;
+import lib.*;
+import lib.field.*;
+import lib.logging.SmartLogger;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -47,10 +46,10 @@ public class Robot extends LoggedRobot {
      */
     @Override
     public void robotInit() {
-        Logger.recordMetadata("Game", CONFIG.GAME);
-        Logger.recordMetadata("Year", CONFIG.YEAR);
-        Logger.recordMetadata("Robot", CONFIG.ROBOT);
-        Logger.recordMetadata("Team", CONFIG.TEAM);
+        Logger.recordMetadata("Game", RobotConfig.GAME);
+        Logger.recordMetadata("Year", RobotConfig.YEAR);
+        Logger.recordMetadata("Robot", RobotConfig.ROBOT);
+        Logger.recordMetadata("Team", RobotConfig.TEAM);
 
         if (Robot.isReal()) { // If running on a real robot
             String time = DateTimeFormatter.ofPattern("yy-MM-dd_HH-mm-ss").format(LocalDateTime.now());

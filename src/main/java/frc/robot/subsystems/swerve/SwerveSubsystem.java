@@ -4,9 +4,7 @@
 
 package frc.robot.subsystems.swerve;
 
-import edu.wpi.first.math.controller.HolonomicDriveController;
-import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.controller.*;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -16,13 +14,12 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.*;
-import frc.robot.Constants.SWERVE;
 import frc.robot.subsystems.Subsystem;
-import lib.team1731.MatchMode;
-import lib.team1731.SmoothingFilter;
-import lib.team8592.Utils;
+import lib.MatchMode;
+import lib.SmoothingFilter;
+import lib.Utils;
 
-import static frc.robot.Constants.SWERVE.*;
+import static frc.robot.subsystems.swerve.SwerveConstants.*;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
@@ -55,13 +52,13 @@ public class SwerveSubsystem extends Subsystem {
     private PIDController snapToCtrl = SNAP_TO_GAINS.toPIDController();
 
     private HolonomicDriveController pathFollowerCtrl = new HolonomicDriveController(
-        SWERVE.PATH_FOLLOW_TRANSLATE_GAINS.toPIDController(),
-        SWERVE.PATH_FOLLOW_TRANSLATE_GAINS.toPIDController(),
-        SWERVE.PATH_FOLLOW_ROTATE_GAINS.toProfiledPIDController()
+        PATH_FOLLOW_TRANSLATE_GAINS.toPIDController(),
+        PATH_FOLLOW_TRANSLATE_GAINS.toPIDController(),
+        PATH_FOLLOW_ROTATE_GAINS.toProfiledPIDController()
     );
 
-    private ProfiledPIDController driveToPoseXCtrl = SWERVE.PATH_FOLLOW_TRANSLATE_GAINS.toProfiledPIDController();
-    private ProfiledPIDController driveToPoseYCtrl = SWERVE.PATH_FOLLOW_TRANSLATE_GAINS.toProfiledPIDController();
+    private ProfiledPIDController driveToPoseXCtrl = PATH_FOLLOW_TRANSLATE_GAINS.toProfiledPIDController();
+    private ProfiledPIDController driveToPoseYCtrl = PATH_FOLLOW_TRANSLATE_GAINS.toProfiledPIDController();
 
     public SwerveSubsystem(SwerveIO io) {
 
@@ -76,9 +73,9 @@ public class SwerveSubsystem extends Subsystem {
 
         this.pathFollowerCtrl.setTolerance(new Pose2d(
             new Translation2d(
-                SWERVE.PATH_FOLLOW_TRANSLATE_GAINS.toPIDController().getPositionTolerance(), 
-                SWERVE.PATH_FOLLOW_TRANSLATE_GAINS.toPIDController().getPositionTolerance()),
-            new Rotation2d(SWERVE.PATH_FOLLOW_ROTATE_GAINS.toProfiledPIDController().getPositionTolerance())
+                PATH_FOLLOW_TRANSLATE_GAINS.toPIDController().getPositionTolerance(), 
+                PATH_FOLLOW_TRANSLATE_GAINS.toPIDController().getPositionTolerance()),
+            new Rotation2d(PATH_FOLLOW_ROTATE_GAINS.toProfiledPIDController().getPositionTolerance())
         ));
     }
 
@@ -359,16 +356,16 @@ public class SwerveSubsystem extends Subsystem {
             trajectoryTimer.reset();
             trajectoryTimer.restart();
             this.pathFollowerCtrl = new HolonomicDriveController(
-                SWERVE.PATH_FOLLOW_TRANSLATE_GAINS.toPIDController(),
-                SWERVE.PATH_FOLLOW_TRANSLATE_GAINS.toPIDController(),
-                SWERVE.PATH_FOLLOW_ROTATE_GAINS.toProfiledPIDController()
+                PATH_FOLLOW_TRANSLATE_GAINS.toPIDController(),
+                PATH_FOLLOW_TRANSLATE_GAINS.toPIDController(),
+                PATH_FOLLOW_ROTATE_GAINS.toProfiledPIDController()
             );
 
             this.pathFollowerCtrl.setTolerance(new Pose2d(
                 new Translation2d(
-                    SWERVE.PATH_FOLLOW_TRANSLATE_GAINS.toPIDController().getPositionTolerance(), 
-                    SWERVE.PATH_FOLLOW_TRANSLATE_GAINS.toPIDController().getPositionTolerance()),
-                new Rotation2d(SWERVE.PATH_FOLLOW_ROTATE_GAINS.toProfiledPIDController().getPositionTolerance())
+                    PATH_FOLLOW_TRANSLATE_GAINS.toPIDController().getPositionTolerance(), 
+                    PATH_FOLLOW_TRANSLATE_GAINS.toPIDController().getPositionTolerance()),
+                new Rotation2d(PATH_FOLLOW_ROTATE_GAINS.toProfiledPIDController().getPositionTolerance())
             ));
         })
         .andThen(resetPose(trajectory.getInitialPose(), flip)).onlyIf(() -> Robot.isSimulation()) // Reset pose only if we are in simulation

@@ -4,12 +4,11 @@ import java.util.*;
 
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.*;
-import frc.robot.Constants;
 import frc.robot.RobotSelector;
 import frc.robot.subsystems.swerve.*;
 import frc.robot.subsystems.swerve.ctreswerve.TunerConstants;
 import frc.robot.subsystems.vision.*;
-import lib.team1731.MatchMode;
+import lib.MatchMode;
 
 public class SubsystemManager extends SubsystemBase {
     public SwerveSubsystem swerve;
@@ -25,7 +24,7 @@ public class SubsystemManager extends SubsystemBase {
                 );
 
                 this.vision = new VisionSubsystem(
-                    new CameraIOSim(Constants.VISION.CAM_NAME, Constants.VISION.CAMERA_OFFSET)
+                    new CameraIOSim(VisionConstants.CAM_NAME, VisionConstants.CAMERA_OFFSET)
                 );
                 break;
             case DEV_BOT: // Development robot
@@ -34,7 +33,7 @@ public class SubsystemManager extends SubsystemBase {
                 );
 
                 this.vision = new VisionSubsystem(
-                    new CameraIOArducam(Constants.VISION.CAM_NAME, Constants.VISION.CAMERA_OFFSET)
+                    new CameraIOArducam(VisionConstants.CAM_NAME, VisionConstants.CAMERA_OFFSET)
                 );
                 break;
             case COMP_BOT: // Main robot for competition
@@ -45,7 +44,7 @@ public class SubsystemManager extends SubsystemBase {
                 );
 
                 this.vision = new VisionSubsystem(
-                    new CameraIOArducam(Constants.VISION.CAM_NAME, Constants.VISION.CAMERA_OFFSET)
+                    new CameraIOArducam(VisionConstants.CAM_NAME, VisionConstants.CAMERA_OFFSET)
                 );
                 break;
         }
@@ -86,9 +85,7 @@ public class SubsystemManager extends SubsystemBase {
     }
 
     @Override
-    public void periodic() {
-       
-    }
+    public void periodic() {}
 
     @Override
     public void initSendable(SendableBuilder builder) {

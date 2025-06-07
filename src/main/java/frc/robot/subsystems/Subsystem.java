@@ -3,8 +3,8 @@ package frc.robot.subsystems;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
-import lib.team1731.MatchMode;
-import lib.team8592.logging.SmartLogger;
+import lib.MatchMode;
+import lib.logging.SmartLogger;
 
 public abstract class Subsystem extends SubsystemBase {
     private boolean enabled = false; // TODO - Get Working
