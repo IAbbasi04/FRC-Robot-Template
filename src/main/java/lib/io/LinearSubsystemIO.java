@@ -25,4 +25,9 @@ public abstract class LinearSubsystemIO implements ISubsystemIO {
     public double getDesiredPosition() {
         return this.desiredPosition;
     }
+
+    @Override
+    public void halt() {
+        setPosition(getPosition());
+    }
 }

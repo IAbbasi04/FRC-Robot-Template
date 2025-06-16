@@ -23,4 +23,9 @@ public abstract class RotationalSubsystemIO implements ISubsystemIO {
     public double getDesiredDegrees() {
         return this.desiredDegrees;
     }
+
+    @Override
+    public void halt() {
+        setDegrees(getDegrees());
+    }
 }
