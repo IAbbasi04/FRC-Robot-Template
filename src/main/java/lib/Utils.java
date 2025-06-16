@@ -40,7 +40,7 @@ public class Utils {
         if (flip) {
             newPose = new Pose2d(
                 Robot.FIELD.getFieldLength() - pose.getX(),
-                /*Robot.FIELD.getFieldWidth() - */pose.getY(),
+                Robot.FIELD.getFieldWidth() - pose.getY(),
                 Rotation2d.fromRadians(Math.PI).minus(pose.getRotation())
             );
         }

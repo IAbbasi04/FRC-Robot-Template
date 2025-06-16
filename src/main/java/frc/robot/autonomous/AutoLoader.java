@@ -5,63 +5,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.networktables.GenericEntry;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.shuffleboard.*;
 import edu.wpi.first.wpilibj.smartdashboard.*;
 import edu.wpi.first.wpilibj2.command.*;
-
 import frc.robot.subsystems.SubsystemManager;
-import frc.robot.subsystems.swerve.SwerveConstants;
+
 import lib.MatchMode;
 import lib.commands.MultiComposableCommand;
 
 public class AutoLoader {
     private SubsystemManager manager;
 
-    private SendableChooser<Class<?>> autoChooser = new SendableChooser<>();
+    private SendableChooser<BaseAuto> autoChooser = new SendableChooser<>();
     private ShuffleboardTab autoTab = Shuffleboard.getTab("Autonomous Config");
     private GenericEntry startDelayEntry;
-    
-    // private Class<?>[] autos = new Class<?>[]{
-    //     TestAuto.class
-    // };
 
     public AutoLoader(SubsystemManager manager) {
         this.manager = manager;
-
-        try {
-            AutoBuilder.configure(
-                manager.swerve::getCurrentPosition, 
-                (pose) -> {manager.swerve.resetPose(pose);}, 
-                manager.swerve::getWheelSpeeds, 
-                (speeds) -> {manager.swerve.driveFieldOriented(speeds);},
-                new PPHolonomicDriveController(
-                    SwerveConstants.PATH_FOLLOW_TRANSLATE_GAINS.toPIDConstants(), 
-                    SwerveConstants.PATH_FOLLOW_ROTATE_GAINS.toPIDConstants()
-                ),
-                RobotConfig.fromGUISettings(),
-                () -> 
-                    DriverStation.getAlliance().isPresent() && 
-                    DriverStation.getAlliance().get() == Alliance.Red,
-                manager.swerve);
-        } catch (Exception e) {
-            System.out.println("GUI Settings not properly configured for PathPlanner");
-        }
-
-        initAutoSelector();
+        initAutoSelector(manager);
     }
 
-    private void initAutoSelector() {
-        List<BaseAuto> autos = new ArrayList<>();
+    private void initAutoSelector(SubsystemManager manager) {
         String packageName = "/src/main/java/frc/robot/autonomous/autos";
         File autosDir = new File(System.getProperty("user.dir") + packageName);
 
-        this.autoChooser.setDefaultOption("DEFAULT - DO NOTHING", BaseAuto.getDefaultAuto().getClass());
+        this.autoChooser.setDefaultOption("DEFAULT - DO NOTHING", BaseAuto.getDefaultAuto());
 
         this.autoTab.add("Auto Selector", autoChooser)
             .withPosition(3, 3)
@@ -74,32 +45,52 @@ public class AutoLoader {
 
         if(autosDir.isDirectory()) {
             File[] files = autosDir.listFiles((dir, name) -> name.endsWith(".java"));
+
             ClassLoader classLoader = getClass().getClassLoader();
 
-            try {
-                if (files != null) {
-                    for (File file : files) {
+            if (files != null) {
+                for (File file : files) {
+                    try {
                         String className = file.getName().replace(".java", "");
                         String fullClassName = "frc.robot.autonomous.autos." + className;
 
                         Class<?> auto = classLoader.loadClass(fullClassName);
 
                         if (BaseAuto.class.isAssignableFrom(auto)) {
-                            BaseAuto baseAuto = (BaseAuto) auto.getDeclaredConstructor().newInstance();
-                            autos.add(baseAuto);
-                            autoChooser.addOption(baseAuto.getName(), auto);
+                            BaseAuto baseAuto = (BaseAuto) auto.getDeclaredConstructor(SubsystemManager.class).newInstance(manager);
+                            autoChooser.addOption(baseAuto.getName(), baseAuto);
                         }
+                    } catch (Exception e) {
+                        System.out.print("Auto: " + file.getName() + "could not load");
                     }
                 }
-            } catch (Exception e) {}
+            }
         }
+
+        List<String> ppAutoNames = new ArrayList<>();
+        try {   
+            ppAutoNames = AutoBuilder.getAllAutoNames();
+        } catch (Exception e) {
+            System.err.print("PathPlannerAuto could not load");
+        }
+
+        for(String name : ppAutoNames) {
+            BaseAuto auto = BaseAuto.fromPathPlannerAuto(new PathPlannerAuto(name));
+            autoChooser.addOption(name, auto);
+        } 
     }
 
     public Command loadSelectedAuto() {
         return manager.onModeInitCommand(MatchMode.AUTONOMOUS)
         .andThen(
             manager.swerve.resetHeading(),
-            manager.swerve.resetAlliancePose(getSelectedAuto().getInitialPose()),
+            new ConditionalCommand(
+                manager.swerve.resetAlliancePose(getSelectedAuto().getInitialPose()), 
+                // manager.swerve.resetPoseFlipOnlyX(getSelectedAuto().getInitialPose(), Robot.isRedAlliance),
+                Commands.none(),
+                // () -> getSelectedAuto().isPathPlannerAuto
+                () -> true
+            ),
             getStartDelay(), 
             new MultiComposableCommand(getSelectedAuto())
         );
@@ -107,7 +98,7 @@ public class AutoLoader {
 
     private BaseAuto getSelectedAuto() {
         try {
-            return (BaseAuto) autoChooser.getSelected().getDeclaredConstructor().newInstance();
+            return autoChooser.getSelected();
         } catch (Exception e) {
             return BaseAuto.getDefaultAuto();
         }

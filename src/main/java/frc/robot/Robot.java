@@ -6,6 +6,7 @@ package frc.robot;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.function.BooleanSupplier;
 
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -13,6 +14,7 @@ import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.*;
 import lib.*;
@@ -38,6 +40,9 @@ public class Robot extends LoggedRobot {
     
     public static final RobotClock CLOCK = new RobotClock();
     public static final FieldLayout FIELD = new ReefscapeFieldLayout();
+
+    public static final BooleanSupplier isRedAlliance = () -> DriverStation.getAlliance().isPresent() && 
+        DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
 
     /**
      * This function is run when the robot is first started up and should be used

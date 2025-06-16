@@ -23,6 +23,11 @@ import static frc.robot.subsystems.swerve.SwerveConstants.*;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.config.RobotConfig;
 
 public class SwerveSubsystem extends Subsystem {
     /**
@@ -57,11 +62,10 @@ public class SwerveSubsystem extends Subsystem {
         PATH_FOLLOW_ROTATE_GAINS.toProfiledPIDController()
     );
 
-    private ProfiledPIDController driveToPoseXCtrl = PATH_FOLLOW_TRANSLATE_GAINS.toProfiledPIDController();
-    private ProfiledPIDController driveToPoseYCtrl = PATH_FOLLOW_TRANSLATE_GAINS.toProfiledPIDController();
+    private ProfiledPIDController driveToPoseXCtrl = DRIVE_TO_POSE_GAINS.toProfiledPIDController();
+    private ProfiledPIDController driveToPoseYCtrl = DRIVE_TO_POSE_GAINS.toProfiledPIDController();
 
     public SwerveSubsystem(SwerveIO io) {
-
         smoothingFilter = new SmoothingFilter(
             TRANSLATION_SMOOTHING_AMOUNT,
             TRANSLATION_SMOOTHING_AMOUNT,
@@ -77,6 +81,25 @@ public class SwerveSubsystem extends Subsystem {
                 PATH_FOLLOW_TRANSLATE_GAINS.toPIDController().getPositionTolerance()),
             new Rotation2d(PATH_FOLLOW_ROTATE_GAINS.toProfiledPIDController().getPositionTolerance())
         ));
+
+        try {
+            AutoBuilder.configure(
+                this::getCurrentPosition, 
+                (pose) -> io.setKnownOdometryPose(pose), 
+                this::getWheelSpeeds, 
+                (speeds) -> this.drive(speeds),
+                new PPHolonomicDriveController(
+                    SwerveConstants.PATH_FOLLOW_TRANSLATE_GAINS.toPIDConstants(), 
+                    SwerveConstants.PATH_FOLLOW_ROTATE_GAINS.toPIDConstants()
+                ),
+                RobotConfig.fromGUISettings(),
+                Robot.isRedAlliance,
+                this
+            );
+        } catch (Exception e) {
+            System.out.println("GUI Settings not properly configured for PathPlanner");
+        }
+        
     }
 
     /**
@@ -107,6 +130,8 @@ public class SwerveSubsystem extends Subsystem {
                     yield false;
             }
         );
+
+        
     }
 
     /**
@@ -181,13 +206,10 @@ public class SwerveSubsystem extends Subsystem {
         return currentSpeeds;
     }
 
-    public void addVisionMeasurement(Pose2d visionRobotPoseMeters) {
-        io.addVisionMeasurement(visionRobotPoseMeters, Timer.getFPGATimestamp());
-    }
-
     @Override
     public void onModeInit(MatchMode mode) {
         stop();
+        driveToPoseXCtrl.reset(0, 0);
     }
 
     @Override
@@ -256,6 +278,22 @@ public class SwerveSubsystem extends Subsystem {
                 resetToPose = new Pose2d(
                     new Translation2d(
                         Robot.FIELD.getFieldLength() - pose.getX(),
+                        Robot.FIELD.getFieldWidth() - pose.getY()
+                    ),
+                    Rotation2d.fromDegrees(180).minus(pose.getRotation())
+                );
+            }
+            io.setKnownOdometryPose(resetToPose);
+        });
+    }
+
+    public Command resetPoseFlipOnlyX(Pose2d pose, BooleanSupplier flip) {
+        return runOnce(() -> {
+            Pose2d resetToPose = pose;
+            if (flip.getAsBoolean()) {
+                resetToPose = new Pose2d(
+                    new Translation2d(
+                        Robot.FIELD.getFieldLength() - pose.getX(),
                         pose.getY()
                     ),
                     Rotation2d.fromDegrees(180).minus(pose.getRotation())
@@ -273,7 +311,7 @@ public class SwerveSubsystem extends Subsystem {
                 resetToPose = new Pose2d(
                     new Translation2d(
                         Robot.FIELD.getFieldLength() - pose.getX(),
-                        pose.getY()
+                        Robot.FIELD.getFieldWidth() - pose.getY()
                     ),
                     Rotation2d.fromDegrees(180).minus(pose.getRotation())
                 );
@@ -282,7 +320,7 @@ public class SwerveSubsystem extends Subsystem {
         });
     }
 
-        /**
+    /**
      * Command to drive the swerve with translation and rotation processed for human input
      * 
      * @param translateX a lambda returning the driver's X input
@@ -429,5 +467,9 @@ public class SwerveSubsystem extends Subsystem {
                 ), DriveModes.FIELD_RELATIVE);
             }
         ).until(() -> driveToPoseXCtrl.atSetpoint() && driveToPoseYCtrl.atSetpoint() && snapToCtrl.atSetpoint());
+    }
+
+    public Command addVisionMeasurement(Supplier<Pose2d> visionRobotPoseMeters) {
+        return runOnce(() -> io.addVisionMeasurement(visionRobotPoseMeters.get(), Timer.getFPGATimestamp()));
     }
 }
