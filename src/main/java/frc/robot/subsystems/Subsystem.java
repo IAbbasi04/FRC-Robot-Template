@@ -6,16 +6,24 @@ import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import lib.MatchMode;
 import lib.io.ISubsystemIO;
 import lib.logging.SmartLogger;
+import lib.logging.SubsystemDataMap;
 
-public abstract class Subsystem<V extends ISubsystemIO> extends SubsystemBase {
+public abstract class Subsystem<E extends ISubsystemIO, V extends Enum<V>> extends SubsystemBase {
     private boolean enabled = false; // TODO - Get Working
-    protected V io;
+    protected E io;
+    public SubsystemDataMap<V> db = new SubsystemDataMap<>(); // accesible
 
     protected SmartLogger logger;
+    
+    private Class<V> dataClz;
 
-    protected Subsystem(V io) {
+    protected Subsystem(E io, Class<V> dataClz) {
         this.io = io;
+        this.dataClz = dataClz;
         this.logger = new SmartLogger(getName());
+        for (V key : dataClz.getEnumConstants()) {
+            this.db.set(key, 0d);
+        }
     }
 
     public boolean currentlyCommanded(){
@@ -28,6 +36,14 @@ public abstract class Subsystem<V extends ISubsystemIO> extends SubsystemBase {
 
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public V getData() {
+        try {
+            return (V)dataClz.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /**
@@ -85,6 +101,9 @@ public abstract class Subsystem<V extends ISubsystemIO> extends SubsystemBase {
             logger.log("Has Default Command", !getDefaultCommand().equals(Commands.none()));
             logger.log("Active Command", getCurrentCommand().getName());
             logger.log("Default Command", getDefaultCommand().getName());
+            for (V value : dataClz.getEnumConstants()) {
+                logger.log(value.name(), db.get(value).toString());
+            }
         }
     }
     

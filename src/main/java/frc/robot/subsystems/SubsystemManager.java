@@ -61,7 +61,7 @@ public class SubsystemManager extends SubsystemBase {
     }
 
     public Command onModeInitCommand(MatchMode mode) {
-        Subsystem<?>[] subs = new Subsystem[activeSubsystems.size()];
+        Subsystem<?, ?>[] subs = new Subsystem[activeSubsystems.size()];
         for (int i = 0; i < activeSubsystems.size(); i++) {
             subs[i] = activeSubsystems.get(i);
         }
@@ -71,12 +71,12 @@ public class SubsystemManager extends SubsystemBase {
         }, subs);
     }
 
-    public List<Subsystem<?>> getAllSubsystemsAsList() {
+    public List<Subsystem<?, ?>> getAllSubsystemsAsList() {
         return activeSubsystems;
     }
 
-    public Subsystem<?>[] getAllSubsystemsAsArray() {
-        Subsystem<?>[] subsystems = new Subsystem[activeSubsystems.size()];
+    public Subsystem<?, ?>[] getAllSubsystemsAsArray() {
+        Subsystem<?, ?>[] subsystems = new Subsystem[activeSubsystems.size()];
         for (int i = 0; i < activeSubsystems.size(); i++) {
             subsystems[i] = activeSubsystems.get(i);
         }

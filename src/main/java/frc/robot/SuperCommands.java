@@ -19,7 +19,7 @@ public final class SuperCommands {
     public static Command updateOdometryWithVision(SwerveSubsystem swerve, VisionSubsystem vision) {
         return new DeferredCommand(
             () -> {
-                Optional<EstimatedRobotPose> estimatedRobotPose = vision.getRobotPoseVision();
+                Optional<EstimatedRobotPose> estimatedRobotPose = vision.db.get(EVisionData.ESTIMATED_ROBOT_POSE);
                 if (estimatedRobotPose.isPresent()) {
                     Pose2d robotPose = estimatedRobotPose.get().estimatedPose.toPose2d();
                     double ambiguity = vision.getPoseAmbiguityRatio();

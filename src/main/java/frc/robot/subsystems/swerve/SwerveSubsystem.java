@@ -30,7 +30,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.config.RobotConfig;
 
-public class SwerveSubsystem extends Subsystem<SwerveIO> {
+public class SwerveSubsystem extends Subsystem<SwerveIO, ESwerveData> {
     /**
      * Small enum to control whether to drive robot- or field-
      * relative for {@link SwerveSubsystem#drive(ChassisSpeeds, DriveModes)}
@@ -62,13 +62,13 @@ public class SwerveSubsystem extends Subsystem<SwerveIO> {
         DriveScaler.ScaleType.QUADRATIC, 
         true, 
         0.03
-    );//.withSlewLimit(4d);
+    );
 
     private DriveScaler yScaler = new DriveScaler(
         DriveScaler.ScaleType.QUADRATIC, 
         true, 
         0.03
-    );//.withSlewLimit(4d);
+    );
 
     private DriveScaler rotScaler = new DriveScaler(
         DriveScaler.ScaleType.LINEAR, 
@@ -86,7 +86,7 @@ public class SwerveSubsystem extends Subsystem<SwerveIO> {
     private ProfiledPIDController driveToPoseYCtrl = DRIVE_TO_POSE_GAINS.toProfiledPIDController();
 
     public SwerveSubsystem(SwerveIO io) {
-        super(io);
+        super(io, ESwerveData.class);
         smoothingFilter = new SmoothingFilter(
             TRANSLATION_SMOOTHING_AMOUNT,
             TRANSLATION_SMOOTHING_AMOUNT,
@@ -157,21 +157,21 @@ public class SwerveSubsystem extends Subsystem<SwerveIO> {
     /**
      * Get the current robot yaw as a Rotation2d
      */
-    public Rotation2d getYaw() {
+    private Rotation2d getYaw() {
         return io.getYaw();
     }
 
     /**
      * Get the current position of the swerve as judged by odometry.
      */
-    public Pose2d getCurrentPosition() {
+    private Pose2d getCurrentPosition() {
         return io.getCurrentOdometryPosition();
     }
 
     /**
      * Get the current translational and rotational speeds of the drivetrain
      */
-    public ChassisSpeeds getWheelSpeeds() {
+    private ChassisSpeeds getWheelSpeeds() {
         return io.getWheelSpeeds();
     }
 
@@ -221,9 +221,12 @@ public class SwerveSubsystem extends Subsystem<SwerveIO> {
 
     @Override
     public void periodicTelemetry() {
-        logger.log("Current Pose", getCurrentPosition());
-        logger.log("Desired Speeds", desiredSpeeds);
         io.updateInputs();
+
+        this.db.set(ESwerveData.CURRENT_POSE, getCurrentPosition());
+        this.db.set(ESwerveData.CURRENT_WHEEL_SPEEDS, getWheelSpeeds());
+        this.db.set(ESwerveData.CURRENT_YAW, getYaw());
+        this.db.set(ESwerveData.DESIRED_SPEEDS, desiredSpeeds);
     }
 
     /**

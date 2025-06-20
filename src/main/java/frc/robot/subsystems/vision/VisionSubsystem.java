@@ -2,33 +2,33 @@ package frc.robot.subsystems.vision;
 
 import java.util.*;
 
-import org.photonvision.EstimatedRobotPose;
 import org.photonvision.targeting.*;
+import org.team254.geometry.Pose2d;
 
 import edu.wpi.first.math.geometry.*;
 import frc.robot.Robot;
 import frc.robot.subsystems.Subsystem;
 import lib.MatchMode;
 
-public class VisionSubsystem extends Subsystem<CameraIO> {
+public class VisionSubsystem extends Subsystem<CameraIO, EVisionData> {
     private List<PhotonTrackedTarget> allVisibleTags = new ArrayList<>();
     private PhotonTrackedTarget bestTarget = new PhotonTrackedTarget();
 
     public VisionSubsystem(CameraIO io){
-        super(io);
+        super(io, EVisionData.class);
     }
 
-    public boolean isAnyTargetVisible() {
-        return io.isAnyTargetVisible();
-    }
+    // public boolean isAnyTargetVisible() {
+    //     return io.isAnyTargetVisible();
+    // }
 
     public List<PhotonTrackedTarget> getTargets() {
         return io.getAllTargets();
     }
 
-    public Optional<EstimatedRobotPose> getRobotPoseVision() {
-        return io.getVisionEstimatedPose();
-    }
+    // public Optional<EstimatedRobotPose> getRobotPoseVision() {
+    //     return io.getVisionEstimatedPose();
+    // }
 
     public double getPoseAmbiguityRatio() {
         return io.getPoseAmbiguityRatio();
@@ -63,23 +63,32 @@ public class VisionSubsystem extends Subsystem<CameraIO> {
         
         if (Robot.isSimulation()) return; // Do not log below if simulation
 
-        this.logger.logIf("Best Target Yaw", bestTarget.yaw, -1d, isAnyTargetVisible());
-        this.logger.logIf("Best Target Pitch", bestTarget.pitch, -1d, isAnyTargetVisible());
-        this.logger.logIf("Best Target Skew", bestTarget.skew, -1d, isAnyTargetVisible());
-        this.logger.logIf("Best Target Yaw", bestTarget.yaw, -1d, isAnyTargetVisible());
-        this.logger.logIf("Best Target ID", bestTarget.getDetectedObjectClassID(), -1d, isAnyTargetVisible());
-        this.logger.logIf("Best Target X", bestTarget.getBestCameraToTarget().getX(), -1d, isAnyTargetVisible());
-        this.logger.logIf("Best Target Y", bestTarget.getBestCameraToTarget().getY(), -1d, isAnyTargetVisible());
-        this.logger.logIf("Best Target Z", bestTarget.getBestCameraToTarget().getZ(), -1d, isAnyTargetVisible());
+        // this.logger.logIf("Best Target Yaw", bestTarget.yaw, -1d, isAnyTargetVisible());
+        // this.logger.logIf("Best Target Pitch", bestTarget.pitch, -1d, isAnyTargetVisible());
+        // this.logger.logIf("Best Target Skew", bestTarget.skew, -1d, isAnyTargetVisible());
+        // this.logger.logIf("Best Target Yaw", bestTarget.yaw, -1d, isAnyTargetVisible());
+        // this.logger.logIf("Best Target ID", bestTarget.getDetectedObjectClassID(), -1d, isAnyTargetVisible());
+        // this.logger.logIf("Best Target X", bestTarget.getBestCameraToTarget().getX(), -1d, isAnyTargetVisible());
+        // this.logger.logIf("Best Target Y", bestTarget.getBestCameraToTarget().getY(), -1d, isAnyTargetVisible());
+        // this.logger.logIf("Best Target Z", bestTarget.getBestCameraToTarget().getZ(), -1d, isAnyTargetVisible());
 
-        this.logger.logIf("Closest Tag ID", io.getClosestTagID(), -1, isAnyTargetVisible());
+        // this.logger.logIf("Closest Tag ID", io.getClosestTagID(), -1, isAnyTargetVisible());
 
-        this.logger.logIf(
-            "Estimated Pose", 
-            getRobotPoseVision().get().estimatedPose.toPose2d(),
+        this.db.set(EVisionData.BEST_TARGET_DATA, bestTarget);
+        this.db.set(EVisionData.IS_ANY_TARGET_VISIBLE, io.isAnyTargetVisible());
+        this.db.setIf(
+            EVisionData.ESTIMATED_ROBOT_POSE,
+            io.getVisionEstimatedPose().get().estimatedPose.toPose2d(),
             new Pose2d(),
-            getRobotPoseVision().isPresent()
+            io.getVisionEstimatedPose().isPresent()
         );
+
+        // this.logger.logIf(
+        //     "Estimated Pose", 
+        //     getRobotPoseVision().get().estimatedPose.toPose2d(),
+        //     new Pose2d(),
+        //     getRobotPoseVision().isPresent()
+        // );
     }
 
     @Override
