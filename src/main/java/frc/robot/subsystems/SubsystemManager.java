@@ -14,7 +14,7 @@ public class SubsystemManager extends SubsystemBase {
     public SwerveSubsystem swerve;
     public VisionSubsystem vision;
 
-    private List<Subsystem> activeSubystems = new ArrayList<>();
+    private SubsystemList activeSubsystems;
 
     public SubsystemManager() {
         switch(RobotSelector.getRobot()) {
@@ -49,37 +49,36 @@ public class SubsystemManager extends SubsystemBase {
                 break;
         }
 
-        this.activeSubystems = List.of(
+        this.activeSubsystems = new SubsystemList(
             // Add all active subsystems here
             swerve,
             vision
         );
 
-        this.activeSubystems.forEach(s -> {
+        this.activeSubsystems.forEach(s -> {
             s.enableSubsystem(true);
-            // s.initializeLogger();
         });
     }
 
     public Command onModeInitCommand(MatchMode mode) {
-        Subsystem[] subs = new Subsystem[activeSubystems.size()];
-        for (int i = 0; i < activeSubystems.size(); i++) {
-            subs[i] = activeSubystems.get(i);
+        Subsystem<?>[] subs = new Subsystem[activeSubsystems.size()];
+        for (int i = 0; i < activeSubsystems.size(); i++) {
+            subs[i] = activeSubsystems.get(i);
         }
 
         return Commands.runOnce(() -> {
-            activeSubystems.forEach(s -> s.onModeInit(mode));
+            activeSubsystems.forEach(s -> s.onModeInit(mode));
         }, subs);
     }
 
-    public List<Subsystem> getAllSubsystemsAsList() {
-        return activeSubystems;
+    public List<Subsystem<?>> getAllSubsystemsAsList() {
+        return activeSubsystems;
     }
 
-    public Subsystem[] getAllSubsystemsAsArray() {
-        Subsystem[] subsystems = new Subsystem[activeSubystems.size()];
-        for (int i = 0; i < activeSubystems.size(); i++) {
-            subsystems[i] = activeSubystems.get(i);
+    public Subsystem<?>[] getAllSubsystemsAsArray() {
+        Subsystem<?>[] subsystems = new Subsystem[activeSubsystems.size()];
+        for (int i = 0; i < activeSubsystems.size(); i++) {
+            subsystems[i] = activeSubsystems.get(i);
         }
         return subsystems;
     }
@@ -90,7 +89,7 @@ public class SubsystemManager extends SubsystemBase {
     @Override
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("SubsystemManager");
-        activeSubystems.forEach(sub -> {
+        activeSubsystems.forEach(sub -> {
             builder.addBooleanProperty(sub.getName() + "/Enabled", 
                 sub::isEnabled, 
                 (enable) -> {

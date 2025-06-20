@@ -4,14 +4,17 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import lib.MatchMode;
+import lib.io.ISubsystemIO;
 import lib.logging.SmartLogger;
 
-public abstract class Subsystem extends SubsystemBase {
+public abstract class Subsystem<V extends ISubsystemIO> extends SubsystemBase {
     private boolean enabled = false; // TODO - Get Working
+    protected V io;
 
     protected SmartLogger logger;
 
-    protected Subsystem() {
+    protected Subsystem(V io) {
+        this.io = io;
         this.logger = new SmartLogger(getName());
     }
 
@@ -76,6 +79,7 @@ public abstract class Subsystem extends SubsystemBase {
     public void periodic() {
         periodicTelemetry();
         periodicOutputs();
+        io.updateInputs();
         if (logger != null) {
             logger.log("Actively Command", !getCurrentCommand().equals(Commands.none()));
             logger.log("Has Default Command", !getDefaultCommand().equals(Commands.none()));

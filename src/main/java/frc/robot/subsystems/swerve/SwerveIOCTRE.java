@@ -2,11 +2,8 @@ package frc.robot.subsystems.swerve;
 
 import static edu.wpi.first.units.Units.*;
 
-import java.util.function.Consumer;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -85,10 +82,10 @@ public class SwerveIOCTRE<E extends TunerConstants> extends SwerveIO {
         drivetrain.setControl(point.withModuleDirection(direction));
     }
 
-    @Override
-    public void registerTelemetry(Consumer<SwerveDriveState> driveState){
-        drivetrain.registerTelemetry(driveState);
-    }
+    // @Override
+    // public void registerTelemetry(Consumer<SwerveDriveState> driveState){
+    //     drivetrain.registerTelemetry(driveState);
+    // }
 
     @Override
     public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {

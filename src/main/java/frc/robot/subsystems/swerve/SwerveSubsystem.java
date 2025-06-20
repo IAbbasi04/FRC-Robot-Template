@@ -30,7 +30,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.config.RobotConfig;
 
-public class SwerveSubsystem extends Subsystem {
+public class SwerveSubsystem extends Subsystem<SwerveIO> {
     /**
      * Small enum to control whether to drive robot- or field-
      * relative for {@link SwerveSubsystem#drive(ChassisSpeeds, DriveModes)}
@@ -48,7 +48,6 @@ public class SwerveSubsystem extends Subsystem {
 
     private SmoothingFilter smoothingFilter;
 
-    private SwerveIO io;
 
     private ChassisSpeeds desiredSpeeds = new ChassisSpeeds();
 
@@ -87,14 +86,14 @@ public class SwerveSubsystem extends Subsystem {
     private ProfiledPIDController driveToPoseYCtrl = DRIVE_TO_POSE_GAINS.toProfiledPIDController();
 
     public SwerveSubsystem(SwerveIO io) {
+        super(io);
         smoothingFilter = new SmoothingFilter(
             TRANSLATION_SMOOTHING_AMOUNT,
             TRANSLATION_SMOOTHING_AMOUNT,
             ROTATION_SMOOTHING_AMOUNT
         );
 
-        this.io = io;
-        this.io.registerTelemetry((state) -> {});
+        // this.io.registerTelemetry((state) -> {});
 
         this.pathFollowerCtrl.setTolerance(new Pose2d(
             new Translation2d(

@@ -10,15 +10,12 @@ import frc.robot.Robot;
 import frc.robot.subsystems.Subsystem;
 import lib.MatchMode;
 
-public class VisionSubsystem extends Subsystem {
-    private CameraIO io;
-
+public class VisionSubsystem extends Subsystem<CameraIO> {
     private List<PhotonTrackedTarget> allVisibleTags = new ArrayList<>();
     private PhotonTrackedTarget bestTarget = new PhotonTrackedTarget();
 
-
     public VisionSubsystem(CameraIO io){
-        this.io = io;
+        super(io);
     }
 
     public boolean isAnyTargetVisible() {

@@ -1,11 +1,6 @@
 package frc.robot.subsystems.swerve;
 
-import java.util.function.Consumer;
-
-import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
-
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import lib.io.ISubsystemIO;
 
@@ -30,7 +25,7 @@ public abstract class SwerveIO implements ISubsystemIO {
 
     public abstract void snapToHeading(ChassisSpeeds targetSpeeds, Rotation2d heading);
 
-    public abstract void registerTelemetry(Consumer<SwerveDriveState> driveState);
+    // public abstract void registerTelemetry(Consumer<SwerveDriveState> driveState);
 
     public abstract void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds);
 
