@@ -4,8 +4,7 @@ package frc.robot;
 import java.lang.reflect.Field;
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.button.*;
 import lib.logging.SmartLogger;
 
 public final class Controls {
@@ -56,7 +55,6 @@ public final class Controls {
 
                 break;
         }
-        
     }
 
     public static void logControls() {

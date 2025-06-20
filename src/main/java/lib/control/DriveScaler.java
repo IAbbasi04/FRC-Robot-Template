@@ -14,9 +14,14 @@ public class DriveScaler {
         CUBIC
     }
 
-    public DriveScaler(ScaleType type, boolean zeroAtDeadband) {
+    public DriveScaler(ScaleType type, boolean zeroAtDeadband, double deadband) {
         this.type = type;
         this.zeroAtDeadband = zeroAtDeadband;
+        this.deadband = deadband;
+    }
+
+    public DriveScaler(ScaleType type, boolean zeroAtDeadband) {
+        this(type, zeroAtDeadband, 0.03);
     }
 
     public DriveScaler withSlewLimit(double slewRate) {

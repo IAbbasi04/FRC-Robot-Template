@@ -18,6 +18,7 @@ import frc.robot.subsystems.Subsystem;
 import lib.MatchMode;
 import lib.SmoothingFilter;
 import lib.Utils;
+import lib.control.DriveScaler;
 
 import static frc.robot.subsystems.swerve.SwerveConstants.*;
 
@@ -43,7 +44,6 @@ public class SwerveSubsystem extends Subsystem {
         FIELD_RELATIVE
     }
 
-    private boolean isSlowMode;
     private boolean robotRelative;
 
     private SmoothingFilter smoothingFilter;
@@ -55,6 +55,27 @@ public class SwerveSubsystem extends Subsystem {
     private Timer trajectoryTimer = new Timer();
 
     private PIDController snapToCtrl = SNAP_TO_GAINS.toPIDController();
+
+    private double translationScaling = 1d;
+    private double rotateScaling = 1d;
+
+    private DriveScaler xScaler = new DriveScaler(
+        DriveScaler.ScaleType.QUADRATIC, 
+        true, 
+        0.03
+    );//.withSlewLimit(4d);
+
+    private DriveScaler yScaler = new DriveScaler(
+        DriveScaler.ScaleType.QUADRATIC, 
+        true, 
+        0.03
+    );//.withSlewLimit(4d);
+
+    private DriveScaler rotScaler = new DriveScaler(
+        DriveScaler.ScaleType.LINEAR, 
+        true, 
+        0.03
+    );
 
     private HolonomicDriveController pathFollowerCtrl = new HolonomicDriveController(
         PATH_FOLLOW_TRANSLATE_GAINS.toPIDController(),
@@ -168,40 +189,17 @@ public class SwerveSubsystem extends Subsystem {
      * @return a ChassisSpeeds ready to be sent to the swerve.
      */
     private ChassisSpeeds processJoystickInputs(double rawX, double rawY, double rawRot){
-        double driveTranslateY = (
-            rawY >= 0
-            ? (Math.pow(Math.abs(rawY), JOYSTICK_EXPONENT))
-            : -(Math.pow(Math.abs(rawY), JOYSTICK_EXPONENT))
-        );
-
-        double driveTranslateX = (
-            rawX >= 0
-            ? (Math.pow(Math.abs(rawX), JOYSTICK_EXPONENT))
-            : -(Math.pow(Math.abs(rawX), JOYSTICK_EXPONENT))
-        );
-
-        double driveRotate = (
-            rawRot >= 0
-            ? (Math.pow(Math.abs(rawRot), JOYSTICK_EXPONENT))
-            : -(Math.pow(Math.abs(rawRot), JOYSTICK_EXPONENT))
-        );
+        double driveTranslateX = xScaler.scale(rawX);
+        double driveTranslateY = yScaler.scale(rawY);
+        double driveRotate = rotScaler.scale(rawRot);
 
         ChassisSpeeds currentSpeeds;
 
-        if (isSlowMode) {
-            currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
-                driveTranslateY * TRANSLATE_POWER_SLOW * MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
-                driveTranslateX * TRANSLATE_POWER_SLOW * MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
-                driveRotate * ROTATE_POWER_SLOW * MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND
-            ));
-        }
-        else {
-            currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
-                driveTranslateY * TRANSLATE_POWER_FAST * MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
-                driveTranslateX * TRANSLATE_POWER_FAST * MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
-                driveRotate * ROTATE_POWER_FAST * MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND
-            ));
-        }
+        currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
+            driveTranslateY * translationScaling * MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
+            driveTranslateX * translationScaling * MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
+            driveRotate * rotateScaling * MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND
+        ));
 
         return currentSpeeds;
     }
@@ -247,7 +245,10 @@ public class SwerveSubsystem extends Subsystem {
      * @param slowMode whether to slow the drivetrain
      */
     public Command setSlowMode(boolean slowMode){
-        return runOnce(() -> this.isSlowMode = slowMode);
+        return runOnce(() -> {
+            this.translationScaling = slowMode ? TRANSLATE_POWER_SLOW : TRANSLATE_POWER_FAST;
+            this.rotateScaling = slowMode ? ROTATE_POWER_SLOW : ROTATE_POWER_FAST;
+        });
     }
 
     /**
