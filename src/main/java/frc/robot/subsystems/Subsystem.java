@@ -14,7 +14,6 @@ public abstract class Subsystem<E extends ISubsystemIO, V extends Enum<V>> exten
     public SubsystemDataMap<V> data = new SubsystemDataMap<>(); // accesible
 
     protected SmartLogger logger;
-    
     private Class<V> dataClz;
 
     protected Subsystem(E io, Class<V> dataClz) {
@@ -97,7 +96,7 @@ public abstract class Subsystem<E extends ISubsystemIO, V extends Enum<V>> exten
         periodicOutputs();
         io.updateInputs();
         if (logger != null) {
-            logger.log("Actively Command", !getCurrentCommand().equals(Commands.none()));
+            logger.log("Actively Commanded", !getCurrentCommand().equals(Commands.none()));
             logger.log("Has Default Command", !getDefaultCommand().equals(Commands.none()));
             logger.log("Active Command", getCurrentCommand().getName());
             logger.log("Default Command", getDefaultCommand().getName());
