@@ -175,34 +175,6 @@ public class SwerveSubsystem extends Subsystem<SwerveIO, ESwerveData> {
         return io.getWheelSpeeds();
     }
 
-    /**
-     * Process joystick inputs for human control
-     *
-     * @param rawX the raw X input from a joystick. Should be -1 to 1
-     * @param rawY the raw Y input from a joystick. Should be -1 to 1
-     * @param rawRot the raw rotation input from a joystick. Should be -1 to 1
-     * @param fieldRelativeAllowed if this is true, switch between field- and
-     * robot-relative based on {@link SwerveSubsystem#robotRelative}. Otherwise, force
-     * robot-relative.
-     *
-     * @return a ChassisSpeeds ready to be sent to the swerve.
-     */
-    private ChassisSpeeds processJoystickInputs(double rawX, double rawY, double rawRot){
-        double driveTranslateX = xScaler.scale(rawX);
-        double driveTranslateY = yScaler.scale(rawY);
-        double driveRotate = rotScaler.scale(rawRot);
-
-        ChassisSpeeds currentSpeeds;
-
-        currentSpeeds = smoothingFilter.smooth(new ChassisSpeeds(
-            driveTranslateY * translationScaling * MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
-            driveTranslateX * translationScaling * MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
-            driveRotate * rotateScaling * MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND
-        ));
-
-        return currentSpeeds;
-    }
-
     @Override
     public void onModeInit(MatchMode mode) {
         stop();
@@ -221,12 +193,11 @@ public class SwerveSubsystem extends Subsystem<SwerveIO, ESwerveData> {
 
     @Override
     public void periodicTelemetry() {
-        io.updateInputs();
-
-        this.db.set(ESwerveData.CURRENT_POSE, getCurrentPosition());
-        this.db.set(ESwerveData.CURRENT_WHEEL_SPEEDS, getWheelSpeeds());
-        this.db.set(ESwerveData.CURRENT_YAW, getYaw());
-        this.db.set(ESwerveData.DESIRED_SPEEDS, desiredSpeeds);
+        this.data.set(ESwerveData.CURRENT_POSE, getCurrentPosition());
+        this.data.set(ESwerveData.CURRENT_WHEEL_SPEEDS, getWheelSpeeds());
+        this.data.set(ESwerveData.CURRENT_YAW, getYaw());
+        this.data.set(ESwerveData.DESIRED_SPEEDS, desiredSpeeds);
+        this.io.updateInputs();
     }
 
     /**
@@ -334,11 +305,17 @@ public class SwerveSubsystem extends Subsystem<SwerveIO, ESwerveData> {
      */
     public Command joystickDrive(DoubleSupplier translateX, DoubleSupplier translateY, DoubleSupplier rotate) {
         return run(() -> {
-            drive(processJoystickInputs(
-                translateX.getAsDouble(),
-                translateY.getAsDouble(),
-                rotate.getAsDouble()
-            ), DriveModes.AUTOMATIC);
+            double driveTranslateX = xScaler.scale(translateX.getAsDouble());
+            double driveTranslateY = yScaler.scale(translateY.getAsDouble());
+            double driveRotate = rotScaler.scale(rotate.getAsDouble());
+
+            ChassisSpeeds speeds = smoothingFilter.smooth(new ChassisSpeeds(
+                driveTranslateY * translationScaling * MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
+                driveTranslateX * translationScaling * MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
+                driveRotate * rotateScaling * MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND
+            ));
+
+            drive(speeds, DriveModes.AUTOMATIC);
         });
     }
 
@@ -366,7 +343,7 @@ public class SwerveSubsystem extends Subsystem<SwerveIO, ESwerveData> {
      * @return the command
      */
     public Command snapToAngle(Rotation2d angle, DoubleSupplier translateX, DoubleSupplier translateY) {
-        return run(() -> {
+        return joystickDrive(translateX, translateY, () -> {
             double currYaw = Math.toRadians(getYaw().getDegrees()%360);
             double errorAngle = angle.getRadians() - currYaw;
 
@@ -377,14 +354,7 @@ public class SwerveSubsystem extends Subsystem<SwerveIO, ESwerveData> {
                 errorAngle += 2*Math.PI;
             }
 
-            double rotSpeed = snapToCtrl.calculate(0, errorAngle);
-
-            drive(
-                processJoystickInputs(
-                    translateX.getAsDouble(),
-                    translateY.getAsDouble(),
-                    rotSpeed
-                ), DriveModes.AUTOMATIC);
+            return snapToCtrl.calculate(0, errorAngle);
         });
     }
 

@@ -11,8 +11,8 @@ public class RobotSelector {
     }
 
     public static enum RobotType {
+        // Add all usable robots here
         COMP_BOT,
-        DEV_BOT,
         SIM_BOT
     }
 }

@@ -6,7 +6,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.RobotSelector;
 import frc.robot.subsystems.swerve.*;
-import frc.robot.subsystems.swerve.ctreswerve.TunerConstants;
+import frc.robot.subsystems.swerve.ctre.BaseTunerConstants;
 import frc.robot.subsystems.vision.*;
 import lib.MatchMode;
 
@@ -20,27 +20,18 @@ public class SubsystemManager extends SubsystemBase {
         switch(RobotSelector.getRobot()) {
             case SIM_BOT: // Robot for simulation
                 this.swerve = new SwerveSubsystem(
-                    new SwerveIOCTRE<TunerConstants>(TunerConstants.class) // CTRE Swerve works well in simulation
+                    new SwerveIOCTRE<BaseTunerConstants>(BaseTunerConstants.class) // CTRE Swerve works well in simulation
                 );
 
                 this.vision = new VisionSubsystem(
                     new CameraIOSim(VisionConstants.CAM_NAME, VisionConstants.CAMERA_OFFSET)
                 );
                 break;
-            case DEV_BOT: // Development robot
-                this.swerve = new SwerveSubsystem(
-                    new SwerveIOCTRE<TunerConstants>(TunerConstants.class)
-                );
-
-                this.vision = new VisionSubsystem(
-                    new CameraIOArducam(VisionConstants.CAM_NAME, VisionConstants.CAMERA_OFFSET)
-                );
-                break;
             case COMP_BOT: // Main robot for competition
             // Note - Fall through intentional
             default:
                 this.swerve = new SwerveSubsystem(
-                    new SwerveIOCTRE<TunerConstants>(TunerConstants.class)
+                    new SwerveIOCTRE<BaseTunerConstants>(BaseTunerConstants.class)
                 );
 
                 this.vision = new VisionSubsystem(

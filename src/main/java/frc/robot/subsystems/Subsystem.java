@@ -11,7 +11,7 @@ import lib.logging.SubsystemDataMap;
 public abstract class Subsystem<E extends ISubsystemIO, V extends Enum<V>> extends SubsystemBase {
     private boolean enabled = false; // TODO - Get Working
     protected E io;
-    public SubsystemDataMap<V> db = new SubsystemDataMap<>(); // accesible
+    public SubsystemDataMap<V> data = new SubsystemDataMap<>(); // accesible
 
     protected SmartLogger logger;
     
@@ -22,7 +22,7 @@ public abstract class Subsystem<E extends ISubsystemIO, V extends Enum<V>> exten
         this.dataClz = dataClz;
         this.logger = new SmartLogger(getName());
         for (V key : dataClz.getEnumConstants()) {
-            this.db.set(key, 0d);
+            this.data.set(key, 0d);
         }
     }
 
@@ -102,7 +102,7 @@ public abstract class Subsystem<E extends ISubsystemIO, V extends Enum<V>> exten
             logger.log("Active Command", getCurrentCommand().getName());
             logger.log("Default Command", getDefaultCommand().getName());
             for (V value : dataClz.getEnumConstants()) {
-                logger.log(value.name(), db.get(value).toString());
+                logger.log(value.name(), data.get(value).toString());
             }
         }
     }

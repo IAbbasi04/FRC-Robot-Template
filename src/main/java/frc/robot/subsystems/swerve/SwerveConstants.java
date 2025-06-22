@@ -1,10 +1,10 @@
 package frc.robot.subsystems.swerve;
 
-import frc.robot.subsystems.swerve.ctreswerve.TunerConstants;
+import frc.robot.subsystems.swerve.ctre.BaseTunerConstants;
 import lib.PIDProfile;
 
 public class SwerveConstants {
-    public static final double MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND = TunerConstants.kSpeedAt12Volts.baseUnitMagnitude(); // m/s
+    public static final double MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND = BaseTunerConstants.kSpeedAt12Volts.baseUnitMagnitude(); // m/s
     public static final double MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND = Math.toRadians(720); // rad/s
 
     public static final PIDProfile SNAP_TO_GAINS = new PIDProfile().setP(2d).setD(0.1).setTolerance(0.15).setContinuousInput(-180, 180);

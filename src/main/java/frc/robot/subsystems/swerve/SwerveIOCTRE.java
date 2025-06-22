@@ -9,9 +9,9 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import frc.robot.subsystems.swerve.ctreswerve.*;
+import frc.robot.subsystems.swerve.ctre.*;
 
-public class SwerveIOCTRE<E extends TunerConstants> extends SwerveIO {
+public class SwerveIOCTRE<E extends BaseTunerConstants> extends SwerveIO {
     public String tunerConstantsName = "";
 
     private final ProfiledPIDController kSnapToCtrl = SwerveConstants.SNAP_TO_GAINS.toProfiledPIDController();

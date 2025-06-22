@@ -74,9 +74,9 @@ public class VisionSubsystem extends Subsystem<CameraIO, EVisionData> {
 
         // this.logger.logIf("Closest Tag ID", io.getClosestTagID(), -1, isAnyTargetVisible());
 
-        this.db.set(EVisionData.BEST_TARGET_DATA, bestTarget);
-        this.db.set(EVisionData.IS_ANY_TARGET_VISIBLE, io.isAnyTargetVisible());
-        this.db.setIf(
+        this.data.set(EVisionData.BEST_TARGET_DATA, bestTarget);
+        this.data.set(EVisionData.IS_ANY_TARGET_VISIBLE, io.isAnyTargetVisible());
+        this.data.setIf(
             EVisionData.ESTIMATED_ROBOT_POSE,
             io.getVisionEstimatedPose().get().estimatedPose.toPose2d(),
             new Pose2d(),

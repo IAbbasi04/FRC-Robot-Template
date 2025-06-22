@@ -4,11 +4,7 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.auto.NamedCommands;
-
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import frc.robot.Controls.ControlSets;
@@ -40,8 +36,6 @@ public class RobotContainer {
 
         Controls.applyControlSet(ControlSets.DUAL_DRIVER);
 
-        // BaseAuto.initSubsystemManager(manager);
-        
         this.configureNamedCommands();
         this.configureBindings();
         this.configureDefaults();
@@ -50,9 +44,6 @@ public class RobotContainer {
     private void configureNamedCommands() {
         // NamedCommands.registerCommand("Example", exampleCommand());
         // TODO - Add named commands to use during PathPlanner autos
-        NamedCommands.registerCommand("Intake", Commands.run(() -> {
-            SmartDashboard.putNumber("MMIMIMIMIMIMIMI IUNTAKE", Timer.getFPGATimestamp());
-        }).withTimeout(5d));
     }
 
     /**
