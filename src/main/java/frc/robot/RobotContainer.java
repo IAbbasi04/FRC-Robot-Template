@@ -13,6 +13,9 @@ import frc.robot.subsystems.SubsystemManager;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import lib.MatchMode;
+import lib.PIDProfile;
+import lib.hardware.motor.TestMotor;
+import lib.hardware.motor.ctre.TalonFXMotor;
 
 
 public class RobotContainer {
@@ -22,6 +25,8 @@ public class RobotContainer {
     private final VisionSubsystem vision;
 
     private final AutoLoader autoLoader;
+
+    private TestMotor frontElevMotor, backElevMotor;
 
     /**
      * Create the robot container. This creates and configures subsystems, sets
@@ -33,6 +38,13 @@ public class RobotContainer {
 
         this.swerve = manager.swerve;
         this.vision = manager.vision;
+
+        this.frontElevMotor = new TestMotor(41, false, TalonFXMotor.class);
+        this.backElevMotor = new TestMotor(42, true, TalonFXMotor.class);
+        this.frontElevMotor.withFollower(backElevMotor);
+
+        this.frontElevMotor.withGains(new PIDProfile().setP(3).setMaxAcceleration(300).setMaxVelocity(100));
+        this.backElevMotor.withGains(new PIDProfile().setP(3).setMaxAcceleration(300).setMaxVelocity(100));
 
         Controls.applyControlSet(ControlSets.DUAL_DRIVER);
 
@@ -102,6 +114,10 @@ public class RobotContainer {
                 Controls.driveTranslateY
             ).withInterruptBehavior(InterruptionBehavior.kCancelIncoming)
         );
+
+        Controls.getDriver().y().whileTrue(this.frontElevMotor.setPosition(15/0.1)).onFalse(this.frontElevMotor.setPercentOutput(0.0));
+        Controls.getDriver().b().whileTrue(this.frontElevMotor.setPosition(10/0.1)).onFalse(this.frontElevMotor.setPercentOutput(0.0));
+        Controls.getDriver().a().whileTrue(this.frontElevMotor.setPosition(0/0.1)).onFalse(this.frontElevMotor.setPercentOutput(0.0));
     };
 
     public Command onModeInit(MatchMode mode) {

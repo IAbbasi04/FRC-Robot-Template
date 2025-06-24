@@ -1,8 +1,6 @@
 package lib.hardware.motor;
 
 import lib.PIDProfile;
-import lib.hardware.motor.ctre.*;
-import lib.hardware.motor.rev.*;
 import lib.logging.SmartLogger;
 
 import edu.wpi.first.wpilibj2.command.*;
@@ -22,14 +20,19 @@ public class TestMotor extends SubsystemBase {
 
     public TestMotor(int deviceID, boolean inverted, Class<? extends BaseMotor> cls) {
         PortConfig config = new PortConfig(deviceID, inverted);
-        if (cls.getSimpleName().equals(SparkFlexMotor.class.getSimpleName())) {
-            this.testMotor = new SparkFlexMotor(config);
-        } else if (cls.getSimpleName().equals(SparkMaxMotor.class.getSimpleName())) {
-            this.testMotor = new SparkMaxMotor(config);
-        } else if (cls.getSimpleName().equals(TalonFXMotor.class.getSimpleName())) {
-            this.testMotor = new TalonFXMotor(config);
-        } else if (cls.getSimpleName().equals(TalonFXSMotor.class.getSimpleName())) {
-            this.testMotor = new TalonFXSMotor(config);
+        // if (cls.getSimpleName().equals(SparkFlexMotor.class.getSimpleName())) {
+        //     this.testMotor = new SparkFlexMotor(config);
+        // } else if (cls.getSimpleName().equals(SparkMaxMotor.class.getSimpleName())) {
+        //     this.testMotor = new SparkMaxMotor(config);
+        // } else if (cls.getSimpleName().equals(TalonFXMotor.class.getSimpleName())) {
+        //     this.testMotor = new TalonFXMotor(config);
+        // } else if (cls.getSimpleName().equals(TalonFXSMotor.class.getSimpleName())) {
+        //     this.testMotor = new TalonFXSMotor(config);
+        // }
+        try {
+            this.testMotor = cls.getDeclaredConstructor(PortConfig.class).newInstance(config);
+        } catch (Exception e) {
+            System.out.println("Could not create motor of type: " + cls.getSimpleName());
         }
 
         this.logger = new SmartLogger("TestMotor/" + cls.getSimpleName() + "[" + deviceID + "]");
