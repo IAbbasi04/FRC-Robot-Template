@@ -1,5 +1,8 @@
 package frc.robot.subsystems.swerve;
 
+import com.pathplanner.lib.path.PathConstraints;
+
+import edu.wpi.first.math.util.Units;
 import frc.robot.subsystems.swerve.ctre.BaseTunerConstants;
 import lib.PIDProfile;
 
@@ -11,10 +14,18 @@ public class SwerveConstants {
 
     public static final PIDProfile DRIVE_TO_POSE_GAINS = 
         new PIDProfile()
-            .setP(1d)
-            .setMaxVelocity(MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND)
-            .setMaxAcceleration(6d)
+            .setP(2.5d)
+            .setD(0.01d)
+            .setMaxVelocity(3d)
+            .setMaxAcceleration(3d)
             .setTolerance(0.02);
+
+    public static final PathConstraints DRIVE_TO_POSE_CONSTRAINTS = new PathConstraints(
+        MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND, 
+        3.0,
+        Units.degreesToRadians(720), 
+        Units.degreesToRadians(720)
+    );
 
     public static final PIDProfile PATH_FOLLOW_TRANSLATE_GAINS = new PIDProfile().setP(10d).setTolerance(0.1);
     public static final PIDProfile PATH_FOLLOW_ROTATE_GAINS = new PIDProfile()
@@ -34,7 +45,5 @@ public class SwerveConstants {
     public static final int TRANSLATION_SMOOTHING_AMOUNT = 3;
     public static final int ROTATION_SMOOTHING_AMOUNT = 1;
 
-    public static final double JOYSTICK_EXPONENT = 1.2;
-
-    
+    public static final double JOYSTICK_DEADZONE = 0.03;
 }

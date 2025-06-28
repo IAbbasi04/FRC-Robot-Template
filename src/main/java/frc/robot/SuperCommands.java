@@ -28,7 +28,7 @@ public final class SuperCommands {
                         if (DriverStation.isDisabled()){
                             return swerve.resetPose(robotPose);
                         } else {
-                            return swerve.addVisionMeasurement(() -> robotPose);
+                            return swerve.addVisionMeasurement(robotPose);
                         }
                     }
                 }

@@ -8,5 +8,5 @@ public class RobotConfig {
     public static final String GAME = "[_]";
     public static final String YEAR = "202[_]";
     public static final String ROBOT = "[_]";
-    public static final String TEAM = "8592";
+    public static final String TEAM = "1731";
 }

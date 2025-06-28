@@ -12,22 +12,20 @@ import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.*;
 import frc.robot.subsystems.Subsystem;
 import lib.MatchMode;
-import lib.SmoothingFilter;
 import lib.Utils;
 import lib.control.DriveScaler;
 
 import static frc.robot.subsystems.swerve.SwerveConstants.*;
 
-import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.pathfinding.*;
 import com.pathplanner.lib.config.RobotConfig;
 
 public class SwerveSubsystem extends Subsystem<SwerveIO, ESwerveData> {
@@ -45,9 +43,6 @@ public class SwerveSubsystem extends Subsystem<SwerveIO, ESwerveData> {
     }
 
     private boolean robotRelative;
-
-    private SmoothingFilter smoothingFilter;
-
 
     private ChassisSpeeds desiredSpeeds = new ChassisSpeeds();
 
@@ -82,18 +77,8 @@ public class SwerveSubsystem extends Subsystem<SwerveIO, ESwerveData> {
         PATH_FOLLOW_ROTATE_GAINS.toProfiledPIDController()
     );
 
-    private ProfiledPIDController driveToPoseXCtrl = DRIVE_TO_POSE_GAINS.toProfiledPIDController();
-    private ProfiledPIDController driveToPoseYCtrl = DRIVE_TO_POSE_GAINS.toProfiledPIDController();
-
     public SwerveSubsystem(SwerveIO io) {
         super(io, ESwerveData.class);
-        smoothingFilter = new SmoothingFilter(
-            TRANSLATION_SMOOTHING_AMOUNT,
-            TRANSLATION_SMOOTHING_AMOUNT,
-            ROTATION_SMOOTHING_AMOUNT
-        );
-
-        // this.io.registerTelemetry((state) -> {});
 
         this.pathFollowerCtrl.setTolerance(new Pose2d(
             new Translation2d(
@@ -113,13 +98,14 @@ public class SwerveSubsystem extends Subsystem<SwerveIO, ESwerveData> {
                     SwerveConstants.PATH_FOLLOW_ROTATE_GAINS.toPIDConstants()
                 ),
                 RobotConfig.fromGUISettings(),
-                Robot.isRedAlliance,
+                Robot.IS_RED_ALLIANCE,
                 this
             );
         } catch (Exception e) {
             System.out.println("GUI Settings not properly configured for PathPlanner");
         }
-        
+
+        Pathfinding.setPathfinder(new LocalADStar());
     }
 
     /**
@@ -178,7 +164,6 @@ public class SwerveSubsystem extends Subsystem<SwerveIO, ESwerveData> {
     @Override
     public void onModeInit(MatchMode mode) {
         stop();
-        driveToPoseXCtrl.reset(0, 0);
     }
 
     @Override
@@ -198,6 +183,8 @@ public class SwerveSubsystem extends Subsystem<SwerveIO, ESwerveData> {
         this.data.set(ESwerveData.CURRENT_YAW, getYaw());
         this.data.set(ESwerveData.DESIRED_SPEEDS, desiredSpeeds);
         this.io.updateInputs();
+
+        this.logger.log("CURRENT ROBOT POSE", getCurrentPosition());
     }
 
     /**
@@ -309,11 +296,11 @@ public class SwerveSubsystem extends Subsystem<SwerveIO, ESwerveData> {
             double driveTranslateY = yScaler.scale(translateY.getAsDouble());
             double driveRotate = rotScaler.scale(rotate.getAsDouble());
 
-            ChassisSpeeds speeds = smoothingFilter.smooth(new ChassisSpeeds(
+            ChassisSpeeds speeds = new ChassisSpeeds(
                 driveTranslateY * translationScaling * MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
                 driveTranslateX * translationScaling * MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
                 driveRotate * rotateScaling * MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND
-            ));
+            );
 
             drive(speeds, DriveModes.AUTOMATIC);
         });
@@ -403,46 +390,23 @@ public class SwerveSubsystem extends Subsystem<SwerveIO, ESwerveData> {
         });
     }
 
-    public Command driveToPose(Pose2d pose) {
-        return this.driveToPose(pose, () -> false);
+    public Command addVisionMeasurement(Pose2d visionRobotPoseMeters) {
+        return runOnce(() -> io.addVisionMeasurement(visionRobotPoseMeters, Timer.getFPGATimestamp()));
     }
 
-    public Command driveToPose(Pose2d pose, BooleanSupplier flipPose) {
-        return this.run(
-            () -> {
-                logger.log("Error Degrees", snapToCtrl.getPositionError());
-
-                Pose2d desiredPose = Utils.mirrorPose(pose, flipPose.getAsBoolean());
-
-                this.drive(new ChassisSpeeds(
-                    -driveToPoseXCtrl.calculate(getCurrentPosition().getX(), desiredPose.getX()), 
-                    -driveToPoseYCtrl.calculate(getCurrentPosition().getY(), desiredPose.getY()), 
-                    snapToCtrl.calculate(getYaw().getDegrees(), desiredPose.getRotation().getDegrees())
-                ), DriveModes.FIELD_RELATIVE);
-            }
-        ).until(() -> driveToPoseXCtrl.atSetpoint() && driveToPoseYCtrl.atSetpoint() && snapToCtrl.atSetpoint());
+    public Command driveToPose(Pose2d targetPose, BooleanSupplier flipPose) {
+        return new ConditionalCommand(
+            AutoBuilder.pathfindToPoseFlipped(targetPose, DRIVE_TO_POSE_CONSTRAINTS),
+            AutoBuilder.pathfindToPose(targetPose, DRIVE_TO_POSE_CONSTRAINTS),
+            flipPose
+        );
     }
 
-    public Command driveToAlliancePose(Pose2d pose) {
-        return this.run(
-            () -> {
-                logger.log("Error Degrees", snapToCtrl.getPositionError());
-
-                boolean isRedAlliance = DriverStation.getAlliance().isPresent() && 
-                DriverStation.getAlliance().get() == Alliance.Red;
-
-                Pose2d desiredPose = Utils.mirrorPose(pose, isRedAlliance);
-
-                this.drive(new ChassisSpeeds(
-                    -driveToPoseXCtrl.calculate(getCurrentPosition().getX(), desiredPose.getX()), 
-                    -driveToPoseYCtrl.calculate(getCurrentPosition().getY(), desiredPose.getY()), 
-                    snapToCtrl.calculate(getYaw().getDegrees(), desiredPose.getRotation().getDegrees())
-                ), DriveModes.FIELD_RELATIVE);
-            }
-        ).until(() -> driveToPoseXCtrl.atSetpoint() && driveToPoseYCtrl.atSetpoint() && snapToCtrl.atSetpoint());
+    public Command driveToPose(Pose2d targetPose) {
+        return driveToPose(targetPose, () -> false);
     }
 
-    public Command addVisionMeasurement(Supplier<Pose2d> visionRobotPoseMeters) {
-        return runOnce(() -> io.addVisionMeasurement(visionRobotPoseMeters.get(), Timer.getFPGATimestamp()));
+    public Command driveToAlliancePose(Pose2d targetPose) {
+        return driveToPose(targetPose, Robot.IS_RED_ALLIANCE);
     }
 }

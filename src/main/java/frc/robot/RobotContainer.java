@@ -16,17 +16,12 @@ import lib.MatchMode;
 
 
 public class RobotContainer {
-    // The robot's subsystems
     private final SubsystemManager manager;
     private final SwerveSubsystem swerve;
     private final VisionSubsystem vision;
 
     private final AutoLoader autoLoader;
 
-    /**
-     * Create the robot container. This creates and configures subsystems, sets
-     * up button bindings, and prepares for autonomous.
-     */
     public RobotContainer() {
         this.manager = new SubsystemManager();
         this.autoLoader = new AutoLoader(manager);
@@ -37,7 +32,7 @@ public class RobotContainer {
         Controls.applyControlSet(ControlSets.DUAL_DRIVER);
 
         this.configureNamedCommands();
-        this.configureBindings();
+        this.configureControls();
         this.configureDefaults();
     }
 
@@ -62,7 +57,7 @@ public class RobotContainer {
     /**
      * Configure all button bindings
      */
-    private void configureBindings() {
+    private void configureControls() {
         Controls.slowMode.onTrue(manager.swerve.setSlowMode(true).ignoringDisable(true))
             .onFalse(manager.swerve.setSlowMode(false).ignoringDisable(true));
 
