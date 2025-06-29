@@ -5,6 +5,7 @@ import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.math.controller.PIDController;
 import frc.robot.subsystems.swerve.ctre.BaseTunerConstants;
 import lib.PIDProfile;
+import lib.control.DriveScaler;
 
 public class SwerveConstants {
     protected static final double MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND = BaseTunerConstants.kSpeedAt12Volts.baseUnitMagnitude(); // m/s
@@ -44,4 +45,22 @@ public class SwerveConstants {
     protected static final double SNAIL_MODE_ROTATION_SCALING = 0.3;
 
     protected static final double JOYSTICK_DEADZONE = 0.03;
+
+    protected static final DriveScaler X_SCALING = new DriveScaler(
+        DriveScaler.ScaleType.QUADRATIC, 
+        true, 
+        0.03
+    );
+
+    protected static final DriveScaler Y_SCALING = new DriveScaler(
+        DriveScaler.ScaleType.QUADRATIC, 
+        true, 
+        0.03
+    );
+
+    protected static final DriveScaler ROT_SCALING = new DriveScaler(
+        DriveScaler.ScaleType.LINEAR, 
+        true, 
+        0.03
+    );
 }

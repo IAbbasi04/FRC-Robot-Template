@@ -11,12 +11,12 @@ import frc.robot.Robot;
 import frc.robot.subsystems.BaseSubsystem;
 import lib.MatchMode;
 
-public class VisionSubsystem extends BaseSubsystem<CameraIO, EVisionData> {
+public class VisionSubsystem extends BaseSubsystem<CameraIO, VisionData> {
     private List<PhotonTrackedTarget> allVisibleTags = new ArrayList<>();
     private PhotonTrackedTarget bestTarget = new PhotonTrackedTarget();
 
     public VisionSubsystem(CameraIO io){
-        super(io, EVisionData.class);
+        super(io, VisionData.class);
     }
 
     public boolean isAnyTargetVisible() {
@@ -75,10 +75,10 @@ public class VisionSubsystem extends BaseSubsystem<CameraIO, EVisionData> {
 
         // this.logger.logIf("Closest Tag ID", io.getClosestTagID(), -1, isAnyTargetVisible());
 
-        this.data.map(EVisionData.BEST_TARGET_DATA, bestTarget);
-        this.data.map(EVisionData.IS_ANY_TARGET_VISIBLE, io.isAnyTargetVisible());
+        this.data.map(VisionData.BEST_TARGET_DATA, bestTarget);
+        this.data.map(VisionData.IS_ANY_TARGET_VISIBLE, io.isAnyTargetVisible());
         this.data.mapIf(
-            EVisionData.ESTIMATED_ROBOT_POSE,
+            VisionData.ESTIMATED_ROBOT_POSE,
             io.getVisionEstimatedPose().get().estimatedPose.toPose2d(),
             new Pose2d(),
             io.getVisionEstimatedPose().isPresent()

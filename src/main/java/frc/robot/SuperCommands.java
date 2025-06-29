@@ -21,16 +21,16 @@ public final class SuperCommands {
     public static Command updateOdometryWithVision(SwerveSubsystem swerve, VisionSubsystem vision) {
         return vision.run(
             () -> {
-                Optional<EstimatedRobotPose> estimatedRobotPose = vision.data.pull(EVisionData.ESTIMATED_ROBOT_POSE);
+                Optional<EstimatedRobotPose> estimatedRobotPose = vision.data.pull(VisionData.ESTIMATED_ROBOT_POSE);
                 if (estimatedRobotPose.isPresent()) {
                     Pose2d robotPose = estimatedRobotPose.get().estimatedPose.toPose2d();
                     double ambiguity = vision.getPoseAmbiguityRatio();
 
                     if(Math.abs(ambiguity) < VisionConstants.MAX_ACCEPTABLE_AMBIGUITY) {
                         if (DriverStation.isDisabled()){
-                            swerve.resetPoseCallback(robotPose);
+                            swerve.doOnce(swerve.resetPose(robotPose));
                         } else {
-                            swerve.addVisionMeasurementCallback(robotPose);
+                            swerve.doOnce(swerve.addVisionMeasurement(robotPose));
                         }
                     }
                 }

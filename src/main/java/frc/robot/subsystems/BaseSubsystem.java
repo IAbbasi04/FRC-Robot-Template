@@ -7,6 +7,7 @@ import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import lib.MatchMode;
+import lib.commands.SubsystemCommand;
 import lib.io.ISubsystemIO;
 import lib.logging.SmartLogger;
 import lib.logging.SubsystemDataMap;
@@ -32,9 +33,18 @@ public abstract class BaseSubsystem<E extends ISubsystemIO, V extends Enum<V>> e
     }
 
     /**
+     * Runs then initialize method of a command.
+     * 
+     * Useful for turning a command into a runnable void
+     */
+    public void doOnce(Command command) {
+        command.initialize();
+    }
+
+    /**
      * Whether there is a command actively running on this subsystem
      */
-    public boolean currentlyCommanded(){
+    public boolean isCurrentlyCommanded(){
         return getCurrentCommand() != null && getCurrentCommand() != getDefaultCommand();
     }
 
@@ -158,6 +168,10 @@ public abstract class BaseSubsystem<E extends ISubsystemIO, V extends Enum<V>> e
      * Stops the subsystem
      */
     public abstract void stop();
+
+    public SubsystemCommand createSubsystemCommand(String name, Command command) {
+        return new SubsystemCommand(command, name, this);
+    }
 
     @Override
     public void initSendable(SendableBuilder builder) {

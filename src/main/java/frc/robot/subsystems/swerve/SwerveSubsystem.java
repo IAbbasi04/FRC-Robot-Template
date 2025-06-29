@@ -1,7 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems.swerve;
 
 import edu.wpi.first.math.controller.*;
@@ -9,17 +5,14 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.Trajectory.State;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.*;
+
 import frc.robot.*;
 import frc.robot.subsystems.BaseSubsystem;
+
 import lib.MatchMode;
 import lib.Utils;
-import lib.control.DriveScaler;
-
-import static frc.robot.subsystems.swerve.SwerveConstants.*;
 
 import java.util.function.*;
 
@@ -28,35 +21,17 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.pathfinding.*;
 import com.pathplanner.lib.config.RobotConfig;
 
-public class SwerveSubsystem extends BaseSubsystem<SwerveIO, ESwerveData> {
+import static frc.robot.subsystems.swerve.SwerveConstants.*;
+
+public class SwerveSubsystem extends BaseSubsystem<SwerveIO, SwerveData> {
     private ChassisSpeeds desiredSpeeds = new ChassisSpeeds();
 
     private Timer trajectoryTimer = new Timer();
-
-    
 
     private double translationScaling = 1d;
     private double rotateScaling = 1d;
 
     private boolean robotRelative;
-
-    private DriveScaler xScaler = new DriveScaler(
-        DriveScaler.ScaleType.QUADRATIC, 
-        true, 
-        0.03
-    );
-
-    private DriveScaler yScaler = new DriveScaler(
-        DriveScaler.ScaleType.QUADRATIC, 
-        true, 
-        0.03
-    );
-
-    private DriveScaler rotScaler = new DriveScaler(
-        DriveScaler.ScaleType.LINEAR, 
-        true, 
-        0.03
-    );
 
     private HolonomicDriveController pathFollowerCtrl = new HolonomicDriveController(
         PATH_FOLLOW_TRANSLATE_GAINS.toPIDController(),
@@ -65,7 +40,7 @@ public class SwerveSubsystem extends BaseSubsystem<SwerveIO, ESwerveData> {
     );
 
     public SwerveSubsystem(SwerveIO io) {
-        super(io, ESwerveData.class);
+        super(io, SwerveData.class);
 
         this.pathFollowerCtrl.setTolerance(new Pose2d(
             new Translation2d(
@@ -76,12 +51,12 @@ public class SwerveSubsystem extends BaseSubsystem<SwerveIO, ESwerveData> {
 
         try {
             AutoBuilder.configure(
-                this::getCurrentPosition, 
-                (pose) -> resetPoseCallback(pose), 
-                this::getWheelSpeeds, 
+                io::getCurrentOdometryPosition,
+                (pose) -> io.setKnownOdometryPose(pose),
+                io::getWheelSpeeds,
                 (speeds) -> this.drive(speeds),
                 new PPHolonomicDriveController(
-                    SwerveConstants.PATH_FOLLOW_TRANSLATE_GAINS.toPIDConstants(), 
+                    SwerveConstants.PATH_FOLLOW_TRANSLATE_GAINS.toPIDConstants(),
                     SwerveConstants.PATH_FOLLOW_ROTATE_GAINS.toPIDConstants()
                 ),
                 RobotConfig.fromGUISettings(),
@@ -101,8 +76,7 @@ public class SwerveSubsystem extends BaseSubsystem<SwerveIO, ESwerveData> {
      * @param speeds the speeds to run the drivetrain at
      */
     private void drive(ChassisSpeeds speeds){
-        this.desiredSpeeds = speeds;
-        io.drive(speeds, false);
+        this.drive(speeds, false);
     }
 
     /**
@@ -118,41 +92,6 @@ public class SwerveSubsystem extends BaseSubsystem<SwerveIO, ESwerveData> {
         );
     }
 
-    /**
-     * Get the current robot yaw as a Rotation2d
-     */
-    private Rotation2d getYaw() {
-        return io.getYaw();
-    }
-
-    /**
-     * Get the current position of the swerve as judged by odometry.
-     */
-    private Pose2d getCurrentPosition() {
-        return io.getCurrentOdometryPosition();
-    }
-
-    /**
-     * Get the current translational and rotational speeds of the drivetrain
-     */
-    private ChassisSpeeds getWheelSpeeds() {
-        return io.getWheelSpeeds();
-    }
-
-    /**
-     * Resets the known pose of the robot to the given pose
-     */
-    public void resetPoseCallback(Pose2d pose) {
-        io.setKnownOdometryPose(pose);
-    }
-
-    /**
-     * Adds the given pose towards the odometry estimate
-     */
-    public void addVisionMeasurementCallback(Pose2d pose) {
-        io.addVisionMeasurement(pose, Timer.getFPGATimestamp());
-    }
-
     @Override
     public void onModeInit(MatchMode mode) {
         stop();
@@ -161,8 +100,8 @@ public class SwerveSubsystem extends BaseSubsystem<SwerveIO, ESwerveData> {
     @Override
     public void simulationPeriodic() {
         Pose2d pose = new Pose2d(
-            getCurrentPosition().getTranslation(),
-            getCurrentPosition().getRotation()
+            io.getCurrentOdometryPosition().getTranslation(),
+            io.getCurrentOdometryPosition().getRotation()
         );
 
         Robot.FIELD.getField().setRobotPose(pose==null?new Pose2d():pose);
@@ -170,16 +109,13 @@ public class SwerveSubsystem extends BaseSubsystem<SwerveIO, ESwerveData> {
 
     @Override
     public void periodicTelemetry() {
-        this.data.map(ESwerveData.CURRENT_POSE, getCurrentPosition());
-        this.data.map(ESwerveData.CURRENT_WHEEL_SPEEDS, getWheelSpeeds());
-        this.data.map(ESwerveData.CURRENT_YAW, getYaw());
-        this.data.map(ESwerveData.DESIRED_SPEEDS, desiredSpeeds);
+        this.data.map(SwerveData.CURRENT_POSE, io.getCurrentOdometryPosition());
+        this.data.map(SwerveData.CURRENT_WHEEL_SPEEDS, io.getWheelSpeeds());
+        this.data.map(SwerveData.CURRENT_YAW, io.getYaw());
+        this.data.map(SwerveData.DESIRED_SPEEDS, desiredSpeeds);
         this.io.updateInputs();
     }
 
-    /**
-     * Stop the swerve (feed zeros for all target velocities)
-     */
     @Override
     public void stop(){
         drive(new ChassisSpeeds());
@@ -195,10 +131,10 @@ public class SwerveSubsystem extends BaseSubsystem<SwerveIO, ESwerveData> {
      * @param snailMode whether to slow the drivetrain
      */
     public Command setSnailMode(boolean snailMode){
-        return runOnce(() -> {
+        return super.createSubsystemCommand("Set Snail Mode", runOnce(() -> {
             this.translationScaling = snailMode ? SNAIL_MODE_TRANSLATIONAL_SCALING : DEFAULT_TRANSLATIONAL_SCALING;
             this.rotateScaling = snailMode ? SNAIL_MODE_ROTATION_SCALING : DEFAULT_ROTATION_SCALING;
-        });
+        }));
     }
 
     /**
@@ -208,22 +144,22 @@ public class SwerveSubsystem extends BaseSubsystem<SwerveIO, ESwerveData> {
      * @param robotRelative whether to run the drivetrain robot-relative
      */
     public Command setRobotRelative(boolean robotRelative){
-        return runOnce(() -> this.robotRelative = robotRelative);
+        return super.createSubsystemCommand("Set To " + (robotRelative?"Robot":"Field") + " Relative", runOnce(() -> this.robotRelative = robotRelative));
     }
 
     /**
      * Define whatever direction the robot is facing as forward
      */
     public Command resetHeading(){
-        return runOnce(() -> io.resetHeading());
+        return super.createSubsystemCommand("Reset Heading", runOnce(() -> io.resetHeading()));
     }
 
     public Command resetPose(Pose2d pose){
-        return runOnce(() -> resetPoseCallback(pose));
+        return super.createSubsystemCommand("Reset Pose" + pose.toString(), runOnce(() -> io.setKnownOdometryPose(pose)));
     }
 
     public Command resetPose(Pose2d pose, BooleanSupplier flip) {
-        return runOnce(() -> {
+        return super.createSubsystemCommand("Reset Pose" + pose.toString(), runOnce(() -> {
             Pose2d resetToPose = pose;
             if (flip.getAsBoolean()) {
                 resetToPose = new Pose2d(
@@ -234,15 +170,14 @@ public class SwerveSubsystem extends BaseSubsystem<SwerveIO, ESwerveData> {
                     Rotation2d.fromDegrees(180).minus(pose.getRotation())
                 );
             }
-            resetPoseCallback(resetToPose);
-        });
+            io.setKnownOdometryPose(resetToPose);
+        }));
     }
 
     public Command resetAlliancePose(Pose2d pose) {
         return runOnce(() -> {
             Pose2d resetToPose = pose;
-            if (DriverStation.getAlliance().isPresent() && 
-                DriverStation.getAlliance().get() == Alliance.Red) {
+            if (Robot.IS_RED_ALLIANCE.getAsBoolean()) {
                 resetToPose = new Pose2d(
                     new Translation2d(
                         Robot.FIELD.getFieldLength() - pose.getX(),
@@ -251,7 +186,7 @@ public class SwerveSubsystem extends BaseSubsystem<SwerveIO, ESwerveData> {
                     Rotation2d.fromDegrees(180).minus(pose.getRotation())
                 );
             }
-            resetPoseCallback(resetToPose);
+            io.setKnownOdometryPose(resetToPose);
         });
     }
 
@@ -266,9 +201,9 @@ public class SwerveSubsystem extends BaseSubsystem<SwerveIO, ESwerveData> {
      */
     public Command joystickDrive(DoubleSupplier translateX, DoubleSupplier translateY, DoubleSupplier rotate) {
         return run(() -> {
-            double driveTranslateX = xScaler.scale(translateX.getAsDouble());
-            double driveTranslateY = yScaler.scale(translateY.getAsDouble());
-            double driveRotate = rotScaler.scale(rotate.getAsDouble());
+            double driveTranslateX = X_SCALING.scale(translateX.getAsDouble());
+            double driveTranslateY = Y_SCALING.scale(translateY.getAsDouble());
+            double driveRotate = ROT_SCALING.scale(rotate.getAsDouble());
 
             ChassisSpeeds speeds = new ChassisSpeeds(
                 driveTranslateY * translationScaling * MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND,
@@ -305,7 +240,7 @@ public class SwerveSubsystem extends BaseSubsystem<SwerveIO, ESwerveData> {
      */
     public Command snapToAngle(Rotation2d angle, DoubleSupplier translateX, DoubleSupplier translateY) {
         return joystickDrive(translateX, translateY, () -> {
-            double currYaw = Math.toRadians(getYaw().getDegrees()%360);
+            double currYaw = Math.toRadians(io.getYaw().getDegrees()%360);
             double errorAngle = angle.getRadians() - currYaw;
 
             if(errorAngle > Math.PI){
@@ -348,13 +283,12 @@ public class SwerveSubsystem extends BaseSubsystem<SwerveIO, ESwerveData> {
             }
 
             ChassisSpeeds driveSpeeds = pathFollowerCtrl.calculate(
-                getCurrentPosition(),
+                io.getCurrentOdometryPosition(),
                 desiredState,
                 desiredState.poseMeters.getRotation()
-            );
-
+            ); 
+            
             drive(driveSpeeds);
-
         })).until(() -> // End condition
             trajectoryTimer.hasElapsed(trajectory.getTotalTimeSeconds()) && 
                 (pathFollowerCtrl.atReference() || !Robot.isReal())
