@@ -84,13 +84,7 @@ public class AutoLoader {
         return manager.onModeInitCommand(MatchMode.AUTONOMOUS)
         .andThen(
             manager.swerve.resetHeading(),
-            new ConditionalCommand(
-                manager.swerve.resetAlliancePose(getSelectedAuto().getInitialPose()), 
-                // manager.swerve.resetPoseFlipOnlyX(getSelectedAuto().getInitialPose(), Robot.isRedAlliance),
-                Commands.none(),
-                // () -> getSelectedAuto().isPathPlannerAuto
-                () -> true
-            ),
+            manager.swerve.resetAlliancePose(getSelectedAuto().getInitialPose()),
             getStartDelay(), 
             new MultiComposableCommand(getSelectedAuto())
         );

@@ -6,8 +6,11 @@ import java.util.List;
 import edu.wpi.first.apriltag.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import lib.logging.LogUtils;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+/**
+ * Class that holds useful information for a particular game's field
+ */
 public abstract class FieldLayout {
     private AprilTagLayout aprilTagLayout;
     private Field2d field = new Field2d();
@@ -50,11 +53,11 @@ public abstract class FieldLayout {
     }
 
     public void logToShuffleboard(boolean log) {
-        if (log) LogUtils.addSendable("Field", field);
+        if (log) SmartDashboard.putData("Field", field);
     }
 
     public static FieldLayout none() {
-        return new FieldLayout(new AprilTagLayout(List.of(), 0d, 0d)) {};
+        return new FieldLayout(new AprilTagLayout(List.of(), 16.542d, 8d)) {};
     }
 
     public static AprilTagFieldLayout createLayout(String path) {

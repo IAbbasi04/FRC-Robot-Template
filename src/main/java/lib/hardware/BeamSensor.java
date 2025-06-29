@@ -2,6 +2,9 @@ package lib.hardware;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 
+/**
+ * Wrapper class for any digital input light sensor
+ */
 public class BeamSensor {
     private DigitalInput sensor; // Any digital input beam sensor
 

@@ -2,15 +2,16 @@ package frc.robot.subsystems.vision;
 
 import java.util.*;
 
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.targeting.*;
 import org.team254.geometry.Pose2d;
 
 import edu.wpi.first.math.geometry.*;
 import frc.robot.Robot;
-import frc.robot.subsystems.Subsystem;
+import frc.robot.subsystems.BaseSubsystem;
 import lib.MatchMode;
 
-public class VisionSubsystem extends Subsystem<CameraIO, EVisionData> {
+public class VisionSubsystem extends BaseSubsystem<CameraIO, EVisionData> {
     private List<PhotonTrackedTarget> allVisibleTags = new ArrayList<>();
     private PhotonTrackedTarget bestTarget = new PhotonTrackedTarget();
 
@@ -18,17 +19,17 @@ public class VisionSubsystem extends Subsystem<CameraIO, EVisionData> {
         super(io, EVisionData.class);
     }
 
-    // public boolean isAnyTargetVisible() {
-    //     return io.isAnyTargetVisible();
-    // }
+    public boolean isAnyTargetVisible() {
+        return io.isAnyTargetVisible();
+    }
 
     public List<PhotonTrackedTarget> getTargets() {
         return io.getAllTargets();
     }
 
-    // public Optional<EstimatedRobotPose> getRobotPoseVision() {
-    //     return io.getVisionEstimatedPose();
-    // }
+    public Optional<EstimatedRobotPose> getRobotPoseVision() {
+        return io.getVisionEstimatedPose();
+    }
 
     public double getPoseAmbiguityRatio() {
         return io.getPoseAmbiguityRatio();
@@ -74,9 +75,9 @@ public class VisionSubsystem extends Subsystem<CameraIO, EVisionData> {
 
         // this.logger.logIf("Closest Tag ID", io.getClosestTagID(), -1, isAnyTargetVisible());
 
-        this.data.set(EVisionData.BEST_TARGET_DATA, bestTarget);
-        this.data.set(EVisionData.IS_ANY_TARGET_VISIBLE, io.isAnyTargetVisible());
-        this.data.setIf(
+        this.data.map(EVisionData.BEST_TARGET_DATA, bestTarget);
+        this.data.map(EVisionData.IS_ANY_TARGET_VISIBLE, io.isAnyTargetVisible());
+        this.data.mapIf(
             EVisionData.ESTIMATED_ROBOT_POSE,
             io.getVisionEstimatedPose().get().estimatedPose.toPose2d(),
             new Pose2d(),

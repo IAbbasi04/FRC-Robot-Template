@@ -7,6 +7,9 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj2.command.button.*;
 import lib.logging.SmartLogger;
 
+/**
+ * Class that handles driver and operator inputs
+ */
 public final class Controls {
     private static final CommandXboxController driverController = new CommandXboxController(0);
     private static final CommandXboxController operatorController = new CommandXboxController(1);
@@ -57,6 +60,9 @@ public final class Controls {
         }
     }
 
+    /**
+     * Logs the current state of all controls
+     */
     public static void logControls() {
         for (Field field : Controls.class.getDeclaredFields()) {
             try {
@@ -65,10 +71,16 @@ public final class Controls {
         }
     }
 
+    /**
+     * Returns the driver controller
+     */
     protected static CommandXboxController getDriver() {
         return driverController;
     }
 
+    /**
+     * Returns the operator controller
+     */
     protected static CommandXboxController getOperator() {
         return operatorController;
     }

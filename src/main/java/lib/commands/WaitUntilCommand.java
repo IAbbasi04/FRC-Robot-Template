@@ -2,18 +2,18 @@ package lib.commands;
 
 import java.util.function.BooleanSupplier;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import edu.wpi.first.wpilibj2.command.WrapperCommand;
+import edu.wpi.first.wpilibj2.command.*;
 
+/**
+ * Wrapper command that only runs the indicated command once the given condition is true
+ */
 public class WaitUntilCommand extends WrapperCommand{
-    public WaitUntilCommand(Command command, BooleanSupplier supplier){
-        super(new WaitCommand(Double.POSITIVE_INFINITY).until(supplier).andThen(command));
+    public WaitUntilCommand(Command command, BooleanSupplier startCondition){
+        super(new WaitCommand(Double.POSITIVE_INFINITY).until(startCondition).andThen(command));
     }
 
-    public WaitUntilCommand(BooleanSupplier supplier) {
-        this(Commands.none(), supplier);
+    public WaitUntilCommand(BooleanSupplier startCondition) {
+        this(Commands.none(), startCondition);
     }
 
     public WaitUntilCommand(Command command, double waitTime){

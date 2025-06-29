@@ -2,6 +2,9 @@ package lib.math.regression;
 
 import lib.Utils;
 
+/**
+ * Class that represents a linear regression model
+ */
 public class LinearRegression extends Regression {
     private double slope, intercept, residual;
 

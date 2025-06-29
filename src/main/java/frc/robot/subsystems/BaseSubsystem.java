@@ -11,7 +11,10 @@ import lib.io.ISubsystemIO;
 import lib.logging.SmartLogger;
 import lib.logging.SubsystemDataMap;
 
-public abstract class Subsystem<E extends ISubsystemIO, V extends Enum<V>> extends SubsystemBase {
+/**
+ * Template class for the robot's subsystems
+ */
+public abstract class BaseSubsystem<E extends ISubsystemIO, V extends Enum<V>> extends SubsystemBase {
     private boolean enabled = false; // TODO - Get Working
     protected E io;
     public SubsystemDataMap<V> data = new SubsystemDataMap<>(); // accesible
@@ -19,33 +22,34 @@ public abstract class Subsystem<E extends ISubsystemIO, V extends Enum<V>> exten
     protected SmartLogger logger;
     private Class<V> dataClz;
 
-    protected Subsystem(E io, Class<V> dataClz) {
+    protected BaseSubsystem(E io, Class<V> dataClz) {
         this.io = io;
         this.dataClz = dataClz;
         this.logger = new SmartLogger(getName());
         for (V key : dataClz.getEnumConstants()) {
-            this.data.set(key, 0d);
+            this.data.map(key, 0d);
         }
     }
 
+    /**
+     * Whether there is a command actively running on this subsystem
+     */
     public boolean currentlyCommanded(){
         return getCurrentCommand() != null && getCurrentCommand() != getDefaultCommand();
     }
 
+    /**
+     * Enables or disables the subsystem
+     */
     public void enableSubsystem(boolean enable) {
         this.enabled = enable;
     }
 
+    /**
+     * Returns whether the subsystem is enabled
+     */
     public boolean isEnabled() {
         return enabled;
-    }
-
-    public V getData() {
-        try {
-            return (V)dataClz.getDeclaredConstructor().newInstance();
-        } catch (Exception e) {
-            return null;
-        }
     }
 
     /**
@@ -63,23 +67,32 @@ public abstract class Subsystem<E extends ISubsystemIO, V extends Enum<V>> exten
     }
     
     /**
-     * Set the default command of a subsystem (what to run if no other command requiring it is running).
-     *
-     * @param command to command to set as default
+     * Set the default command of a subsystem (what to run if no other command requiring it is running)
      */
     @Override
     public void setDefaultCommand(Command command) {
         super.setDefaultCommand(command.withInterruptBehavior(InterruptionBehavior.kCancelSelf));
     }
 
+    /**
+     * Set the default command of a subsystem (what to run if no other command requiring it is running)
+     *
+     * @param command to command to set as default
+     */
     public void setDefaultCommand(Runnable runnable) {
         this.setDefaultCommand(run(runnable));
     }
 
+    /**
+     * Removes the current default command
+     */
     public void removeDefaultCommand() {
         super.removeDefaultCommand();
     }
 
+    /**
+     * Returns the current command that is actively running on this subsystem
+     */
     public Command getCurrentCommand() {
         if (super.getCurrentCommand() == null) {// No command currently running
             return Commands.none();
@@ -87,6 +100,9 @@ public abstract class Subsystem<E extends ISubsystemIO, V extends Enum<V>> exten
         return super.getCurrentCommand();
     }
 
+    /**
+     * Returns the default command for this subsystem
+     */
     public Command getDefaultCommand() {
         if (super.getDefaultCommand() == null) {// No default command
             return Commands.none();
@@ -94,6 +110,7 @@ public abstract class Subsystem<E extends ISubsystemIO, V extends Enum<V>> exten
         return super.getDefaultCommand();
     }
 
+    @Override
     public void periodic() {
         periodicTelemetry();
         periodicOutputs();
@@ -104,8 +121,7 @@ public abstract class Subsystem<E extends ISubsystemIO, V extends Enum<V>> exten
             logger.log("Active Command", getCurrentCommand().getName());
             logger.log("Default Command", getDefaultCommand().getName());
             for (V key : dataClz.getEnumConstants()) {
-                var value = data.get(key);
-
+                var value = data.pull(key);
                 if (value.getClass().equals(ChassisSpeeds.class)) {
                     logger.log(key.name(), (ChassisSpeeds)value);
                 } else if (value.getClass().equals(Pose2d.class)) {
@@ -123,12 +139,24 @@ public abstract class Subsystem<E extends ISubsystemIO, V extends Enum<V>> exten
         }
     }
     
+    /**
+     * Optional method to set the outputs of the subsystem periodically
+     */
     public void periodicOutputs() {}
 
+    /**
+     * Called upon the start of the indicated match mode
+     */
     public abstract void onModeInit(MatchMode mode);
 
+    /**
+     * Periodic method to update telemetry and data
+     */
     public abstract void periodicTelemetry();
 
+    /**
+     * Stops the subsystem
+     */
     public abstract void stop();
 
     @Override

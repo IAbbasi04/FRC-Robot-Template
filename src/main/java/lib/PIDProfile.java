@@ -6,6 +6,11 @@ import edu.wpi.first.math.controller.*;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.util.sendable.*;
 
+/**
+ * Helper class that is used to store and utilize PID and other hardware constants
+ * 
+ * - Credit to team 1885 ILITE Robotics for the inital indea
+ */
 public class PIDProfile implements Sendable {
     public int pidSlot = 0;
 
@@ -42,12 +47,14 @@ public class PIDProfile implements Sendable {
 
     private static int instances = 0;
 
-
     public PIDProfile() {
         SendableRegistry.add(this, this.getClass().getSimpleName(), instances);
         instances++;
     }
 
+    /**
+     * Sets the basic P, I, and D gains
+     */
     public PIDProfile setPID(double p, double i, double d) {
         this.kP = p;
         this.kI = i;
@@ -55,107 +62,174 @@ public class PIDProfile implements Sendable {
         return this;
     }
 
+
+    /**
+     * Sets the P gain to the desired value
+     */
     public PIDProfile setP(double gain) {
         kP = gain;
         return this;
     }
 
+    /**
+     * Returns P gain
+     */
     public double getP() {
         return kP;
     }
 
+    /**
+     * Sets the I gain to the desired value along with the I zone
+     */
     public PIDProfile setI(double gain, double zone) {
         kI = gain;
         kIZone = zone;
         return this;
     }
 
+    /**
+     * Sets the I gain to the desired value
+     */
     public PIDProfile setI(double gain) {
         kI = gain;
         return this;
     }
 
+    /**
+     * Sets the I zone to the desired range
+     */
     public PIDProfile setIZone(double zone) {
         kIZone = zone;
         return this;
     }
 
+    /**
+     * Returns I gain
+     */
     public double getI() {
         return kI;
     }
 
+    /**
+     * Returns I zone
+     */
     public double getIZone() {
         return kIZone;
     }
 
+    /**
+     * Sets the D gain to the desired value
+     */
     public PIDProfile setD(double gain) {
         kD = gain;
         return this;
     }
 
+    /**
+     * Returns the D gain
+     */
     public double getD() {
         return kD;
     }
 
+    /**
+     * Sets the V gain to the desired value
+     */
     public PIDProfile setV(double gain) {
         this.kV = gain;
         this.refreshFF();
         return this;
     }
 
+    /**
+     * Returns the V gain
+     */
     public double getV() {
         return this.kV;
     }
 
+    /**
+     * Sets the A gain to the desired value
+     */
     public PIDProfile setA(double gain) {
         this.kA = gain;
         this.refreshFF();
         return this;
     }
 
+    /**
+     * Returns the A gain
+     */
     public double getA() {
         return this.kA;
     }
 
+    /**
+     * Sets the I gain to the desired value
+     */
     public PIDProfile setS(double gain) {
         this.kS = gain;
         this.refreshFF();
         return this;
     }
 
+    /**
+     * Returns the S gain
+     */
     public double getS() {
         return this.kS;
     }
 
+    /**
+     * Sets the max acceleration to the desired value
+     */
     public PIDProfile setMaxAcceleration(double gain) {
         maxAcceleration = gain;
         useSmartMotion = true;
         return this;
     }
 
+    /**
+     * Returns the max acceleration
+     */
     public double getMaxAcceleration() {
         return maxAcceleration;
     }
 
+    /**
+     * Sets the max velocity to the desired value
+     */
     public PIDProfile setMaxVelocity(double gain) {
         maxVelocity = gain;
         useSmartMotion = true;
         return this;
     }
 
+    /**
+     * Returns the max velocity
+     */
     public double getMaxVelocity() {
         return maxVelocity;
     }
 
+    /**
+     * Sets the pid slot to the desired slot
+     */
     public PIDProfile setSlot(int slot) {
         pidSlot = slot;
         return this;
     }
 
+    /**
+     * Returns the pid slot for this PIDProfile
+     */
     public int getSlot() {
         return pidSlot;
     }
 
+    /**
+     * Sets the position tolerance to the desired range
+     */
     public PIDProfile setTolerance(double tolerance) {
         this.tolerance = tolerance;
         return this;
@@ -189,6 +263,9 @@ public class PIDProfile implements Sendable {
         return this;
     }
 
+    /**
+     * Whether this set of pid constants constains a soft limit
+     */
     public boolean hasSoftLimits() {
         return softLimit;
     }
@@ -263,10 +340,16 @@ public class PIDProfile implements Sendable {
         return pidCtrl;
     }
 
+    /**
+     * Converts the generic PIDConstants (P, I, D) to a useable form for PathPlanner
+     */
     public PIDConstants toPIDConstants() {
         return new PIDConstants(kP, kI, kD);
     }
 
+    /**
+     * Resets the feedforward object with the updated values for S, V, and A
+     */
     private void refreshFF() {
         this.feedForward = new SimpleMotorFeedforward(kS, kV, kA);
     }

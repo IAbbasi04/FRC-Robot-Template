@@ -1,5 +1,8 @@
 package lib.math.regression;
 
+/**
+ * Class that represents a piecewise regression model
+ */
 public class PiecewiseRegression extends Regression {
     private double[] values;
     private double deltaDistance; // meters

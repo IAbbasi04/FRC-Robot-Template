@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.*;
 import frc.robot.*;
-import frc.robot.subsystems.Subsystem;
+import frc.robot.subsystems.BaseSubsystem;
 import lib.MatchMode;
 import lib.Utils;
 import lib.control.DriveScaler;
@@ -28,7 +28,7 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.pathfinding.*;
 import com.pathplanner.lib.config.RobotConfig;
 
-public class SwerveSubsystem extends Subsystem<SwerveIO, ESwerveData> {
+public class SwerveSubsystem extends BaseSubsystem<SwerveIO, ESwerveData> {
     /**
      * Small enum to control whether to drive robot- or field-
      * relative for {@link SwerveSubsystem#drive(ChassisSpeeds, DriveModes)}
@@ -178,13 +178,11 @@ public class SwerveSubsystem extends Subsystem<SwerveIO, ESwerveData> {
 
     @Override
     public void periodicTelemetry() {
-        this.data.set(ESwerveData.CURRENT_POSE, getCurrentPosition());
-        this.data.set(ESwerveData.CURRENT_WHEEL_SPEEDS, getWheelSpeeds());
-        this.data.set(ESwerveData.CURRENT_YAW, getYaw());
-        this.data.set(ESwerveData.DESIRED_SPEEDS, desiredSpeeds);
+        this.data.map(ESwerveData.CURRENT_POSE, getCurrentPosition());
+        this.data.map(ESwerveData.CURRENT_WHEEL_SPEEDS, getWheelSpeeds());
+        this.data.map(ESwerveData.CURRENT_YAW, getYaw());
+        this.data.map(ESwerveData.DESIRED_SPEEDS, desiredSpeeds);
         this.io.updateInputs();
-
-        this.logger.log("CURRENT ROBOT POSE", getCurrentPosition());
     }
 
     /**

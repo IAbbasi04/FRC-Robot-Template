@@ -8,6 +8,9 @@ public class StopWatch implements Sendable {
     private double stopTime = 0d;
     private boolean hasStarted = false;
 
+    /**
+     * A timer that counts down from a certain starting point
+     */
     public StopWatch(double stopTime) {
         this.stopTime = stopTime;
         this.timer.reset();
@@ -15,6 +18,9 @@ public class StopWatch implements Sendable {
         SendableRegistry.addLW(this, "StopWatch");
     }
 
+    /**
+     * Starts the timer if it hasn't been started yet
+     */
     public void start() {
         if (!hasStarted) {
             this.timer.start();
@@ -22,11 +28,17 @@ public class StopWatch implements Sendable {
         }
     }
 
+    /**
+     * Stops and resets the timer
+     */
     public void stop() {
         this.timer.stop();
         this.timer.reset();
     }
 
+    /**
+     * The amount of time elapsed since started
+     */
     public double getElapsed() {
         if (!hasStarted) {
             this.start();
@@ -35,6 +47,9 @@ public class StopWatch implements Sendable {
         return this.timer.get();
     }
 
+    /**
+     * The amount of time remaining
+     */
     public double getRemaining() {
         if (!hasStarted) {
             this.start();
@@ -43,6 +58,9 @@ public class StopWatch implements Sendable {
         return this.timer.get() - stopTime;
     }
 
+    /**
+     * Whether the indicated elapsed time has passed
+     */
     public boolean hasFinished() {
         if (!hasStarted) {
             this.start();

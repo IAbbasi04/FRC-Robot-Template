@@ -14,7 +14,9 @@ import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import lib.MatchMode;
 
-
+/**
+ * Integration class that takes inputs from subystems and controls and applies them to the robot
+ */
 public class RobotContainer {
     private final SubsystemManager manager;
     private final SwerveSubsystem swerve;

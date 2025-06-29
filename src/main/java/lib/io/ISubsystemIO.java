@@ -1,6 +1,16 @@
 package lib.io;
 
+/**
+ * Interface that tags a class as an IO class used by subsystems
+ */
 public interface ISubsystemIO {
-    public default void updateInputs() {} // Periodic call that is used to frequently update values within the subsystem
-    public default void halt() {} // Prevent the subsystem from moving
+    /**
+     * Periodic call that is used to frequently update values within the subsystem
+     */
+    public default void updateInputs() {}
+
+    /**
+     * Prevent the subsystem from moving
+     */
+    public default void halt() {} 
 }

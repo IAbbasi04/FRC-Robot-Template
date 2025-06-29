@@ -2,6 +2,9 @@ package lib.math;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 
+/**
+ * Class that represents a vector in 2d space
+ */
 public class Vector2d {
     private Distance2d magnitude;
     private Rotation2d direction;

@@ -6,6 +6,9 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 
 import lib.hardware.motor.PortConfig;
 
+/**
+ * Wrapper class for motors that use the Spark Flex motor controller
+ */
 public class SparkFlexMotor extends SparkBaseMotor<SparkFlex, SparkFlexConfig> {
     public SparkFlexMotor(PortConfig config) {
         super(

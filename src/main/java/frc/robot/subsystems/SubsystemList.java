@@ -2,9 +2,12 @@ package frc.robot.subsystems;
 
 import java.util.ArrayList;
 
-public class SubsystemList extends ArrayList<Subsystem<?, ?>> {
-    public SubsystemList(Subsystem<?, ?>... subsystems) {
-        for (Subsystem<?, ?> subsystem : subsystems) {
+/**
+ * Helper class that extends from Arraylist to more easily manage subsystems
+ */
+public class SubsystemList extends ArrayList<BaseSubsystem<?, ?>> {
+    public SubsystemList(BaseSubsystem<?, ?>... subsystems) {
+        for (BaseSubsystem<?, ?> subsystem : subsystems) {
             this.add(subsystem);
         }
     }
