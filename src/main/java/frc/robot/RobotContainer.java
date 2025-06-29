@@ -60,8 +60,8 @@ public class RobotContainer {
      * Configure all button bindings
      */
     private void configureControls() {
-        Controls.slowMode.onTrue(manager.swerve.setSlowMode(true).ignoringDisable(true))
-            .onFalse(manager.swerve.setSlowMode(false).ignoringDisable(true));
+        Controls.slowMode.onTrue(manager.swerve.setSnailMode(true).ignoringDisable(true))
+            .onFalse(manager.swerve.setSnailMode(false).ignoringDisable(true));
 
         Controls.zeroGryoscope.onTrue(manager.swerve.resetHeading());
 

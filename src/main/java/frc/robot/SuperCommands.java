@@ -1,7 +1,6 @@
 package frc.robot;
 
 import java.util.Optional;
-import java.util.Set;
 
 import org.photonvision.EstimatedRobotPose;
 
@@ -20,7 +19,7 @@ public final class SuperCommands {
      * Updates the telemetry of the swerve subsystem with the latest vision data.
      */
     public static Command updateOdometryWithVision(SwerveSubsystem swerve, VisionSubsystem vision) {
-        return new DeferredCommand(
+        return vision.run(
             () -> {
                 Optional<EstimatedRobotPose> estimatedRobotPose = vision.data.pull(EVisionData.ESTIMATED_ROBOT_POSE);
                 if (estimatedRobotPose.isPresent()) {
@@ -29,15 +28,13 @@ public final class SuperCommands {
 
                     if(Math.abs(ambiguity) < VisionConstants.MAX_ACCEPTABLE_AMBIGUITY) {
                         if (DriverStation.isDisabled()){
-                            return swerve.resetPose(robotPose);
+                            swerve.resetPoseCallback(robotPose);
                         } else {
-                            return swerve.addVisionMeasurement(robotPose);
+                            swerve.addVisionMeasurementCallback(robotPose);
                         }
                     }
                 }
-                return Commands.none();
-            }, 
-            Set.of(swerve, vision)
+            }
         )
         .withInterruptBehavior(InterruptionBehavior.kCancelSelf)
         .onlyIf(() -> Robot.isReal());

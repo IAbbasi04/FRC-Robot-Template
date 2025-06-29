@@ -29,29 +29,16 @@ import com.pathplanner.lib.pathfinding.*;
 import com.pathplanner.lib.config.RobotConfig;
 
 public class SwerveSubsystem extends BaseSubsystem<SwerveIO, ESwerveData> {
-    /**
-     * Small enum to control whether to drive robot- or field-
-     * relative for {@link SwerveSubsystem#drive(ChassisSpeeds, DriveModes)}
-     */
-    public enum DriveModes{
-        /** Drive robot-relative */
-        ROBOT_RELATIVE,
-        /** Switch between robot- and field-relative depending on driver input */
-        AUTOMATIC,
-        /** Drive field-relative */
-        FIELD_RELATIVE
-    }
-
-    private boolean robotRelative;
-
     private ChassisSpeeds desiredSpeeds = new ChassisSpeeds();
 
     private Timer trajectoryTimer = new Timer();
 
-    private PIDController snapToCtrl = SNAP_TO_GAINS.toPIDController();
+    
 
     private double translationScaling = 1d;
     private double rotateScaling = 1d;
+
+    private boolean robotRelative;
 
     private DriveScaler xScaler = new DriveScaler(
         DriveScaler.ScaleType.QUADRATIC, 
@@ -90,7 +77,7 @@ public class SwerveSubsystem extends BaseSubsystem<SwerveIO, ESwerveData> {
         try {
             AutoBuilder.configure(
                 this::getCurrentPosition, 
-                (pose) -> io.setKnownOdometryPose(pose), 
+                (pose) -> resetPoseCallback(pose), 
                 this::getWheelSpeeds, 
                 (speeds) -> this.drive(speeds),
                 new PPHolonomicDriveController(
@@ -123,21 +110,12 @@ public class SwerveSubsystem extends BaseSubsystem<SwerveIO, ESwerveData> {
      *
      * @param speeds the speeds to run the drivetrain at
      */
-    private void drive(ChassisSpeeds speeds, DriveModes mode){
+    private void drive(ChassisSpeeds speeds, boolean robotRelative){
         this.desiredSpeeds = speeds;
         io.drive(
             speeds,
-            switch(mode){
-                case FIELD_RELATIVE:
-                    yield true;
-                case AUTOMATIC:
-                    yield !robotRelative;
-                case ROBOT_RELATIVE:
-                    yield false;
-            }
+            robotRelative
         );
-
-        
     }
 
     /**
@@ -159,6 +137,20 @@ public class SwerveSubsystem extends BaseSubsystem<SwerveIO, ESwerveData> {
      */
     private ChassisSpeeds getWheelSpeeds() {
         return io.getWheelSpeeds();
+    }
+
+    /**
+     * Resets the known pose of the robot to the given pose
+     */
+    public void resetPoseCallback(Pose2d pose) {
+        io.setKnownOdometryPose(pose);
+    }
+
+    /**
+     * Adds the given pose towards the odometry estimate
+     */
+    public void addVisionMeasurementCallback(Pose2d pose) {
+        io.addVisionMeasurement(pose, Timer.getFPGATimestamp());
     }
 
     @Override
@@ -200,12 +192,12 @@ public class SwerveSubsystem extends BaseSubsystem<SwerveIO, ESwerveData> {
     /**
      * Set whether human-input-processed joystick input should be slowed
      *
-     * @param slowMode whether to slow the drivetrain
+     * @param snailMode whether to slow the drivetrain
      */
-    public Command setSlowMode(boolean slowMode){
+    public Command setSnailMode(boolean snailMode){
         return runOnce(() -> {
-            this.translationScaling = slowMode ? TRANSLATE_POWER_SLOW : TRANSLATE_POWER_FAST;
-            this.rotateScaling = slowMode ? ROTATE_POWER_SLOW : ROTATE_POWER_FAST;
+            this.translationScaling = snailMode ? SNAIL_MODE_TRANSLATIONAL_SCALING : DEFAULT_TRANSLATIONAL_SCALING;
+            this.rotateScaling = snailMode ? SNAIL_MODE_ROTATION_SCALING : DEFAULT_ROTATION_SCALING;
         });
     }
 
@@ -227,7 +219,7 @@ public class SwerveSubsystem extends BaseSubsystem<SwerveIO, ESwerveData> {
     }
 
     public Command resetPose(Pose2d pose){
-        return runOnce(() -> io.setKnownOdometryPose(pose));
+        return runOnce(() -> resetPoseCallback(pose));
     }
 
     public Command resetPose(Pose2d pose, BooleanSupplier flip) {
@@ -242,23 +234,7 @@ public class SwerveSubsystem extends BaseSubsystem<SwerveIO, ESwerveData> {
                     Rotation2d.fromDegrees(180).minus(pose.getRotation())
                 );
             }
-            io.setKnownOdometryPose(resetToPose);
-        });
-    }
-
-    public Command resetPoseFlipOnlyX(Pose2d pose, BooleanSupplier flip) {
-        return runOnce(() -> {
-            Pose2d resetToPose = pose;
-            if (flip.getAsBoolean()) {
-                resetToPose = new Pose2d(
-                    new Translation2d(
-                        Robot.FIELD.getFieldLength() - pose.getX(),
-                        pose.getY()
-                    ),
-                    Rotation2d.fromDegrees(180).minus(pose.getRotation())
-                );
-            }
-            io.setKnownOdometryPose(resetToPose);
+            resetPoseCallback(resetToPose);
         });
     }
 
@@ -275,7 +251,7 @@ public class SwerveSubsystem extends BaseSubsystem<SwerveIO, ESwerveData> {
                     Rotation2d.fromDegrees(180).minus(pose.getRotation())
                 );
             }
-            io.setKnownOdometryPose(resetToPose);
+            resetPoseCallback(resetToPose);
         });
     }
 
@@ -300,19 +276,19 @@ public class SwerveSubsystem extends BaseSubsystem<SwerveIO, ESwerveData> {
                 driveRotate * rotateScaling * MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND
             );
 
-            drive(speeds, DriveModes.AUTOMATIC);
+            drive(speeds, !robotRelative);
         });
     }
 
     public Command driveFieldOriented(ChassisSpeeds speeds) {
         return run(() -> {
-            drive(speeds, DriveModes.FIELD_RELATIVE);
+            drive(speeds, false);
         });
     }
 
     public Command driveRobotRelative(ChassisSpeeds speeds) {
         return run(() -> {
-            drive(speeds, DriveModes.ROBOT_RELATIVE);
+            drive(speeds, true);
         });
     }
 
@@ -339,7 +315,7 @@ public class SwerveSubsystem extends BaseSubsystem<SwerveIO, ESwerveData> {
                 errorAngle += 2*Math.PI;
             }
 
-            return snapToCtrl.calculate(0, errorAngle);
+            return SNAP_TO_PID.calculate(0, errorAngle);
         });
     }
 

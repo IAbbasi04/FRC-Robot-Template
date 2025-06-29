@@ -1,11 +1,11 @@
 package frc.robot.subsystems.swerve;
 
 import static edu.wpi.first.units.Units.*;
+import static frc.robot.subsystems.swerve.SwerveConstants.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -13,8 +13,6 @@ import frc.robot.subsystems.swerve.ctre.*;
 
 public class SwerveIOCTRE<E extends BaseTunerConstants> extends SwerveIO {
     public String tunerConstantsName = "";
-
-    private final ProfiledPIDController kSnapToCtrl = SwerveConstants.SNAP_TO_GAINS.toProfiledPIDController();
 
     private double MaxSpeed = E.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
@@ -82,11 +80,6 @@ public class SwerveIOCTRE<E extends BaseTunerConstants> extends SwerveIO {
         drivetrain.setControl(point.withModuleDirection(direction));
     }
 
-    // @Override
-    // public void registerTelemetry(Consumer<SwerveDriveState> driveState){
-    //     drivetrain.registerTelemetry(driveState);
-    // }
-
     @Override
     public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
         drivetrain.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds);
@@ -103,7 +96,7 @@ public class SwerveIOCTRE<E extends BaseTunerConstants> extends SwerveIO {
             new ChassisSpeeds(
                 targetSpeeds.vxMetersPerSecond,
                 targetSpeeds.vyMetersPerSecond,
-                kSnapToCtrl.calculate(getYaw().getDegrees(), heading.getDegrees())
+                SNAP_TO_PID.calculate(getYaw().getDegrees(), heading.getDegrees())
             ),
             true
         );
