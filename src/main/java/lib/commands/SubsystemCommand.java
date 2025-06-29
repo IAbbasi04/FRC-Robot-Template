@@ -1,7 +1,7 @@
 package lib.commands;
 
 import edu.wpi.first.wpilibj2.command.*;
-import frc.robot.subsystems.BaseSubsystem;
+import lib.subsystem.BaseSubsystem;
 
 /**
  * Wrapper class that adds a few convenience methods for commands within a subsystem

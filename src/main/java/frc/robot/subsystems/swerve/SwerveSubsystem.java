@@ -9,10 +9,9 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.*;
 
 import frc.robot.*;
-import frc.robot.subsystems.BaseSubsystem;
-
 import lib.MatchMode;
 import lib.Utils;
+import lib.subsystem.BaseSubsystem;
 
 import java.util.function.*;
 

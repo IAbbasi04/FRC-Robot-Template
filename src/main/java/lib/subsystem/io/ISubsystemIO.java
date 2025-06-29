@@ -1,4 +1,4 @@
-package lib.io;
+package lib.subsystem.io;
 
 /**
  * Interface that tags a class as an IO class used by subsystems

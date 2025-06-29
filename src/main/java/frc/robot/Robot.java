@@ -16,6 +16,10 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.*;
+import frc.robot.config.Controls;
+import frc.robot.config.RobotConfig;
+import frc.robot.config.RobotContainer;
+import frc.robot.config.RobotSelector;
 import lib.*;
 import lib.field.*;
 

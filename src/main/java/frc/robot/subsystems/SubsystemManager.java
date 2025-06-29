@@ -3,11 +3,13 @@ package frc.robot.subsystems;
 import java.util.*;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.*;
-import frc.robot.RobotSelector;
+import frc.robot.config.RobotSelector;
 import frc.robot.subsystems.swerve.*;
 import frc.robot.subsystems.swerve.ctre.BaseTunerConstants;
 import frc.robot.subsystems.vision.*;
 import lib.MatchMode;
+import lib.subsystem.BaseSubsystem;
+import lib.subsystem.SubsystemList;
 
 /**
  * Class that handles all active and inactive subsystems on the robot

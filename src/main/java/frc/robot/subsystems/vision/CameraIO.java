@@ -15,7 +15,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import frc.robot.Robot;
-import lib.io.ISubsystemIO;
+import lib.subsystem.io.ISubsystemIO;
 
 public abstract class CameraIO implements ISubsystemIO {
     protected PhotonCamera camera;

@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.config;
 
 
 import java.lang.reflect.Field;

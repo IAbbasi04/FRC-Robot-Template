@@ -1,4 +1,4 @@
-package lib.io;
+package lib.subsystem.io;
 
 /**
  * Template SubsystemIO class for subsystems that have rotational movement

@@ -2,17 +2,26 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot;
+package frc.robot.config;
 
+import java.util.Optional;
+
+import org.photonvision.EstimatedRobotPose;
+
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
-import frc.robot.Controls.ControlSets;
-import frc.robot.autonomous.*;
+
+import frc.robot.Robot;
+import frc.robot.config.Controls.ControlSets;
 import frc.robot.subsystems.SubsystemManager;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
-import frc.robot.subsystems.vision.VisionSubsystem;
+import frc.robot.subsystems.vision.*;
+
 import lib.MatchMode;
+import lib.autonomous.AutoLoader;
 
 /**
  * Integration class that takes inputs from subystems and controls and applies them to the robot
@@ -53,7 +62,26 @@ public class RobotContainer {
             Controls.driveRotate
         ));
 
-        vision.setDefaultCommand(SuperCommands.updateOdometryWithVision(swerve, vision));
+        vision.setDefaultCommand(vision.run(
+            () -> {
+                Optional<EstimatedRobotPose> estimatedRobotPose = vision.data.pull(VisionData.ESTIMATED_ROBOT_POSE);
+                if (estimatedRobotPose.isPresent()) {
+                    Pose2d robotPose = estimatedRobotPose.get().estimatedPose.toPose2d();
+                    double ambiguity = vision.getPoseAmbiguityRatio();
+
+                    if(Math.abs(ambiguity) < VisionConstants.MAX_ACCEPTABLE_AMBIGUITY) {
+                        if (DriverStation.isDisabled()){
+                            swerve.doOnce(swerve.resetPose(robotPose));
+                        } else {
+                            swerve.doOnce(swerve.addVisionMeasurement(robotPose));
+                        }
+                    }
+                }
+            }
+        )
+        .withInterruptBehavior(InterruptionBehavior.kCancelSelf)
+        .onlyIf(() -> Robot.isReal())
+        .ignoringDisable(true));
     }
 
     /**

@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package lib.subsystem;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -8,9 +8,9 @@ import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import lib.MatchMode;
 import lib.commands.SubsystemCommand;
-import lib.io.ISubsystemIO;
 import lib.logging.SmartLogger;
 import lib.logging.SubsystemDataMap;
+import lib.subsystem.io.ISubsystemIO;
 
 /**
  * Template class for the robot's subsystems

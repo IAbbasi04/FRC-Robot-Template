@@ -1,6 +1,6 @@
-package frc.robot;
+package frc.robot.config;
 
-import frc.robot.RobotSelector.RobotType;
+import frc.robot.config.RobotSelector.RobotType;
 
 /**
  * General configuration constants for the robot

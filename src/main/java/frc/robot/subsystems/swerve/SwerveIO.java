@@ -2,7 +2,7 @@ package frc.robot.subsystems.swerve;
 
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import lib.io.ISubsystemIO;
+import lib.subsystem.io.ISubsystemIO;
 
 public abstract class SwerveIO implements ISubsystemIO {
     public abstract void drive(ChassisSpeeds speeds, boolean driveFieldRelative);

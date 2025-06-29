@@ -8,8 +8,8 @@ import org.team254.geometry.Pose2d;
 
 import edu.wpi.first.math.geometry.*;
 import frc.robot.Robot;
-import frc.robot.subsystems.BaseSubsystem;
 import lib.MatchMode;
+import lib.subsystem.BaseSubsystem;
 
 public class VisionSubsystem extends BaseSubsystem<CameraIO, VisionData> {
     private List<PhotonTrackedTarget> allVisibleTags = new ArrayList<>();
