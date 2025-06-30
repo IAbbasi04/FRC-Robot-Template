@@ -2,26 +2,39 @@ package lib.logging;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
+/**
+ * A class that maps an enum constant to a value. Useful for logging and used in an automated manner within subsystems
+ */
 public class SubsystemDataMap<E extends Enum<E>> {
-    private Map<E, DataEntry<?>> dataMap = new HashMap<E, DataEntry<?>>();
+    private Map<E, Supplier<?>> dataMap =   new HashMap<E, Supplier<?>>();
 
     public SubsystemDataMap() {}
 
-    public <T> void set(E key, T value) {
-        dataMap.put(key, new DataEntry<T>(() -> value));
+    /**
+     * Maps an enum constant to a value of any type
+     */
+    public <T> void map(E key, T value) {
+        dataMap.put(key, () -> value);
     }
 
-    public <T> void setIf(E key, T value, T alternative, boolean condition) {
+    /**
+     * Maps an enum constant to a value of any type if the condition is true, otherwise maps it to an alternative value.
+     */
+    public <T> void mapIf(E key, T value, T alternative, boolean condition) {
         if (condition) {
-            dataMap.put(key, new DataEntry<T>(() -> value));
+            dataMap.put(key, () -> value);
         } else {
-            dataMap.put(key, new DataEntry<T>(() -> alternative));
+            dataMap.put(key, () -> alternative);
         }
     }
 
+    /**
+     * Pulls the value associated with the given enum constant key in its native type
+     */
     @SuppressWarnings("unchecked")
-    public <T> T get(E key) {
+    public <T> T pull(E key) {
         try {
             return (T)dataMap.get(key).get();
         } catch (Exception e) {

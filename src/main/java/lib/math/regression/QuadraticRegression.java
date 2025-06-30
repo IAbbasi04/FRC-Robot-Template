@@ -2,6 +2,9 @@ package lib.math.regression;
 
 import lib.Utils;
 
+/**
+ * Class that represents a quadratic regression model
+ */
 public class QuadraticRegression extends Regression {
     private double a, b, c, residual;
     public QuadraticRegression(double[] inputs, double[] outputs) {

@@ -1,4 +1,4 @@
-package frc.robot.autonomous;
+package lib.autonomous;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ public class AutoLoader {
     }
 
     private void initAutoSelector(SubsystemManager manager) {
-        String packageName = "/src/main/java/frc/robot/autonomous/autos";
+        String packageName = "/src/main/java/frc/robot/autos";
         File autosDir = new File(System.getProperty("user.dir") + packageName);
 
         this.autoChooser.setDefaultOption("DEFAULT - DO NOTHING", BaseAuto.getDefaultAuto());
@@ -52,7 +52,7 @@ public class AutoLoader {
                 for (File file : files) {
                     try {
                         String className = file.getName().replace(".java", "");
-                        String fullClassName = "frc.robot.autonomous.autos." + className;
+                        String fullClassName = "frc.robot.autos." + className;
 
                         Class<?> auto = classLoader.loadClass(fullClassName);
 
@@ -84,13 +84,7 @@ public class AutoLoader {
         return manager.onModeInitCommand(MatchMode.AUTONOMOUS)
         .andThen(
             manager.swerve.resetHeading(),
-            new ConditionalCommand(
-                manager.swerve.resetAlliancePose(getSelectedAuto().getInitialPose()), 
-                // manager.swerve.resetPoseFlipOnlyX(getSelectedAuto().getInitialPose(), Robot.isRedAlliance),
-                Commands.none(),
-                // () -> getSelectedAuto().isPathPlannerAuto
-                () -> true
-            ),
+            manager.swerve.resetAlliancePose(getSelectedAuto().getInitialPose()),
             getStartDelay(), 
             new MultiComposableCommand(getSelectedAuto())
         );

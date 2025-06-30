@@ -8,8 +8,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.function.BooleanSupplier;
 
-import org.littletonrobotics.junction.LoggedRobot;
-import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.*;
 import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
@@ -17,9 +16,12 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.*;
+import frc.robot.config.Controls;
+import frc.robot.config.RobotConfig;
+import frc.robot.config.RobotContainer;
+import frc.robot.config.RobotSelector;
 import lib.*;
 import lib.field.*;
-import lib.logging.SmartLogger;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -31,7 +33,6 @@ import lib.logging.SmartLogger;
  * project.
  */
 public class Robot extends LoggedRobot {
-    private SmartLogger logger = new SmartLogger("Config");
     private Command autonomousCommand = Commands.none();
 
     private RobotContainer robotContainer;
@@ -41,7 +42,7 @@ public class Robot extends LoggedRobot {
     public static final RobotClock CLOCK = new RobotClock();
     public static final FieldLayout FIELD = new ReefscapeFieldLayout();
 
-    public static final BooleanSupplier isRedAlliance = () -> DriverStation.getAlliance().isPresent() && 
+    public static final BooleanSupplier IS_RED_ALLIANCE = () -> DriverStation.getAlliance().isPresent() && 
         DriverStation.getAlliance().get() == DriverStation.Alliance.Red;
 
     /**
@@ -55,6 +56,7 @@ public class Robot extends LoggedRobot {
         Logger.recordMetadata("Year", RobotConfig.YEAR);
         Logger.recordMetadata("Robot", RobotConfig.ROBOT);
         Logger.recordMetadata("Team", RobotConfig.TEAM);
+        Logger.recordMetadata("Robot Type", RobotSelector.getRobot().name());
 
         if (Robot.isReal()) { // If running on a real robot
             String time = DateTimeFormatter.ofPattern("yy-MM-dd_HH-mm-ss").format(LocalDateTime.now());
@@ -92,9 +94,6 @@ public class Robot extends LoggedRobot {
         CommandScheduler.getInstance().run(); 
         Controls.logControls();
         Robot.CLOCK.update();
-
-        logger.log("Robot Type", RobotSelector.getRobot());
-        logger.log("Match Mode", Robot.MODE);
     }
 
     /** This function is called once each time the robot enters Disabled mode. */

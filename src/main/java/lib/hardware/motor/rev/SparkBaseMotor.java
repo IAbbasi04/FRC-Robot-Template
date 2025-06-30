@@ -5,12 +5,13 @@ import lib.Utils;
 import lib.hardware.motor.*;
 
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.*;
 import com.revrobotics.spark.SparkBase.*;
-import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.config.SparkBaseConfig;
 
+/**
+ * Wrapper class for rev motors that use a spark motor controller
+ */
 public abstract class SparkBaseMotor<M extends SparkBase, C extends SparkBaseConfig> extends BaseMotor {
     protected M motor;
     protected SparkClosedLoopController motorCtrl;
@@ -106,11 +107,6 @@ public abstract class SparkBaseMotor<M extends SparkBase, C extends SparkBaseCon
 
         ClosedLoopSlot slot = getSlot(pidSlot);
 
-        // double arbFF = 0d;
-        // if (feedForward.size() > 0) {
-        //     arbFF = feedForward.get(pidSlot).calculate(getVelocityRPM(), Robot.CLOCK.dt());
-        // }
-
         this.motorCtrl.setReference(
             desiredVelocityRPM, 
             ControlType.kMAXMotionVelocityControl, 
@@ -132,8 +128,9 @@ public abstract class SparkBaseMotor<M extends SparkBase, C extends SparkBaseCon
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void setFollowerTo(BaseMotor master, boolean reversed) {
-        this.config.follow(master.getAsSparkFlex().motor);
+        this.config.follow(((SparkBaseMotor<M, C>)master).motor);
         this.motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
@@ -196,6 +193,9 @@ public abstract class SparkBaseMotor<M extends SparkBase, C extends SparkBaseCon
         this.config.softLimit.reverseSoftLimit(min);
     }
 
+    /**
+     * Gets the target PID slot in a useable form
+     */
     private ClosedLoopSlot getSlot(int slot) {
         switch (slot) {
             case 1:

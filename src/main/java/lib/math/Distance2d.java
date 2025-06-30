@@ -2,6 +2,9 @@ package lib.math;
 
 import edu.wpi.first.math.util.Units;
 
+/**
+ * Class that normalizes and converts between different distance units
+ */
 public class Distance2d {
     private double distanceInMeters;
 

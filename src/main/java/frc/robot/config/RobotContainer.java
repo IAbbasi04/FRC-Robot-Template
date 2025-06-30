@@ -2,24 +2,29 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot;
+package frc.robot.config;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
-import frc.robot.Controls.ControlSets;
-import frc.robot.autonomous.*;
+
+import frc.robot.Robot;
+import frc.robot.SuperCommands;
+import frc.robot.config.Controls.ControlSets;
 import frc.robot.subsystems.SubsystemManager;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
-import frc.robot.subsystems.vision.VisionSubsystem;
+import frc.robot.subsystems.vision.*;
+
 import lib.MatchMode;
 import lib.PIDProfile;
 import lib.hardware.motor.TestMotor;
 import lib.hardware.motor.ctre.TalonFXMotor;
+import lib.autonomous.AutoLoader;
 
-
+/**
+ * Integration class that takes inputs from subystems and controls and applies them to the robot
+ */
 public class RobotContainer {
-    // The robot's subsystems
     private final SubsystemManager manager;
     private final SwerveSubsystem swerve;
     private final VisionSubsystem vision;
@@ -49,7 +54,7 @@ public class RobotContainer {
         Controls.applyControlSet(ControlSets.DUAL_DRIVER);
 
         this.configureNamedCommands();
-        this.configureBindings();
+        this.configureControls();
         this.configureDefaults();
     }
 
@@ -68,15 +73,15 @@ public class RobotContainer {
             Controls.driveRotate
         ));
 
-        vision.setDefaultCommand(SuperCommands.updateOdometryWithVision(swerve, vision));
+        vision.setDefaultCommand(SuperCommands.updateSwerveTelemetry(vision, swerve));
     }
 
     /**
      * Configure all button bindings
      */
-    private void configureBindings() {
-        Controls.slowMode.onTrue(manager.swerve.setSlowMode(true).ignoringDisable(true))
-            .onFalse(manager.swerve.setSlowMode(false).ignoringDisable(true));
+    private void configureControls() {
+        Controls.slowMode.onTrue(manager.swerve.setSnailMode(true).ignoringDisable(true))
+            .onFalse(manager.swerve.setSnailMode(false).ignoringDisable(true));
 
         Controls.zeroGryoscope.onTrue(manager.swerve.resetHeading());
 

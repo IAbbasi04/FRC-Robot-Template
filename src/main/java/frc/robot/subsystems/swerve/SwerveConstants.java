@@ -1,23 +1,36 @@
 package frc.robot.subsystems.swerve;
 
+import com.pathplanner.lib.path.PathConstraints;
+
+import edu.wpi.first.math.controller.PIDController;
 import frc.robot.subsystems.swerve.ctre.BaseTunerConstants;
 import lib.PIDProfile;
+import lib.control.DriveScaler;
 
 public class SwerveConstants {
-    public static final double MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND = BaseTunerConstants.kSpeedAt12Volts.baseUnitMagnitude(); // m/s
-    public static final double MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND = Math.toRadians(720); // rad/s
+    protected static final double MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND = BaseTunerConstants.kSpeedAt12Volts.baseUnitMagnitude(); // m/s
+    protected static final double MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND = Math.toRadians(720); // rad/s
+    protected static final double MAX_TRANSLATIONAL_ACCELERATION_METERS_PER_SECOND_SQUARED = 3.0; // m/s^2
+    protected static final double MAX_ROTATIONAL_ACCELERATION_METERS_PER_SECOND_SQUARED = Math.toRadians(720); // rad/s^2
 
-    public static final PIDProfile SNAP_TO_GAINS = new PIDProfile().setP(2d).setD(0.1).setTolerance(0.15).setContinuousInput(-180, 180);
-
-    public static final PIDProfile DRIVE_TO_POSE_GAINS = 
+    protected static final PIDProfile SNAP_TO_GAINS = 
         new PIDProfile()
-            .setP(1d)
-            .setMaxVelocity(MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND)
-            .setMaxAcceleration(6d)
-            .setTolerance(0.02);
+            .setP(2d)
+            .setD(0.1)
+            .setTolerance(0.15)
+            .setContinuousInput(-180, 180);
 
-    public static final PIDProfile PATH_FOLLOW_TRANSLATE_GAINS = new PIDProfile().setP(10d).setTolerance(0.1);
-    public static final PIDProfile PATH_FOLLOW_ROTATE_GAINS = new PIDProfile()
+    protected static final PIDController SNAP_TO_PID = SNAP_TO_GAINS.toPIDController();
+
+    protected static final PathConstraints DRIVE_TO_POSE_CONSTRAINTS = new PathConstraints(
+        MAX_TRANSLATIONAL_VELOCITY_METERS_PER_SECOND, 
+        MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND,
+        MAX_ROTATIONAL_VELOCITY_RADIANS_PER_SECOND, 
+        MAX_ROTATIONAL_ACCELERATION_METERS_PER_SECOND_SQUARED
+    );
+
+    protected static final PIDProfile PATH_FOLLOW_TRANSLATE_GAINS = new PIDProfile().setP(10d).setTolerance(0.1);
+    protected static final PIDProfile PATH_FOLLOW_ROTATE_GAINS = new PIDProfile()
         .setP(6d).setD(0.1)
         .setMaxVelocity(4*Math.PI)
         .setMaxAcceleration(4*Math.PI)
@@ -25,16 +38,29 @@ public class SwerveConstants {
         .setContinuousInput(-Math.PI, Math.PI)
     ;
 
-    public static final double TRANSLATE_POWER_FAST = 1.0; 
-    public static final double TRANSLATE_POWER_SLOW = 0.5;
+    protected static final double DEFAULT_TRANSLATIONAL_SCALING = 1.0; 
+    protected static final double SNAIL_MODE_TRANSLATIONAL_SCALING = 0.5;
 
-    public static final double ROTATE_POWER_FAST = 0.75; 
-    public static final double ROTATE_POWER_SLOW = 0.3;
+    protected static final double DEFAULT_ROTATION_SCALING = 0.75; 
+    protected static final double SNAIL_MODE_ROTATION_SCALING = 0.3;
 
-    public static final int TRANSLATION_SMOOTHING_AMOUNT = 3;
-    public static final int ROTATION_SMOOTHING_AMOUNT = 1;
+    protected static final double JOYSTICK_DEADZONE = 0.03;
 
-    public static final double JOYSTICK_EXPONENT = 1.2;
+    protected static final DriveScaler X_SCALING = new DriveScaler(
+        DriveScaler.ScaleType.QUADRATIC, 
+        true, 
+        0.03
+    );
 
-    
+    protected static final DriveScaler Y_SCALING = new DriveScaler(
+        DriveScaler.ScaleType.QUADRATIC, 
+        true, 
+        0.03
+    );
+
+    protected static final DriveScaler ROT_SCALING = new DriveScaler(
+        DriveScaler.ScaleType.LINEAR, 
+        true, 
+        0.03
+    );
 }

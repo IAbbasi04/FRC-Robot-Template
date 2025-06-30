@@ -2,12 +2,18 @@ package lib.control;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
 
+/**
+ * Class that scales the joystick inputs based on scaling type and slew limiting
+ */
 public class DriveScaler {
     private ScaleType type; // The type of scaling to apply
     private SlewRateLimiter slewLimiter; // Limits acceleration of inputs
     private boolean zeroAtDeadband = false; // The output starts at 0 at the deadband and not at x=0
     private double deadband = 0.03; // The point where the inputs start translating to outputs
 
+    /**
+     * Different types of scaling that can be applied to the inputs
+     */
     public enum ScaleType {
         LINEAR,
         QUADRATIC,
@@ -24,6 +30,9 @@ public class DriveScaler {
         this(type, zeroAtDeadband, 0.03);
     }
 
+    /**
+     * Slew limiting is used to limit the rate of change of the joystick
+     */
     public DriveScaler withSlewLimit(double slewRate) {
         slewLimiter = new SlewRateLimiter(slewRate);
         return this;

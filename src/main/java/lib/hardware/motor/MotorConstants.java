@@ -1,5 +1,8 @@
 package lib.hardware.motor;
 
+/**
+ * Helper class that holds hardware constants for different motors
+ */
 public enum MotorConstants {
     KRAKEN_X60(6000d, 366d, 7.09, 502.1),
     KRAKEN_X44(7530d, 275d, 4.05, 630.7),

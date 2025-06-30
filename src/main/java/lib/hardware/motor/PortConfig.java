@@ -1,5 +1,8 @@
 package lib.hardware.motor;
 
+/**
+ * Helper class that holds the basic configuration for a motor
+ */
 public class PortConfig {
     public final String kBus;
     public final int kPort;

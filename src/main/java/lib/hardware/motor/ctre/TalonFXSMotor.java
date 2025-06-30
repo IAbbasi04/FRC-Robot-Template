@@ -9,6 +9,9 @@ import lib.PIDProfile;
 import lib.hardware.motor.BaseMotor;
 import lib.hardware.motor.PortConfig;
 
+/**
+ * Wrapper class for motors that use the TalonFXS motor controller
+ */
 public class TalonFXSMotor extends BaseMotor {
     private TalonFXS motor;
     private TalonFXSConfiguration configuration;

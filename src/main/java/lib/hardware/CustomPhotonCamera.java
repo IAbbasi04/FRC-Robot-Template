@@ -14,6 +14,9 @@ import lib.field.FieldLayout;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.*;
 
+/**
+ * Wrapper class for photonlib
+ */
 public class CustomPhotonCamera {
     private PhotonCamera camera;
     private PhotonCameraSim simCamera;
@@ -54,6 +57,9 @@ public class CustomPhotonCamera {
         this.estimator = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotPoseToCameraPose);
     }
 
+    /**
+     * Periodically updates the simulated camera and vision system.
+     */
     public void updateSim(Pose3d robotPose) {
         if (isSimulation) {
             this.simCamera.enableDrawWireframe(true);
@@ -61,10 +67,16 @@ public class CustomPhotonCamera {
         }
     }
 
+    /**
+     * Returns the simulated vision system
+     */
     public VisionSystemSim getSimulation() {
         return this.simVisionSystem;
     }
 
+    /**
+     * Returns the closest april tag to the camera
+     */
     public PhotonTrackedTarget getClosestTag() {
         if (isAnyTargetVisible()) {
             List<PhotonTrackedTarget> targets = getAllTargets();
@@ -86,14 +98,23 @@ public class CustomPhotonCamera {
         }
     }
 
+    /**
+     * Returns the estimated pose of the robot if tag is visible
+     */
     public Optional<EstimatedRobotPose> getVisionEstimatedPose() {
         return this.estimator.update(results.get(results.size() - 1));
     }
 
+    /**
+     * Returns how confident the camera is in the pose estimate
+     */
     public double getPoseAmbiguityRatio() {
         return this.getBestTarget().poseAmbiguity;
     }
 
+    /**
+     * Returns the closest AprilTag ID to the camera
+     */
     public int getClosestTagID() {
         if (getClosestTag() == null) return -1;
         return getClosestTag().getFiducialId();

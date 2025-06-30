@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lib.hardware.motor.ctre.*;
-import lib.hardware.motor.rev.SparkFlexMotor;
-import lib.hardware.motor.rev.SparkMaxMotor;
+import lib.hardware.motor.rev.*;
 
-// TODO - Probably needs testing or fixing but I'm too lazy now to do it
+/**
+ * Utility class for creating and managing motors
+ * 
+ * TODO - Probably needs testing or fixing but I'm too lazy now to do it
+ */
 public class MotorFactory {
     private static List<BaseMotor> motors = new ArrayList<>();
 
@@ -16,7 +19,8 @@ public class MotorFactory {
         if (motors.get(port) == null) {
             motors.add(port, new TalonFXMotor(config));
         }
-        return motors.get(port).getAsTalonFX();
+
+        return (TalonFXMotor) motors.get(port);
     }
 
     public static SparkMaxMotor createDefaultSparkMax(PortConfig config) {
@@ -24,7 +28,8 @@ public class MotorFactory {
         if (motors.get(port) == null) {
             motors.add(port, new SparkMaxMotor(config));
         }
-        return motors.get(port).getAsSparkMax();
+
+        return (SparkMaxMotor) motors.get(port);
     }
 
     public static SparkFlexMotor createDefaultSparkFlex(PortConfig config) {
@@ -32,7 +37,8 @@ public class MotorFactory {
         if (motors.get(port) == null) {
             motors.add(port, new SparkFlexMotor(config));
         }
-        return motors.get(port).getAsSparkFlex();
+
+        return (SparkFlexMotor) motors.get(port);
     }
 
     public static TalonFXSMotor createDefaultTalonFXS(PortConfig config) {
@@ -40,7 +46,8 @@ public class MotorFactory {
         if (motors.get(port) == null) {
             motors.add(port, new TalonFXSMotor(config));
         }
-        return motors.get(port).getAsTalonFXS();
+        
+        return (TalonFXSMotor) motors.get(port);
     }
 
     public static <M extends BaseMotor> boolean isOfMotorType(int port, Class<M> cls) {

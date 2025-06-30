@@ -1,9 +1,11 @@
-package frc.robot;
+package frc.robot.config;
 
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
- * Credit to 6328 Mechanical Advantage for the original version of this class.
+ * Utility class that determines the type of robot being used based on the environment
+ * 
+ * Credit to 6328 Mechanical Advantage for the original version of this class
  */
 public class RobotSelector {
     public static RobotType getRobot() {

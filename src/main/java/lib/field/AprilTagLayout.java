@@ -6,6 +6,9 @@ import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 
+/**
+ * Class representing the layout of the april tags around a particular game's field
+ */
 public class AprilTagLayout extends AprilTagFieldLayout {
     public AprilTagLayout(List<AprilTag> apriltags, double fieldLength, double fieldWidth) {
         super(apriltags, fieldLength, fieldWidth);

@@ -1,5 +1,8 @@
 package lib.math.regression;
 
+/**
+ * Class that represents a regression model
+ */
 public abstract class Regression {
     /**
      * Returns y assuming input is x

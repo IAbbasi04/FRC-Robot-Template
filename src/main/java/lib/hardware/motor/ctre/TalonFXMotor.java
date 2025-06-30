@@ -11,6 +11,9 @@ import com.ctre.phoenix6.controls.*;
 import com.ctre.phoenix6.signals.*;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+/**
+ * Wrapper class for motors that use the TalonFX motor controller
+ */
 public class TalonFXMotor extends BaseMotor {
     protected TalonFX motor;
 
@@ -108,8 +111,6 @@ public class TalonFXMotor extends BaseMotor {
                 this.motor.getConfigurator().apply(slotConfig);
                 break;
         }
-
-        
     }
 
     @Override
@@ -155,7 +156,7 @@ public class TalonFXMotor extends BaseMotor {
 
     @Override
     public void setFollowerTo(BaseMotor master, boolean reversed) {
-        this.motor.setControl(new Follower(master.getAsTalonFX().motor.getDeviceID(), reversed));
+        this.motor.setControl(new Follower(((TalonFXMotor)master).motor.getDeviceID(), reversed));
     }
 
     @Override
@@ -196,7 +197,6 @@ public class TalonFXMotor extends BaseMotor {
         }
         this.motor.setNeutralMode(neutralMode);
     }
-
 
     @Override
     public double getVelocityRPM() {
