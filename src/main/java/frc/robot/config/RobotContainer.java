@@ -4,17 +4,12 @@
 
 package frc.robot.config;
 
-import java.util.Optional;
-
-import org.photonvision.EstimatedRobotPose;
-
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 
 import frc.robot.Robot;
+import frc.robot.SuperCommands;
 import frc.robot.config.Controls.ControlSets;
 import frc.robot.subsystems.SubsystemManager;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
@@ -32,6 +27,7 @@ public class RobotContainer {
     private final VisionSubsystem vision;
 
     private final AutoLoader autoLoader;
+
 
     public RobotContainer() {
         this.manager = new SubsystemManager();
@@ -62,26 +58,7 @@ public class RobotContainer {
             Controls.driveRotate
         ));
 
-        vision.setDefaultCommand(vision.run(
-            () -> {
-                Optional<EstimatedRobotPose> estimatedRobotPose = vision.data.pull(VisionData.ESTIMATED_ROBOT_POSE);
-                if (estimatedRobotPose.isPresent()) {
-                    Pose2d robotPose = estimatedRobotPose.get().estimatedPose.toPose2d();
-                    double ambiguity = vision.getPoseAmbiguityRatio();
-
-                    if(Math.abs(ambiguity) < VisionConstants.MAX_ACCEPTABLE_AMBIGUITY) {
-                        if (DriverStation.isDisabled()){
-                            swerve.doOnce(swerve.resetPose(robotPose));
-                        } else {
-                            swerve.doOnce(swerve.addVisionMeasurement(robotPose));
-                        }
-                    }
-                }
-            }
-        )
-        .withInterruptBehavior(InterruptionBehavior.kCancelSelf)
-        .onlyIf(() -> Robot.isReal())
-        .ignoringDisable(true));
+        vision.setDefaultCommand(SuperCommands.updateSwerveTelemetry(vision, swerve));
     }
 
     /**
