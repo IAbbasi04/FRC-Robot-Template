@@ -13,11 +13,10 @@ import frc.robot.Robot;
 import lib.MatchMode;
 import lib.subsystem.BaseSubsystem;
 
-public class VisionSubsystem extends BaseSubsystem<CameraIO, VisionData> {
+public class VisionSubsystem extends BaseSubsystem {
     private List<PhotonTrackedTarget> allVisibleTags = new ArrayList<>();
 
     public VisionSubsystem(CameraIO io){
-        super(io, VisionData.class);
     }
 
     @Override

@@ -1,35 +1,22 @@
 package lib.subsystem;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import lib.MatchMode;
 import lib.commands.SubsystemCommand;
 import lib.logging.SmartLogger;
-import lib.logging.SubsystemDataMap;
-import lib.subsystem.io.ISubsystemIO;
 
 /**
  * Template class for the robot's subsystems
  */
-public abstract class BaseSubsystem<E extends ISubsystemIO, V extends Enum<V>> extends SubsystemBase {
+public abstract class BaseSubsystem extends SubsystemBase {
     private boolean enabled = false; // TODO - Get Working
-    protected E io;
-    public SubsystemDataMap<V> data = new SubsystemDataMap<>(); // accesible
 
     protected SmartLogger logger;
-    private Class<V> dataClz;
 
-    protected BaseSubsystem(E io, Class<V> dataClz) {
-        this.io = io;
-        this.dataClz = dataClz;
+    protected BaseSubsystem() {
         this.logger = new SmartLogger(getName());
-        for (V key : dataClz.getEnumConstants()) {
-            this.data.map(key, 0d);
-        }
     }
 
     /**
@@ -124,28 +111,11 @@ public abstract class BaseSubsystem<E extends ISubsystemIO, V extends Enum<V>> e
     public void periodic() {
         periodicTelemetry();
         periodicOutputs();
-        io.updateInputs();
         if (logger != null) {
             logger.log("Actively Commanded", !getCurrentCommand().equals(Commands.none()));
             logger.log("Has Default Command", !getDefaultCommand().equals(Commands.none()));
             logger.log("Active Command", getCurrentCommand().getName());
             logger.log("Default Command", getDefaultCommand().getName());
-            for (V key : dataClz.getEnumConstants()) {
-                var value = data.pull(key);
-                if (value.getClass().equals(ChassisSpeeds.class)) {
-                    logger.log(key.name(), (ChassisSpeeds)value);
-                } else if (value.getClass().equals(Pose2d.class)) {
-                    logger.log(key.name(), (Pose2d)value);
-                } else if (value.getClass().equals(Rotation2d.class)) {
-                    logger.log(key.name(), (Rotation2d)value);
-                } else if (value.getClass().equals(Double.class)) {
-                    logger.log(key.name(), (Double)value);
-                } else if (value.getClass().equals(Boolean.class)) {
-                    logger.log(key.name(), (Boolean)value);
-                } else {
-                    logger.log(key.name(), value.toString());
-                }
-            }
         }
     }
     

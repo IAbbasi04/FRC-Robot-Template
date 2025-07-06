@@ -9,9 +9,9 @@ import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 
 import frc.robot.Robot;
-import frc.robot.SuperCommands;
 import frc.robot.config.Controls.ControlSets;
 import frc.robot.subsystems.SubsystemManager;
+import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.vision.*;
 
@@ -28,6 +28,7 @@ public class RobotContainer {
 
     private final AutoLoader autoLoader;
 
+    private final Superstructure superstructure;
 
     public RobotContainer() {
         this.manager = new SubsystemManager();
@@ -35,6 +36,8 @@ public class RobotContainer {
 
         this.swerve = manager.swerve;
         this.vision = manager.vision;
+
+        this.superstructure = new Superstructure(manager);
 
         Controls.applyControlSet(ControlSets.DUAL_DRIVER);
 
@@ -58,7 +61,7 @@ public class RobotContainer {
             Controls.driveRotate
         ));
 
-        vision.setDefaultCommand(SuperCommands.updateSwerveTelemetry(vision, swerve));
+        vision.setDefaultCommand(superstructure.updateSwerveTelemetry());
     }
 
     /**

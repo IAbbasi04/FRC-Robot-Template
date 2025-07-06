@@ -22,7 +22,7 @@ import com.pathplanner.lib.config.RobotConfig;
 
 import static frc.robot.subsystems.swerve.SwerveConstants.*;
 
-public class SwerveSubsystem extends BaseSubsystem<SwerveIO, SwerveData> {
+public class SwerveSubsystem extends BaseSubsystem {
     private ChassisSpeeds desiredSpeeds = new ChassisSpeeds();
 
     private Timer trajectoryTimer = new Timer();
@@ -39,8 +39,6 @@ public class SwerveSubsystem extends BaseSubsystem<SwerveIO, SwerveData> {
     );
 
     public SwerveSubsystem(SwerveIO io) {
-        super(io, SwerveData.class);
-
         this.pathFollowerCtrl.setTolerance(new Pose2d(
             new Translation2d(
                 PATH_FOLLOW_TRANSLATE_GAINS.toPIDController().getPositionTolerance(), 
