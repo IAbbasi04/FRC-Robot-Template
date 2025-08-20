@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 
 import frc.robot.Robot;
-import frc.robot.subsystems.vision.*;
+import frc.robot.subsystems.vision.VisionConstants;
 
 /**
  * Super class meant to represent the entire robot; Mainly used for commands used across subsystems
@@ -24,19 +24,19 @@ public class Superstructure {
     public Command updateSwerveTelemetry() {
         return manager.vision.run(
             () -> {
-                // Optional<EstimatedRobotPose> estimatedRobotPose = manager.vision.data.pull(VisionData.ESTIMATED_ROBOT_POSE);
-                // if (estimatedRobotPose.isPresent()) {
-                //     Pose2d robotPose = estimatedRobotPose.get().estimatedPose.toPose2d();
-                //     double ambiguity = manager.vision.data.pull(VisionData.POSE_AMBIGUITY_RATIO);
+                Optional<EstimatedRobotPose> estimatedRobotPose = manager.vision.getEstimatedRobotPose();
+                if (estimatedRobotPose.isPresent()) {
+                    Pose2d robotPose = estimatedRobotPose.get().estimatedPose.toPose2d();
+                    double ambiguity = manager.vision.getPoseAmbiguity();
 
-                //     if(Math.abs(ambiguity) < VisionConstants.MAX_ACCEPTABLE_AMBIGUITY) {
-                //         if (DriverStation.isDisabled()){
-                //             manager.swerve.doOnce(manager.swerve.resetPose(robotPose));
-                //         } else {
-                //             manager.swerve.doOnce(manager.swerve.addVisionMeasurement(robotPose));
-                //         }
-                //     }
-                // }
+                    if(Math.abs(ambiguity) < VisionConstants.MAX_ACCEPTABLE_AMBIGUITY) {
+                        if (DriverStation.isDisabled()){
+                            manager.swerve.doOnce(manager.swerve.resetPose(robotPose));
+                        } else {
+                            manager.swerve.doOnce(manager.swerve.addVisionMeasurement(robotPose));
+                        }
+                    }
+                }
             }
         )
         .withInterruptBehavior(InterruptionBehavior.kCancelSelf)

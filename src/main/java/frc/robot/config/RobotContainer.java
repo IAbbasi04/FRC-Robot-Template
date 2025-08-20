@@ -23,7 +23,7 @@ import lib.autonomous.AutoLoader;
  */
 public class RobotContainer {
     private final SubsystemManager manager;
-    private final SwerveSubsystem swerve;
+    private final SwerveSubsystem<?> swerve;
     private final VisionSubsystem vision;
 
     private final AutoLoader autoLoader;

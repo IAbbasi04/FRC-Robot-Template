@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.*;
 
 import frc.robot.*;
+import frc.robot.subsystems.swerve.ctre.BaseTunerConstants;
 import lib.MatchMode;
 import lib.Utils;
 import lib.subsystem.BaseSubsystem;
@@ -22,9 +23,7 @@ import com.pathplanner.lib.config.RobotConfig;
 
 import static frc.robot.subsystems.swerve.SwerveConstants.*;
 
-public class SwerveSubsystem extends BaseSubsystem {
-    private ChassisSpeeds desiredSpeeds = new ChassisSpeeds();
-
+public class SwerveSubsystem<T extends BaseTunerConstants> extends BaseSubsystem {
     private Timer trajectoryTimer = new Timer();
 
     private double translationScaling = 1d;
@@ -32,13 +31,15 @@ public class SwerveSubsystem extends BaseSubsystem {
 
     private boolean robotRelative;
 
+    private CTRESwerve<T> swerve;
+
     private HolonomicDriveController pathFollowerCtrl = new HolonomicDriveController(
         PATH_FOLLOW_TRANSLATE_GAINS.toPIDController(),
         PATH_FOLLOW_TRANSLATE_GAINS.toPIDController(),
         PATH_FOLLOW_ROTATE_GAINS.toProfiledPIDController()
     );
 
-    public SwerveSubsystem(SwerveIO io) {
+    public SwerveSubsystem() {
         this.pathFollowerCtrl.setTolerance(new Pose2d(
             new Translation2d(
                 PATH_FOLLOW_TRANSLATE_GAINS.toPIDController().getPositionTolerance(), 
@@ -46,11 +47,13 @@ public class SwerveSubsystem extends BaseSubsystem {
             new Rotation2d(PATH_FOLLOW_ROTATE_GAINS.toProfiledPIDController().getPositionTolerance())
         ));
 
+        this.swerve = new CTRESwerve<>();
+
         try {
             AutoBuilder.configure(
-                io::getCurrentOdometryPosition,
-                (pose) -> io.setKnownOdometryPose(pose),
-                io::getWheelSpeeds,
+                swerve::getPose,
+                (pose) -> swerve.setPose(pose),
+                swerve::getWheelSpeeds,
                 (speeds) -> this.drive(speeds),
                 new PPHolonomicDriveController(
                     SwerveConstants.PATH_FOLLOW_TRANSLATE_GAINS.toPIDConstants(),
@@ -81,11 +84,10 @@ public class SwerveSubsystem extends BaseSubsystem {
      *
      * @param speeds the speeds to run the drivetrain at
      */
-    private void drive(ChassisSpeeds speeds, boolean robotRelative){
-        this.desiredSpeeds = speeds;
-        io.drive(
+    private void drive(ChassisSpeeds speeds, boolean fieldRelative){
+        swerve.drive(
             speeds,
-            robotRelative
+            fieldRelative
         );
     }
 
@@ -97,8 +99,8 @@ public class SwerveSubsystem extends BaseSubsystem {
     @Override
     public void simulationPeriodic() {
         Pose2d pose = new Pose2d(
-            io.getCurrentOdometryPosition().getTranslation(),
-            io.getCurrentOdometryPosition().getRotation()
+            swerve.getPose().getTranslation(),
+            swerve.getPose().getRotation()
         );
 
         Robot.FIELD.getField().setRobotPose(pose==null?new Pose2d():pose);
@@ -106,11 +108,7 @@ public class SwerveSubsystem extends BaseSubsystem {
 
     @Override
     public void periodicTelemetry() {
-        this.data.map(SwerveData.CURRENT_POSE, io.getCurrentOdometryPosition());
-        this.data.map(SwerveData.CURRENT_WHEEL_SPEEDS, io.getWheelSpeeds());
-        this.data.map(SwerveData.CURRENT_YAW, io.getYaw());
-        this.data.map(SwerveData.DESIRED_SPEEDS, desiredSpeeds);
-        this.io.updateInputs();
+        this.swerve.updateInputs();
     }
 
     @Override
@@ -148,11 +146,11 @@ public class SwerveSubsystem extends BaseSubsystem {
      * Define whatever direction the robot is facing as forward
      */
     public Command resetHeading(){
-        return super.createSubsystemCommand("Reset Heading", runOnce(() -> io.resetHeading()));
+        return super.createSubsystemCommand("Reset Heading", runOnce(() -> swerve.resetHeading()));
     }
 
     public Command resetPose(Pose2d pose){
-        return super.createSubsystemCommand("Reset Pose" + pose.toString(), runOnce(() -> io.setKnownOdometryPose(pose)));
+        return super.createSubsystemCommand("Reset Pose" + pose.toString(), runOnce(() -> swerve.setPose(pose)));
     }
 
     public Command resetPose(Pose2d pose, BooleanSupplier flip) {
@@ -167,7 +165,7 @@ public class SwerveSubsystem extends BaseSubsystem {
                     Rotation2d.fromDegrees(180).minus(pose.getRotation())
                 );
             }
-            io.setKnownOdometryPose(resetToPose);
+            swerve.setPose(resetToPose);
         }));
     }
 
@@ -183,7 +181,7 @@ public class SwerveSubsystem extends BaseSubsystem {
                     Rotation2d.fromDegrees(180).minus(pose.getRotation())
                 );
             }
-            io.setKnownOdometryPose(resetToPose);
+            swerve.setPose(resetToPose);
         });
     }
 
@@ -237,7 +235,7 @@ public class SwerveSubsystem extends BaseSubsystem {
      */
     public Command snapToAngle(Rotation2d angle, DoubleSupplier translateX, DoubleSupplier translateY) {
         return joystickDrive(translateX, translateY, () -> {
-            double currYaw = Math.toRadians(io.getYaw().getDegrees()%360);
+            double currYaw = Math.toRadians(swerve.getYaw().getDegrees()%360);
             double errorAngle = angle.getRadians() - currYaw;
 
             if(errorAngle > Math.PI){
@@ -280,7 +278,7 @@ public class SwerveSubsystem extends BaseSubsystem {
             }
 
             ChassisSpeeds driveSpeeds = pathFollowerCtrl.calculate(
-                io.getCurrentOdometryPosition(),
+                swerve.getPose(),
                 desiredState,
                 desiredState.poseMeters.getRotation()
             ); 
@@ -296,7 +294,7 @@ public class SwerveSubsystem extends BaseSubsystem {
     }
 
     public Command addVisionMeasurement(Pose2d visionRobotPoseMeters) {
-        return runOnce(() -> io.addVisionMeasurement(visionRobotPoseMeters, Timer.getFPGATimestamp()));
+        return runOnce(() -> swerve.addVisionMeasurement(visionRobotPoseMeters, Timer.getFPGATimestamp()));
     }
 
     public Command driveToPose(Pose2d targetPose, BooleanSupplier flipPose) {
