@@ -18,7 +18,7 @@ public abstract class BaseMotor {
     protected double desiredVelocityRPM = 0d;
     protected EncoderSim simEncoder; 
     protected DCMotorSim simMotor;
-
+    
     protected BaseMotor(PortConfig config) {
         this.canBusName = config.kBus;
         this.deviceID = config.kPort;

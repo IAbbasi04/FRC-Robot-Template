@@ -62,6 +62,13 @@ public class RobotContainer {
         ));
 
         vision.setDefaultCommand(superstructure.updateSwerveTelemetry());
+
+        manager.elevator.setStopAsDefaultCommand();
+        manager.pivot.setStopAsDefaultCommand();
+        manager.wrist.setStopAsDefaultCommand();
+        manager.rollers.setStopAsDefaultCommand();
+
+        superstructure.setDefaultCommand(superstructure.applyState());
     }
 
     /**
@@ -73,8 +80,8 @@ public class RobotContainer {
 
         Controls.zeroGryoscope.onTrue(manager.swerve.resetHeading());
 
-        Controls.robotRelative.onTrue(manager.swerve.setRobotRelative(true).ignoringDisable(true))
-            .onFalse(manager.swerve.setRobotRelative(false).ignoringDisable(true));
+        // Controls.robotRelative.onTrue(manager.swerve.setRobotRelative(true).ignoringDisable(true))
+        //     .onFalse(manager.swerve.setRobotRelative(false).ignoringDisable(true));
 
         Controls.snapNorth.whileTrue(
             swerve.snapToAngle(

@@ -30,13 +30,39 @@ public final class Controls {
     protected static DoubleSupplier driveRotate = () -> -driverController.getRightX();
 
     protected static Trigger slowMode = driverController.rightBumper();
-    protected static Trigger robotRelative = driverController.leftBumper();
+    // protected static Trigger robotRelative = driverController.leftBumper();
     protected static Trigger zeroGryoscope = driverController.back();
+
+    protected static Trigger shift = operatorController.start();
 
     protected static Trigger snapNorth = driverController.pov(0);
     protected static Trigger snapSouth = driverController.pov(180);
     protected static Trigger snapWest = driverController.pov(270);
     protected static Trigger snapEast = driverController.pov(90);
+
+    protected static Trigger intake = driverController.leftTrigger();
+    protected static Trigger score = driverController.rightTrigger();
+
+    protected static Trigger stow = driverController.a();
+
+    protected static Trigger primeGroundIntake = operatorController.leftTrigger();
+    protected static Trigger primeChuteIntake = operatorController.leftBumper();
+    protected static Trigger primeShelfIntake = operatorController.rightBumper();
+
+    protected static Trigger prime = operatorController.b();
+    protected static Trigger primeStow = driverController.leftBumper();
+    protected static Trigger primeLow = operatorController.a();
+    protected static Trigger primeMid = operatorController.x();
+    protected static Trigger primeHigh = operatorController.y();
+
+    protected static Trigger setCubeMode = operatorController.pov(90).and(() -> !shift.getAsBoolean());
+    protected static Trigger setConeMode = operatorController.pov(270).and(() -> !shift.getAsBoolean());
+    protected static Trigger flashPartyMode = operatorController.pov(0).and(() -> !shift.getAsBoolean());
+
+    protected static Trigger trimWristUp = operatorController.pov(0).and(() -> shift.getAsBoolean());
+    protected static Trigger trimWristDown = operatorController.pov(180).and(() -> shift.getAsBoolean());
+
+    protected static Trigger throwPiece = operatorController.rightTrigger();
 
     /**
      * Change the variables in the Controls class to match the specified

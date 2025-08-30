@@ -3,9 +3,13 @@ package frc.robot.subsystems;
 import java.util.*;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.*;
+import frc.robot.subsystems.elevator.ElevatorSubsystem;
+import frc.robot.subsystems.pivot.PivotSubsystem;
+import frc.robot.subsystems.rollers.RollerSubsystem;
 import frc.robot.subsystems.swerve.*;
 import frc.robot.subsystems.swerve.ctre.BaseTunerConstants;
 import frc.robot.subsystems.vision.*;
+import frc.robot.subsystems.wrist.WristSubsystem;
 import lib.MatchMode;
 import lib.subsystem.BaseSubsystem;
 import lib.subsystem.SubsystemList;
@@ -16,18 +20,29 @@ import lib.subsystem.SubsystemList;
 public class SubsystemManager extends SubsystemBase {
     public SwerveSubsystem<BaseTunerConstants> swerve;
     public VisionSubsystem vision;
+    public RollerSubsystem rollers;
+    public PivotSubsystem pivot;
+    public WristSubsystem wrist;
+    public ElevatorSubsystem elevator;
 
     private SubsystemList activeSubsystems;
 
     public SubsystemManager() {
-                this.swerve = new SwerveSubsystem<>();
-
-                this.vision = new VisionSubsystem();
+        this.swerve = new SwerveSubsystem<>();
+        this.vision = new VisionSubsystem();
+        this.elevator = new ElevatorSubsystem();
+        this.wrist = new WristSubsystem();
+        this.pivot = new PivotSubsystem();
+        this.rollers = new RollerSubsystem();
 
         this.activeSubsystems = new SubsystemList(
             // Add all active subsystems here
             swerve,
-            vision
+            vision,
+            elevator,
+            wrist,
+            pivot,
+            rollers
         );
 
         this.activeSubsystems.forEach(s -> {
