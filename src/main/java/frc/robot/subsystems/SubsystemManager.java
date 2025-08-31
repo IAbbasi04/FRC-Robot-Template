@@ -20,9 +20,8 @@ public class SubsystemManager extends SubsystemBase {
     private SubsystemList activeSubsystems;
 
     public SubsystemManager() {
-                this.swerve = new SwerveSubsystem<>();
-
-                this.vision = new VisionSubsystem();
+        this.swerve = new SwerveSubsystem<>();
+        this.vision = new VisionSubsystem();
 
         this.activeSubsystems = new SubsystemList(
             // Add all active subsystems here
